@@ -1,4 +1,4 @@
-import { createSignal, createEffect, For, Show, onCleanup } from "solid-js";
+import { createSignal, For, Show, onCleanup } from "solid-js";
 import { supabase } from "../lib/supabase";
 import type { Field, Form, Answers, LogicJump } from "../lib/types";
 

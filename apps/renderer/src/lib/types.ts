@@ -25,6 +25,11 @@ export type Form = {
     primary_color: string;
     background_color: string;
     font: string;
+    display_font?: string;
+    body_font?: string;
+    button_radius?: string;
+    brand_name?: string;
+    brand_logo_url?: string;
   };
 };
 
