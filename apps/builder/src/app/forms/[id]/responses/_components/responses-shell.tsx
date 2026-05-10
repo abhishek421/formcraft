@@ -196,6 +196,10 @@ export function ResponsesShell({
           padding: "0 20px", gap: "16px", flexShrink: 0,
           background: "#0A0A0A",
         }}>
+          <Link href="/forms" style={{
+            color: "rgba(240,237,232,0.3)", textDecoration: "none", fontSize: "12px",
+          }}>← Back</Link>
+          <div style={{ width: "1px", height: "20px", background: "rgba(240,237,232,0.08)" }} />
           <span style={{ fontFamily: "'Syne', sans-serif", fontSize: "15px", fontWeight: 700, letterSpacing: "-0.3px" }}>
             {form.title}
           </span>
