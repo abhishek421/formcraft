@@ -104,19 +104,6 @@ export default async function LoginPage({
           overflow: hidden;
         }
 
-        /* Vertical ticker on the far left edge */
-        .left-ticker {
-          position: absolute;
-          left: 20px;
-          top: 50%;
-          transform: translateY(-50%) rotate(-90deg);
-          font-size: 9px;
-          letter-spacing: 4px;
-          text-transform: uppercase;
-          color: var(--text-faint);
-          white-space: nowrap;
-          font-family: var(--font-body);
-        }
 
         .logo {
           font-family: var(--font-display);
@@ -445,8 +432,6 @@ export default async function LoginPage({
       <div className="container">
         {/* Left panel */}
         <div className="left">
-          <div className="left-ticker">FormCraft · Build better forms</div>
-
           <div className="logo">
             <div className="logo-mark">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
