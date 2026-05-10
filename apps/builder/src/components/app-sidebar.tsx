@@ -8,7 +8,7 @@ import { logout } from "@/app/login/actions";
 const NAV = [
   {
     label: "Forms",
-    href: "/dashboard",
+    href: "/forms",
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <rect x="2" y="2" width="12" height="3" stroke="currentColor" strokeWidth="1.2" />
@@ -35,15 +35,15 @@ const NAV = [
 const COLLAPSED_WIDTH = 56;
 const EXPANDED_WIDTH = 220;
 
-export function AppSidebar({ email }: { email: string }) {
+export function AppSidebar({ email, defaultCollapsed = false }: { email: string; defaultCollapsed?: boolean }) {
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(defaultCollapsed);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem("sidebar-collapsed");
-    if (stored === "true") setCollapsed(true);
+    setCollapsed(defaultCollapsed);
     setMounted(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function toggle() {
@@ -140,7 +140,7 @@ export function AppSidebar({ email }: { email: string }) {
         )}
 
         {NAV.map((item) => {
-          const active = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+          const active = pathname === item.href || pathname.startsWith(item.href + "/");
 
           if (collapsed) {
             return (

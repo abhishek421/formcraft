@@ -15,7 +15,7 @@ export function FormCard({ form }: { form: Form }) {
   const timeAgo = getTimeAgo(updatedAt);
 
   return (
-    <Link href={`/builder/${form.id}`} style={{ textDecoration: "none" }}>
+    <Link href={`/forms/${form.id}/builder`} style={{ textDecoration: "none" }}>
       <div
         style={{
           background: "#111111",
