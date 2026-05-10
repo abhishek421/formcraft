@@ -406,7 +406,7 @@ export function BuilderShell({ form, initialFields }: { form: Form; initialField
               padding: "20px 16px",
               display: "flex", flexDirection: "column", gap: "24px",
             }}>
-              <FieldSettings field={selectedField} onChange={(updates) => patchField(selectedField.id, updates)} />
+              <FieldSettings field={selectedField} allFields={fields} onChange={(updates) => patchField(selectedField.id, updates)} />
             </div>
           )}
         </div>
@@ -753,7 +753,7 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
 
 // ─── Field settings (right panel) ────────────────────────────────────────────
 
-function FieldSettings({ field, onChange }: { field: Field; onChange: (u: Partial<Field>) => void }) {
+function FieldSettings({ field, allFields, onChange }: { field: Field; allFields: Field[]; onChange: (u: Partial<Field>) => void }) {
   return (
     <>
       <div>
@@ -852,7 +852,215 @@ function FieldSettings({ field, onChange }: { field: Field; onChange: (u: Partia
           </div>
         </div>
       )}
+
+      {/* Logic branching — not for welcome/statement */}
+      {field.type !== "welcome_screen" && field.type !== "statement" && (
+        <LogicEditor field={field} allFields={allFields} onChange={onChange} />
+      )}
     </>
+  );
+}
+
+// ─── Logic editor ─────────────────────────────────────────────────────────────
+
+type LogicJump = {
+  id: string;
+  operator: string;
+  value: string;
+  destination_field_id: string | null; // null = end of form
+};
+
+function LogicEditor({
+  field,
+  allFields,
+  onChange,
+}: {
+  field: Field;
+  allFields: Field[];
+  onChange: (u: Partial<Field>) => void;
+}) {
+  const rules = ((field.logic ?? []) as LogicJump[]);
+  const otherFields = allFields.filter((f) => f.id !== field.id);
+
+  // Operators available per field type
+  const operatorsFor = (type: string): { value: string; label: string }[] => {
+    if (type === "yes_no") return [
+      { value: "equals", label: "is" },
+    ];
+    if (type === "multiple_choice" || type === "dropdown") return [
+      { value: "equals", label: "is" },
+      { value: "not_equals", label: "is not" },
+    ];
+    if (type === "rating" || type === "opinion_scale" || type === "number") return [
+      { value: "equals", label: "=" },
+      { value: "not_equals", label: "≠" },
+      { value: "greater_than", label: ">" },
+      { value: "less_than", label: "<" },
+    ];
+    return [
+      { value: "is_filled", label: "is filled" },
+      { value: "is_empty", label: "is empty" },
+      { value: "equals", label: "equals" },
+      { value: "contains", label: "contains" },
+    ];
+  };
+
+  // Value options for choice-based fields
+  const valueOptions = (): string[] => {
+    if (field.type === "yes_no") return ["Yes", "No"];
+    if (field.type === "multiple_choice" || field.type === "dropdown") {
+      return ((field.config.choices as { id: string; label: string }[]) ?? []).map((c) => c.label);
+    }
+    return [];
+  };
+
+  const noValueNeeded = (op: string) => op === "is_filled" || op === "is_empty";
+
+  const addRule = () => {
+    const ops = operatorsFor(field.type);
+    const newRule: LogicJump = {
+      id: crypto.randomUUID(),
+      operator: ops[0]?.value ?? "is_filled",
+      value: valueOptions()[0] ?? "",
+      destination_field_id: otherFields[0]?.id ?? null,
+    };
+    onChange({ logic: [...rules, newRule] });
+  };
+
+  const updateRule = (id: string, patch: Partial<LogicJump>) => {
+    onChange({ logic: rules.map((r) => (r.id === id ? { ...r, ...patch } : r)) });
+  };
+
+  const deleteRule = (id: string) => {
+    onChange({ logic: rules.filter((r) => r.id !== id) });
+  };
+
+  const operators = operatorsFor(field.type);
+  const choices = valueOptions();
+  const isChoiceBased = choices.length > 0;
+
+  const labelStyle: React.CSSProperties = {
+    fontSize: "10px", letterSpacing: "2px", textTransform: "uppercase",
+    color: "rgba(240,237,232,0.25)", marginBottom: "10px",
+    fontFamily: "'DM Mono', monospace",
+  };
+
+  const selectStyle: React.CSSProperties = {
+    background: "#111111", border: "1px solid rgba(240,237,232,0.08)",
+    color: "#F0EDE8", fontFamily: "'DM Mono', monospace",
+    fontSize: "11px", padding: "6px 8px", width: "100%",
+    cursor: "pointer",
+  };
+
+  return (
+    <div style={{ borderTop: "1px solid rgba(240,237,232,0.06)", paddingTop: "20px" }}>
+      <div style={labelStyle}>Logic</div>
+
+      {rules.length === 0 && (
+        <div style={{
+          fontSize: "11px", color: "rgba(240,237,232,0.2)",
+          marginBottom: "12px", lineHeight: 1.6,
+        }}>
+          No rules yet. Add a rule to control where users go based on their answer.
+        </div>
+      )}
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "10px" }}>
+        {rules.map((rule) => (
+          <div key={rule.id} style={{
+            background: "#111111", border: "1px solid rgba(240,237,232,0.06)",
+            padding: "10px", display: "flex", flexDirection: "column", gap: "6px",
+          }}>
+            {/* IF row */}
+            <div style={{ fontSize: "10px", color: "rgba(240,237,232,0.25)", letterSpacing: "1px" }}>IF answer</div>
+
+            {/* Operator */}
+            <select
+              value={rule.operator}
+              onChange={(e) => updateRule(rule.id, { operator: e.target.value })}
+              style={selectStyle}
+            >
+              {operators.map((op) => (
+                <option key={op.value} value={op.value}>{op.label}</option>
+              ))}
+            </select>
+
+            {/* Value */}
+            {!noValueNeeded(rule.operator) && (
+              isChoiceBased ? (
+                <select
+                  value={rule.value}
+                  onChange={(e) => updateRule(rule.id, { value: e.target.value })}
+                  style={selectStyle}
+                >
+                  {choices.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  value={rule.value}
+                  onChange={(e) => updateRule(rule.id, { value: e.target.value })}
+                  placeholder="value"
+                  style={{ ...selectStyle, padding: "6px 8px" }}
+                />
+              )
+            )}
+
+            {/* THEN row */}
+            <div style={{ fontSize: "10px", color: "rgba(240,237,232,0.25)", letterSpacing: "1px", marginTop: "2px" }}>THEN jump to</div>
+            <select
+              value={rule.destination_field_id ?? "__end__"}
+              onChange={(e) => updateRule(rule.id, {
+                destination_field_id: e.target.value === "__end__" ? null : e.target.value,
+              })}
+              style={selectStyle}
+            >
+              <option value="__end__">End of form</option>
+              {otherFields.map((f, i) => (
+                <option key={f.id} value={f.id}>
+                  Q{i + 1 + (allFields.findIndex(af => af.id === f.id) > allFields.findIndex(af => af.id === field.id) ? 0 : -1)}: {f.title || "Untitled"}
+                </option>
+              ))}
+            </select>
+
+            {/* Delete */}
+            <button
+              onClick={() => deleteRule(rule.id)}
+              style={{
+                background: "transparent", border: "none",
+                color: "rgba(240,237,232,0.2)", cursor: "pointer",
+                fontSize: "11px", textAlign: "left", padding: "0",
+                marginTop: "2px",
+              }}
+            >
+              × Remove rule
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <button
+        onClick={addRule}
+        style={{
+          background: "transparent", border: "1px dashed rgba(240,237,232,0.1)",
+          color: "rgba(240,237,232,0.3)", fontFamily: "'DM Mono', monospace",
+          fontSize: "11px", padding: "8px", cursor: "pointer", width: "100%",
+          transition: "all 0.12s",
+        }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(202,255,0,0.3)";
+          (e.currentTarget as HTMLButtonElement).style.color = "#CAFF00";
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(240,237,232,0.1)";
+          (e.currentTarget as HTMLButtonElement).style.color = "rgba(240,237,232,0.3)";
+        }}
+      >
+        + Add rule
+      </button>
+    </div>
   );
 }
 

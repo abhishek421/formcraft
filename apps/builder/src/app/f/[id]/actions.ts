@@ -13,7 +13,7 @@ export async function getPublicForm(id: string) {
 
   const { data: fields } = await supabase
     .from("fields")
-    .select("id, type, title, description, required, position, variable, config")
+    .select("id, type, title, description, required, position, variable, config, logic")
     .eq("form_id", id)
     .order("position", { ascending: true });
 

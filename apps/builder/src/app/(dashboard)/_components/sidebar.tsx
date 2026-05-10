@@ -17,18 +17,6 @@ const NAV = [
     ),
   },
   {
-    label: "Templates",
-    href: "/templates",
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <rect x="2" y="2" width="5.5" height="5.5" stroke="currentColor" strokeWidth="1.2" />
-        <rect x="8.5" y="2" width="5.5" height="5.5" stroke="currentColor" strokeWidth="1.2" />
-        <rect x="2" y="8.5" width="5.5" height="5.5" stroke="currentColor" strokeWidth="1.2" />
-        <rect x="8.5" y="8.5" width="5.5" height="5.5" stroke="currentColor" strokeWidth="1.2" />
-      </svg>
-    ),
-  },
-  {
     label: "Integrations",
     href: "/integrations",
     icon: (
@@ -38,16 +26,6 @@ const NAV = [
         <circle cx="12" cy="12" r="2" stroke="currentColor" strokeWidth="1.2" />
         <line x1="6" y1="7" x2="10" y2="4.8" stroke="currentColor" strokeWidth="1.2" />
         <line x1="6" y1="9" x2="10" y2="11.2" stroke="currentColor" strokeWidth="1.2" />
-      </svg>
-    ),
-  },
-  {
-    label: "Settings",
-    href: "/settings",
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <circle cx="8" cy="8" r="2" stroke="currentColor" strokeWidth="1.2" />
-        <path d="M8 1.5v1.8M8 12.7v1.8M1.5 8h1.8M12.7 8h1.8M3.4 3.4l1.27 1.27M11.33 11.33l1.27 1.27M3.4 12.6l1.27-1.27M11.33 4.67l1.27-1.27" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
       </svg>
     ),
   },

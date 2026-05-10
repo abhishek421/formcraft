@@ -12,6 +12,7 @@ type Field = {
   position: number;
   variable?: string;
   config: Record<string, unknown>;
+  logic?: unknown[];
 };
 
 type Form = {
@@ -23,6 +24,38 @@ type Form = {
 
 type Phase = "welcome" | "form" | "done";
 type Answers = Record<string, unknown>;
+
+// ── Logic evaluation ──────────────────────────────────────────────────────────
+
+type LogicJump = {
+  id: string;
+  operator: string;
+  value: string;
+  destination_field_id: string | null;
+};
+
+function evaluateLogic(field: Field, answers: Answers): string | null | undefined {
+  const rules = (field.logic ?? []) as LogicJump[];
+  if (!rules.length) return undefined; // no logic = undefined means go to next
+
+  const answer = answers[field.id];
+  const answerStr = Array.isArray(answer) ? answer.join(", ") : String(answer ?? "");
+
+  for (const rule of rules) {
+    let match = false;
+    switch (rule.operator) {
+      case "equals":       match = answerStr === rule.value; break;
+      case "not_equals":   match = answerStr !== rule.value; break;
+      case "contains":     match = answerStr.toLowerCase().includes(rule.value.toLowerCase()); break;
+      case "greater_than": match = Number(answer) > Number(rule.value); break;
+      case "less_than":    match = Number(answer) < Number(rule.value); break;
+      case "is_filled":    match = answer !== undefined && answer !== null && answer !== ""; break;
+      case "is_empty":     match = !answer; break;
+    }
+    if (match) return rule.destination_field_id; // null = end of form
+  }
+  return undefined; // no rule matched = go to next
+}
 
 // ── Variable interpolation ────────────────────────────────────────────────────
 
@@ -112,6 +145,25 @@ export function FormRenderer({ form, fields }: { form: Form; fields: Field[] }) 
 
     setError(null);
 
+    // Evaluate logic rules
+    const destination = evaluateLogic(field, answers);
+
+    if (destination === null) {
+      // Rule says end of form
+      handleSubmit();
+      return;
+    }
+
+    if (destination !== undefined) {
+      // Rule says jump to specific field
+      const destIdx = allFields.findIndex((f) => f.id === destination);
+      if (destIdx !== -1) {
+        transition("up", () => setCurrentIdx(destIdx));
+        return;
+      }
+    }
+
+    // Default: go to next
     if (currentIdx < allFields.length - 1) {
       transition("up", () => setCurrentIdx((i) => i + 1));
     } else {
