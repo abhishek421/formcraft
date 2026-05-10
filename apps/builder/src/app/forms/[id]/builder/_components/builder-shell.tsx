@@ -209,7 +209,7 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
         .field-row:hover .field-delete { opacity: 1 !important; }
       `}</style>
 
-      <div style={{ display: "flex", height: "100vh", background: "var(--bg)", color: "var(--text)", fontFamily: "'DM Mono', monospace" }}>
+      <div style={{ display: "flex", height: "100vh", background: "var(--bg)", color: "var(--text)", fontFamily: "var(--font-body)" }}>
         <AppSidebar email={email} defaultCollapsed={true} />
 
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
@@ -223,8 +223,8 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
         }}>
           <Link href="/forms" style={{
             color: "var(--text-dim)", textDecoration: "none",
-            fontSize: "12px", fontFamily: "'DM Mono', monospace",
-            transition: "color 0.12s",
+            fontSize: "12px", fontFamily: "var(--font-body)",
+            transition: "color var(--duration) var(--ease)",
           }}>← Back</Link>
 
           <div style={{ width: "1px", height: "20px", background: "var(--text-faint)" }} />
@@ -237,7 +237,7 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
             }}
             style={{
               background: "transparent", border: "none",
-              fontFamily: "'Syne', sans-serif", fontSize: "15px",
+              fontFamily: "var(--font-display)", fontSize: "15px",
               fontWeight: 700, color: "var(--text)", letterSpacing: "-0.3px",
               width: "200px",
             }}
@@ -250,7 +250,7 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
             display: "flex",
             background: "var(--border)",
             border: "1px solid var(--text-faint)",
-            borderRadius: "999px",
+            borderRadius: "var(--radius-full)",
             padding: "3px",
             gap: "2px",
           }}>
@@ -261,11 +261,11 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
               <Link key={tab.label} href={tab.href} style={{
                 padding: "5px 18px", textDecoration: "none",
                 fontSize: "12px", letterSpacing: "0.3px",
-                borderRadius: "999px",
+                borderRadius: "var(--radius-full)",
                 background: tab.active ? "var(--border-mid)" : "transparent",
                 color: tab.active ? "var(--text)" : "var(--text-dim)",
-                fontFamily: "'DM Mono', monospace",
-                transition: "all 0.15s",
+                fontFamily: "var(--font-body)",
+                transition: "all var(--duration) var(--ease)",
               }}>
                 {tab.label}
               </Link>
@@ -275,7 +275,7 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginLeft: "auto" }}>
             <div style={{
               fontSize: "11px", color: "var(--text-dim)",
-              fontFamily: "'DM Mono', monospace",
+              fontFamily: "var(--font-body)",
             }}>
               {fields.length} question{fields.length !== 1 ? "s" : ""}
             </div>
@@ -286,11 +286,12 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
                 padding: "7px 16px",
                 background: copied ? "var(--accent-dim)" : "transparent",
                 border: `1px solid ${copied ? "var(--accent-border)" : "var(--border-strong)"}`,
+                borderRadius: "var(--radius-sm)",
                 color: copied ? "var(--accent)" : "var(--text-muted)",
-                fontFamily: "'DM Mono', monospace",
+                fontFamily: "var(--font-body)",
                 fontSize: "11px", cursor: "pointer",
                 letterSpacing: "1px", textTransform: "uppercase",
-                transition: "all 0.2s",
+                transition: "all var(--duration) var(--ease)",
               }}
             >
               {copied ? "Copied ✓" : "Copy Link"}
@@ -304,12 +305,13 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
                 padding: "7px 16px",
                 background: "transparent",
                 border: "1px solid var(--border-strong)",
+                borderRadius: "var(--radius-sm)",
                 color: "var(--text-muted)",
-                fontFamily: "'DM Mono', monospace",
+                fontFamily: "var(--font-body)",
                 fontSize: "11px", cursor: "pointer",
                 letterSpacing: "1px", textTransform: "uppercase",
                 textDecoration: "none",
-                transition: "all 0.15s",
+                transition: "all var(--duration) var(--ease)",
               }}
             >
               Preview ↗
@@ -319,13 +321,14 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
               onClick={handlePublish}
               style={{
                 padding: "7px 16px",
-                background: published ? "var(--accent-border)" : "transparent",
-                border: `1px solid ${published ? "var(--accent-border)" : "var(--border-strong)"}`,
-                color: published ? "var(--accent)" : "var(--text-muted)",
-                fontFamily: "'DM Mono', monospace",
+                background: published ? "var(--accent-dim)" : "var(--accent)",
+                border: `1px solid ${published ? "var(--accent-border)" : "var(--accent)"}`,
+                borderRadius: "var(--radius-sm)",
+                color: published ? "var(--accent)" : "var(--accent-text)",
+                fontFamily: "var(--font-body)",
                 fontSize: "11px", cursor: "pointer",
                 letterSpacing: "1px", textTransform: "uppercase",
-                transition: "all 0.15s",
+                transition: "all var(--duration) var(--ease)",
               }}
             >
               {published ? "● Live" : "Publish"}
@@ -354,10 +357,12 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
               <button
                 onClick={() => setShowWidgetPicker(true)}
                 style={{
-                  background: "var(--accent)", border: "none", color: "var(--bg)",
+                  background: "var(--accent)", border: "none", color: "var(--accent-text)",
                   width: "22px", height: "22px", cursor: "pointer",
+                  borderRadius: "var(--radius-xs)",
                   fontSize: "16px", lineHeight: 1, fontWeight: 700,
                   display: "flex", alignItems: "center", justifyContent: "center",
+                  transition: "opacity var(--duration) var(--ease)",
                 }}
               >
                 +
@@ -394,13 +399,14 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
             <button
               onClick={() => setShowWidgetPicker(true)}
               style={{
-                margin: "12px", padding: "10px",
+                margin: "var(--space-3)", padding: "var(--space-2) var(--space-3)",
                 background: "transparent",
                 border: "1px dashed var(--border-mid)",
+                borderRadius: "var(--radius-sm)",
                 color: "var(--text-dim)",
-                fontFamily: "'DM Mono', monospace",
+                fontFamily: "var(--font-body)",
                 fontSize: "12px", cursor: "pointer",
-                transition: "all 0.15s",
+                transition: "all var(--duration) var(--ease)",
               }}
               onMouseEnter={(e) => {
                 (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent-border)";
@@ -485,7 +491,7 @@ function SortableFieldRow({
         background: isSelected ? "var(--accent-dim)" : "transparent",
         border: `1px solid ${isSelected ? "var(--accent-border)" : "transparent"}`,
         cursor: "pointer",
-        borderRadius: "2px",
+        borderRadius: "var(--radius-xs)",
         position: "relative",
       }}
       onClick={onSelect}
@@ -511,7 +517,7 @@ function SortableFieldRow({
         display: "flex", alignItems: "center", justifyContent: "center",
         fontSize: "9px", fontWeight: 700,
         color: isSelected ? "var(--bg)" : "var(--text-muted)",
-        fontFamily: "'Syne', sans-serif",
+        fontFamily: "var(--font-display)",
       }}>
         {index + 1}
       </div>
@@ -541,7 +547,7 @@ function SortableFieldRow({
           opacity: 0, background: "transparent", border: "none",
           color: "var(--text-dim)", cursor: "pointer",
           fontSize: "14px", padding: "0 2px", lineHeight: 1,
-          transition: "opacity 0.12s",
+          transition: "opacity var(--duration) var(--ease)",
           flexShrink: 0,
         }}
       >
@@ -561,17 +567,19 @@ function FieldEditor({ field, onChange }: { field: Field; onChange: (u: Partial<
         <div style={{
           padding: "4px 10px", background: "var(--accent-dim)",
           border: "1px solid var(--accent-border)",
+          borderRadius: "var(--radius-sm)",
           fontSize: "10px", letterSpacing: "2px", textTransform: "uppercase",
-          color: "var(--accent)", fontFamily: "'DM Mono', monospace",
+          color: "var(--accent)", fontFamily: "var(--font-body)",
         }}>
           {getTypeIcon(field.type)} {getTypeLabel(field.type)}
         </div>
         {field.required && (
           <div style={{
-            padding: "4px 10px", background: "rgba(255,100,100,0.06)",
-            border: "1px solid rgba(255,100,100,0.15)",
+            padding: "4px 10px", background: "var(--error-bg)",
+            border: "1px solid var(--error)",
+            borderRadius: "var(--radius-sm)",
             fontSize: "10px", letterSpacing: "2px", textTransform: "uppercase",
-            color: "rgba(255,100,100,0.7)", fontFamily: "'DM Mono', monospace",
+            color: "var(--error)", fontFamily: "var(--font-body)",
           }}>
             Required
           </div>
@@ -586,7 +594,7 @@ function FieldEditor({ field, onChange }: { field: Field; onChange: (u: Partial<
         rows={2}
         style={{
           background: "transparent", border: "none",
-          fontFamily: "'Syne', sans-serif", fontSize: "28px",
+          fontFamily: "var(--font-display)", fontSize: "28px",
           fontWeight: 700, color: "var(--text)", letterSpacing: "-0.5px",
           lineHeight: 1.3, width: "100%",
         }}
@@ -600,7 +608,7 @@ function FieldEditor({ field, onChange }: { field: Field; onChange: (u: Partial<
         rows={2}
         style={{
           background: "transparent", border: "none",
-          fontFamily: "'DM Mono', monospace", fontSize: "14px",
+          fontFamily: "var(--font-body)", fontSize: "14px",
           fontWeight: 300, color: "var(--text-muted)", width: "100%",
           lineHeight: 1.6,
         }}
@@ -619,9 +627,10 @@ function FieldEditor({ field, onChange }: { field: Field; onChange: (u: Partial<
 function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Partial<Field>) => void }) {
   const inputStyle = {
     background: "var(--surface-3)", border: "1px solid var(--text-faint)",
-    color: "var(--text-dim)", fontFamily: "'DM Mono', monospace",
+    borderRadius: "var(--radius-sm)",
+    color: "var(--text-dim)", fontFamily: "var(--font-body)",
     fontSize: "14px", fontWeight: 300,
-    padding: "14px 16px", width: "100%",
+    padding: "var(--space-3) var(--space-4)", width: "100%",
     pointerEvents: "none" as const,
   };
 
@@ -654,8 +663,9 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
       <div style={{ display: "flex", gap: "12px" }}>
         {["Yes", "No"].map((opt) => (
           <div key={opt} style={{
-            padding: "12px 32px", border: "1px solid var(--border-mid)",
-            fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "14px",
+            padding: "var(--space-3) var(--space-8)", border: "1px solid var(--border-mid)",
+            borderRadius: "var(--radius-sm)",
+            fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "14px",
             color: "var(--text-muted)",
           }}>
             {opt}
@@ -673,6 +683,7 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
           <div key={i} style={{
             width: "40px", height: "40px",
             border: "1px solid var(--border-mid)",
+            borderRadius: "var(--radius-sm)",
             display: "flex", alignItems: "center", justifyContent: "center",
             color: "var(--text-dim)", fontSize: "18px",
           }}>★</div>
@@ -689,9 +700,10 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
           <div key={i} style={{
             width: "36px", height: "36px",
             border: "1px solid var(--border-mid)",
+            borderRadius: "var(--radius-xs)",
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: "12px", color: "var(--text-dim)",
-            fontFamily: "'DM Mono', monospace",
+            fontFamily: "var(--font-body)",
           }}>
             {i + 1}
           </div>
@@ -722,7 +734,7 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
               style={{
                 background: "transparent", border: "none",
                 borderBottom: "1px solid var(--text-faint)",
-                color: "var(--text)", fontFamily: "'DM Mono', monospace",
+                color: "var(--text)", fontFamily: "var(--font-body)",
                 fontSize: "14px", fontWeight: 300, padding: "6px 0",
                 flex: 1,
               }}
@@ -745,7 +757,7 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
           }}
           style={{
             background: "transparent", border: "1px dashed var(--border-mid)",
-            color: "var(--text-dim)", fontFamily: "'DM Mono', monospace",
+            color: "var(--text-dim)", fontFamily: "var(--font-body)",
             fontSize: "12px", padding: "8px", cursor: "pointer",
             textAlign: "left", marginTop: "4px",
           }}
@@ -759,10 +771,11 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
   if (field.type === "statement" || field.type === "welcome_screen") {
     return (
       <div style={{
-        padding: "20px", background: "var(--accent-dim)",
-        border: "1px solid var(--accent-dim)",
+        padding: "var(--space-5)", background: "var(--accent-dim)",
+        border: "1px solid var(--accent-border)",
+        borderRadius: "var(--radius-md)",
         fontSize: "13px", color: "var(--text-dim)",
-        fontFamily: "'DM Mono', monospace", lineHeight: 1.6,
+        fontFamily: "var(--font-body)", lineHeight: 1.6,
       }}>
         {field.type === "welcome_screen"
           ? "This is the opening screen. Users will see a 'Start' button."
@@ -774,9 +787,10 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
   if (field.type === "file_upload") {
     return (
       <div style={{
-        border: "2px dashed var(--border-mid)", padding: "40px",
+        border: "2px dashed var(--border-mid)", padding: "var(--space-10)",
+        borderRadius: "var(--radius-md)",
         textAlign: "center", color: "var(--text-faint)",
-        fontFamily: "'DM Mono', monospace", fontSize: "13px",
+        fontFamily: "var(--font-body)", fontSize: "13px",
       }}>
         ↑ Drop file here or click to upload
       </div>
@@ -804,8 +818,8 @@ function FieldSettings({ field, allFields, onChange }: { field: Field; allFields
             style={{
               width: "36px", height: "20px",
               background: field.required ? "var(--accent)" : "var(--text-faint)",
-              border: "none", borderRadius: "10px", cursor: "pointer",
-              position: "relative", transition: "background 0.15s",
+              border: "none", borderRadius: "var(--radius-full)", cursor: "pointer",
+              position: "relative", transition: "background var(--duration) var(--ease)",
             }}
           >
             <div style={{
@@ -813,7 +827,7 @@ function FieldSettings({ field, allFields, onChange }: { field: Field; allFields
               left: field.required ? "19px" : "3px",
               width: "14px", height: "14px", borderRadius: "50%",
               background: field.required ? "var(--bg)" : "var(--text-dim)",
-              transition: "left 0.15s",
+              transition: "left var(--duration) var(--ease)",
             }} />
           </button>
         </div>
@@ -831,8 +845,9 @@ function FieldSettings({ field, allFields, onChange }: { field: Field; allFields
             style={{
               width: "100%", background: "var(--surface-3)",
               border: "1px solid var(--text-faint)",
-              color: "var(--text)", fontFamily: "'DM Mono', monospace",
-              fontSize: "12px", fontWeight: 300, padding: "8px 10px",
+              borderRadius: "var(--radius-xs)",
+              color: "var(--text)", fontFamily: "var(--font-body)",
+              fontSize: "12px", fontWeight: 300, padding: "var(--space-2) var(--space-2)",
             }}
           />
           <div style={{ fontSize: "10px", color: "var(--text-faint)", marginTop: "6px", lineHeight: 1.5 }}>
@@ -856,8 +871,9 @@ function FieldSettings({ field, allFields, onChange }: { field: Field; allFields
             style={{
               width: "100%", background: "var(--surface-3)",
               border: "1px solid var(--text-faint)",
-              color: "var(--text)", fontFamily: "'DM Mono', monospace",
-              fontSize: "12px", padding: "8px 10px",
+              borderRadius: "var(--radius-xs)",
+              color: "var(--text)", fontFamily: "var(--font-body)",
+              fontSize: "12px", padding: "var(--space-2) var(--space-2)",
             }}
           />
         </div>
@@ -872,8 +888,8 @@ function FieldSettings({ field, allFields, onChange }: { field: Field; allFields
               style={{
                 width: "36px", height: "20px",
                 background: field.config.allow_multiple ? "var(--accent)" : "var(--text-faint)",
-                border: "none", borderRadius: "10px", cursor: "pointer",
-                position: "relative", transition: "background 0.15s",
+                border: "none", borderRadius: "var(--radius-full)", cursor: "pointer",
+                position: "relative", transition: "background var(--duration) var(--ease)",
               }}
             >
               <div style={{
@@ -881,7 +897,7 @@ function FieldSettings({ field, allFields, onChange }: { field: Field; allFields
                 left: field.config.allow_multiple ? "19px" : "3px",
                 width: "14px", height: "14px", borderRadius: "50%",
                 background: field.config.allow_multiple ? "var(--bg)" : "var(--text-dim)",
-                transition: "left 0.15s",
+                transition: "left var(--duration) var(--ease)",
               }} />
             </button>
           </div>
@@ -997,12 +1013,13 @@ function LogicEditor({
   const labelStyle: React.CSSProperties = {
     fontSize: "10px", letterSpacing: "2px", textTransform: "uppercase",
     color: "var(--text-dim)", marginBottom: "10px",
-    fontFamily: "'DM Mono', monospace",
+    fontFamily: "var(--font-body)",
   };
 
   const selectStyle: React.CSSProperties = {
     background: "var(--surface-3)", border: "1px solid var(--text-faint)",
-    color: "var(--text)", fontFamily: "'DM Mono', monospace",
+    borderRadius: "var(--radius-xs)",
+    color: "var(--text)", fontFamily: "var(--font-body)",
     fontSize: "11px", padding: "6px 8px", width: "100%",
     cursor: "pointer",
   };
@@ -1100,9 +1117,9 @@ function LogicEditor({
         onClick={addRule}
         style={{
           background: "transparent", border: "1px dashed var(--border-mid)",
-          color: "var(--text-dim)", fontFamily: "'DM Mono', monospace",
+          color: "var(--text-dim)", fontFamily: "var(--font-body)",
           fontSize: "11px", padding: "8px", cursor: "pointer", width: "100%",
-          transition: "all 0.12s",
+          transition: "all var(--duration) var(--ease)",
         }}
         onMouseEnter={(e) => {
           (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent-border)";
@@ -1135,14 +1152,15 @@ function WidgetPicker({ onSelect, onClose }: { onSelect: (type: string) => void;
       <div
         style={{
           background: "var(--surface-3)", border: "1px solid var(--border-mid)",
-          padding: "24px", width: "480px", maxHeight: "70vh", overflowY: "auto",
+          borderRadius: "var(--radius-md)",
+          padding: "var(--space-6)", width: "480px", maxHeight: "70vh", overflowY: "auto",
         }}
         onClick={(e) => e.stopPropagation()}
       >
         <div style={{
-          display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px",
+          display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--space-5)",
         }}>
-          <div style={{ fontFamily: "'Syne', sans-serif", fontSize: "16px", fontWeight: 700, letterSpacing: "-0.3px" }}>
+          <div style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 700, letterSpacing: "-0.3px" }}>
             Add Question
           </div>
           <button onClick={onClose} style={{ background: "transparent", border: "none", color: "var(--text-dim)", cursor: "pointer", fontSize: "20px" }}>×</button>
@@ -1153,7 +1171,7 @@ function WidgetPicker({ onSelect, onClose }: { onSelect: (type: string) => void;
             <div style={{
               fontSize: "10px", letterSpacing: "2px", textTransform: "uppercase",
               color: "var(--text-dim)", marginBottom: "10px",
-              fontFamily: "'DM Mono', monospace",
+              fontFamily: "var(--font-body)",
             }}>
               {group.label}
             </div>
@@ -1164,11 +1182,12 @@ function WidgetPicker({ onSelect, onClose }: { onSelect: (type: string) => void;
                   onClick={() => onSelect(t.type)}
                   style={{
                     background: "var(--surface)", border: "1px solid var(--border)",
+                    borderRadius: "var(--radius-sm)",
                     color: "var(--text)", cursor: "pointer",
-                    padding: "12px 10px", textAlign: "left",
+                    padding: "var(--space-3) var(--space-2)", textAlign: "left",
                     display: "flex", flexDirection: "column", gap: "6px",
-                    transition: "all 0.12s",
-                    fontFamily: "'DM Mono', monospace",
+                    transition: "all var(--duration) var(--ease)",
+                    fontFamily: "var(--font-body)",
                   }}
                   onMouseEnter={(e) => {
                     (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent-border)";

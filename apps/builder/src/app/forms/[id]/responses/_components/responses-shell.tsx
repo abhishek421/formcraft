@@ -139,7 +139,7 @@ export function ResponsesShell({
               background: "transparent", border: "none", cursor: "pointer",
               color: active ? "var(--accent)" : "var(--text-dim)",
               fontSize: "10px", letterSpacing: "1.5px", textTransform: "uppercase",
-              fontFamily: "'DM Mono', monospace", fontWeight: 500,
+              fontFamily: "var(--font-body)", fontWeight: 500,
               padding: "2px 0", display: "flex", alignItems: "center", gap: "4px",
             }}
           >
@@ -152,9 +152,10 @@ export function ResponsesShell({
               ref={menuRef}
               style={{
                 position: "absolute", top: "100%", left: 0, marginTop: "4px",
-                background: "#1A1A1A", border: "1px solid var(--border-mid)",
+                background: "var(--surface-3)", border: "1px solid var(--border-mid)",
+                borderRadius: "var(--radius-sm)",
                 zIndex: 50, minWidth: "140px",
-                boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
               }}
             >
               <MenuItem onClick={() => applySort(col)}>
@@ -183,7 +184,7 @@ export function ResponsesShell({
       <div style={{
         display: "flex", height: "100vh",
         background: "var(--bg)", color: "var(--text)",
-        fontFamily: "'DM Mono', monospace", overflow: "hidden",
+        fontFamily: "var(--font-body)", overflow: "hidden",
       }}>
         <AppSidebar email={email} defaultCollapsed={true} />
 
@@ -200,7 +201,7 @@ export function ResponsesShell({
             color: "var(--text-dim)", textDecoration: "none", fontSize: "12px",
           }}>← Back</Link>
           <div style={{ width: "1px", height: "20px", background: "var(--text-faint)" }} />
-          <span style={{ fontFamily: "'Syne', sans-serif", fontSize: "15px", fontWeight: 700, letterSpacing: "-0.3px" }}>
+          <span style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 700, letterSpacing: "-0.3px" }}>
             {form.title}
           </span>
 
@@ -210,7 +211,7 @@ export function ResponsesShell({
             display: "flex",
             background: "var(--border)",
             border: "1px solid var(--text-faint)",
-            borderRadius: "999px",
+            borderRadius: "var(--radius-full)",
             padding: "3px",
             gap: "2px",
           }}>
@@ -221,11 +222,11 @@ export function ResponsesShell({
               <Link key={tab.label} href={tab.href} style={{
                 padding: "5px 18px", textDecoration: "none",
                 fontSize: "12px", letterSpacing: "0.3px",
-                borderRadius: "999px",
+                borderRadius: "var(--radius-full)",
                 background: tab.active ? "var(--border-mid)" : "transparent",
                 color: tab.active ? "var(--text)" : "var(--text-dim)",
-                fontFamily: "'DM Mono', monospace",
-                transition: "all 0.15s",
+                fontFamily: "var(--font-body)",
+                transition: "all var(--duration) var(--ease)",
               }}>
                 {tab.label}
               </Link>
@@ -238,9 +239,11 @@ export function ResponsesShell({
                 onClick={() => setHiddenCols(new Set())}
                 style={{
                   background: "transparent", border: "1px solid var(--border-mid)",
+                  borderRadius: "var(--radius-sm)",
                   color: "var(--text-muted)", fontSize: "11px", letterSpacing: "1px",
                   textTransform: "uppercase", cursor: "pointer", padding: "7px 14px",
-                  fontFamily: "'DM Mono', monospace",
+                  fontFamily: "var(--font-body)",
+                  transition: "all var(--duration) var(--ease)",
                 }}
               >
                 Show all ({hiddenCols.size})
@@ -248,8 +251,11 @@ export function ResponsesShell({
             )}
             <a href={`${rendererBase}/f/${form.id}`} target="_blank" rel="noopener noreferrer" style={{
               padding: "7px 16px", border: "1px solid var(--border-strong)",
+              borderRadius: "var(--radius-sm)",
               color: "var(--text-muted)", fontSize: "11px", letterSpacing: "1px",
               textTransform: "uppercase", textDecoration: "none",
+              fontFamily: "var(--font-body)",
+              transition: "all var(--duration) var(--ease)",
             }}>
               Preview ↗
             </a>
@@ -263,8 +269,8 @@ export function ResponsesShell({
             { label: "Questions", value: questionFields.length },
             { label: "Avg. Completion", value: avgCompletion },
           ].map((stat, i) => (
-            <div key={stat.label} style={{ padding: "16px 32px", borderRight: i < 2 ? "1px solid var(--border)" : "none" }}>
-              <div style={{ fontFamily: "'Syne', sans-serif", fontSize: "24px", fontWeight: 800, letterSpacing: "-0.5px" }}>
+            <div key={stat.label} style={{ padding: "var(--space-4) var(--space-8)", borderRight: i < 2 ? "1px solid var(--border)" : "none" }}>
+              <div style={{ fontFamily: "var(--font-display)", fontSize: "24px", fontWeight: 800, letterSpacing: "-0.5px" }}>
                 {stat.value}
               </div>
               <div style={{ fontSize: "10px", letterSpacing: "1.5px", textTransform: "uppercase", color: "var(--text-dim)", marginTop: "3px" }}>
@@ -356,13 +362,13 @@ export function ResponsesShell({
               <div style={{ width: "min(520px, 45vw)", height: "100%", display: "flex", flexDirection: "column", overflowY: "auto" }}>
                 {/* Panel header */}
                 <div style={{
-                  padding: "20px 24px",
+                  padding: "var(--space-5) var(--space-6)",
                   borderBottom: "1px solid var(--border)",
                   display: "flex", justifyContent: "space-between", alignItems: "center",
                   flexShrink: 0,
                 }}>
                   <div>
-                    <div style={{ fontFamily: "'Syne', sans-serif", fontSize: "16px", fontWeight: 700, letterSpacing: "-0.3px" }}>
+                    <div style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 700, letterSpacing: "-0.3px" }}>
                       Response #{responses.findIndex((r) => r.id === selectedId) + 1}
                     </div>
                     <div style={{ fontSize: "10px", color: "var(--text-dim)", marginTop: "4px" }}>
@@ -381,16 +387,16 @@ export function ResponsesShell({
                 </div>
 
                 {/* Answers */}
-                <div style={{ padding: "8px 24px 28px", flex: 1 }}>
+                <div style={{ padding: "var(--space-2) var(--space-6) var(--space-8)", flex: 1 }}>
                   {questionFields.map((field, idx) => {
                     const map = answerMap(selectedResponse);
                     const val = formatValue(map[field.id]);
                     const empty = val === "—";
                     return (
                       <div key={field.id} style={{
-                        padding: "18px 0",
+                        padding: "var(--space-4) 0",
                         borderBottom: "1px solid var(--border)",
-                        display: "flex", gap: "16px",
+                        display: "flex", gap: "var(--space-4)",
                       }}>
                         <div style={{ width: "20px", flexShrink: 0, paddingTop: "2px", fontSize: "10px", color: "var(--text-faint)", fontWeight: 500 }}>
                           {idx + 1}
@@ -401,7 +407,7 @@ export function ResponsesShell({
                           </div>
                           <div style={{
                             fontSize: "15px",
-                            fontFamily: empty ? "'DM Mono', monospace" : "'Syne', sans-serif",
+                            fontFamily: empty ? "var(--font-body)" : "var(--font-display)",
                             fontWeight: empty ? 300 : 600,
                             color: empty ? "var(--text-faint)" : "var(--text)",
                             letterSpacing: empty ? 0 : "-0.2px",
@@ -429,14 +435,14 @@ function MenuItem({ onClick, danger, children }: { onClick: () => void; danger?:
       onClick={onClick}
       style={{
         display: "block", width: "100%", textAlign: "left",
-        padding: "8px 14px", background: "transparent", border: "none",
-        color: danger ? "rgba(255,100,100,0.7)" : "var(--text-muted)",
+        padding: "var(--space-2) var(--space-3)", background: "transparent", border: "none",
+        color: danger ? "var(--error)" : "var(--text-muted)",
         fontSize: "11px", letterSpacing: "0.5px", cursor: "pointer",
-        fontFamily: "'DM Mono', monospace",
-        transition: "background 0.1s, color 0.1s",
+        fontFamily: "var(--font-body)",
+        transition: "background var(--duration) var(--ease), color var(--duration) var(--ease)",
       }}
-      onMouseEnter={(e) => { e.currentTarget.style.background = "var(--border)"; e.currentTarget.style.color = danger ? "rgba(255,100,100,1)" : "var(--text)"; }}
-      onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = danger ? "rgba(255,100,100,0.7)" : "var(--text-muted)"; }}
+      onMouseEnter={(e) => { e.currentTarget.style.background = "var(--border)"; e.currentTarget.style.color = danger ? "var(--error)" : "var(--text)"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = danger ? "var(--error)" : "var(--text-muted)"; }}
     >
       {children}
     </button>
@@ -444,13 +450,13 @@ function MenuItem({ onClick, danger, children }: { onClick: () => void; danger?:
 }
 
 const thStyle: React.CSSProperties = {
-  padding: "10px 16px",
+  padding: "var(--space-2) var(--space-4)",
   textAlign: "left",
   background: "var(--surface-2)",
 };
 
 const tdStyle: React.CSSProperties = {
-  padding: "12px 16px",
+  padding: "var(--space-3) var(--space-4)",
   fontSize: "12px",
   color: "var(--text-muted)",
   fontWeight: 300,

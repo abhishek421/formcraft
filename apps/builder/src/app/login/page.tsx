@@ -1,5 +1,5 @@
 import { login } from "./actions";
-import { ThemeToggle } from "./theme-toggle";
+import { SettingsPanel } from "@/components/settings-panel";
 
 export default async function LoginPage({
   searchParams,
@@ -11,14 +11,12 @@ export default async function LoginPage({
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
-
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
           background: var(--bg);
           color: var(--text);
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-body);
           min-height: 100vh;
           overflow: hidden;
         }
@@ -53,12 +51,12 @@ export default async function LoginPage({
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          padding: 48px;
+          padding: var(--space-12);
           border-right: 1px solid var(--border);
         }
 
         .logo {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-display);
           font-size: 22px;
           font-weight: 800;
           letter-spacing: -0.5px;
@@ -86,7 +84,7 @@ export default async function LoginPage({
           display: flex;
           flex-direction: column;
           justify-content: center;
-          gap: 24px;
+          gap: var(--space-6);
         }
 
         .hero-label {
@@ -98,7 +96,7 @@ export default async function LoginPage({
         }
 
         .hero-heading {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-display);
           font-size: clamp(40px, 5vw, 64px);
           font-weight: 800;
           line-height: 0.95;
@@ -122,13 +120,13 @@ export default async function LoginPage({
         .feature-list {
           display: flex;
           flex-direction: column;
-          gap: 12px;
+          gap: var(--space-3);
         }
 
         .feature-item {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: var(--space-3);
           font-size: 12px;
           color: var(--text-muted);
           font-weight: 300;
@@ -154,7 +152,7 @@ export default async function LoginPage({
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 48px;
+          padding: var(--space-12);
         }
 
         .form-wrapper {
@@ -162,17 +160,17 @@ export default async function LoginPage({
           max-width: 360px;
           display: flex;
           flex-direction: column;
-          gap: 32px;
+          gap: var(--space-8);
         }
 
         .form-header {
           display: flex;
           flex-direction: column;
-          gap: 8px;
+          gap: var(--space-2);
         }
 
         .form-title {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-display);
           font-size: 28px;
           font-weight: 700;
           letter-spacing: -0.5px;
@@ -193,13 +191,13 @@ export default async function LoginPage({
         form {
           display: flex;
           flex-direction: column;
-          gap: 16px;
+          gap: var(--space-4);
         }
 
         .field {
           display: flex;
           flex-direction: column;
-          gap: 6px;
+          gap: var(--space-1);
         }
 
         label {
@@ -213,13 +211,15 @@ export default async function LoginPage({
         input {
           background: var(--surface-3);
           border: 1px solid var(--text-faint);
+          border-radius: var(--radius-sm);
           color: var(--text);
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-body);
           font-size: 13px;
           font-weight: 300;
-          padding: 14px 16px;
+          padding: var(--space-3) var(--space-4);
           outline: none;
-          transition: border-color 0.15s ease;
+          transition: border-color var(--duration) var(--ease),
+                      background  var(--duration) var(--ease);
           width: 100%;
         }
 
@@ -235,29 +235,31 @@ export default async function LoginPage({
         .error-msg {
           font-size: 11px;
           color: var(--error);
-          padding: 10px 14px;
+          padding: var(--space-2) var(--space-3);
           background: var(--error-bg);
           border-left: 2px solid var(--error);
+          border-radius: var(--radius-xs);
         }
 
         .submit-btn {
           background: var(--accent);
-          color: var(--bg);
+          color: var(--accent-text);
           border: none;
-          font-family: 'Syne', sans-serif;
+          border-radius: var(--radius-sm);
+          font-family: var(--font-display);
           font-size: 13px;
           font-weight: 700;
           letter-spacing: 1px;
           text-transform: uppercase;
-          padding: 16px;
+          padding: var(--space-4);
           cursor: pointer;
-          transition: all 0.15s ease;
-          margin-top: 8px;
+          transition: all var(--duration) var(--ease);
+          margin-top: var(--space-2);
           width: 100%;
         }
 
         .submit-btn:hover {
-          background: #D4FF1A;
+          opacity: 0.88;
           transform: translateY(-1px);
         }
 
@@ -268,7 +270,7 @@ export default async function LoginPage({
         .divider {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: var(--space-3);
           font-size: 10px;
           color: var(--text-faint);
           letter-spacing: 2px;
@@ -285,10 +287,11 @@ export default async function LoginPage({
         .test-creds {
           background: var(--surface-3);
           border: 1px solid var(--accent-dim);
-          padding: 14px 16px;
+          border-radius: var(--radius-sm);
+          padding: var(--space-3) var(--space-4);
           display: flex;
           flex-direction: column;
-          gap: 6px;
+          gap: var(--space-1);
         }
 
         .test-creds-label {
@@ -319,7 +322,7 @@ export default async function LoginPage({
 
       <div className="grid-bg" />
       <div className="grid-fade" />
-      <ThemeToggle />
+      <SettingsPanel />
 
       <div className="container">
         {/* Left panel */}

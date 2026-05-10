@@ -22,8 +22,16 @@ export default function RootLayout({
         {/* Prevent flash: set theme before paint */}
         <script dangerouslySetInnerHTML={{ __html: `
           (function(){
-            var t = localStorage.getItem('theme') || 'dark';
-            document.documentElement.setAttribute('data-theme', t);
+            var el = document.documentElement;
+            var t  = localStorage.getItem('fc-theme')   || 'lavender';
+            var m  = localStorage.getItem('fc-mode')    || 'dark';
+            var r  = localStorage.getItem('fc-radius')  || '';
+            var d  = localStorage.getItem('fc-density') || '';
+            var mo = localStorage.getItem('fc-motion');
+            el.setAttribute('data-theme',   t + '-' + m);
+            if (r && r !== 'sharp')   el.setAttribute('data-radius',  r);
+            if (d && d !== 'default') el.setAttribute('data-density', d);
+            if (mo === 'false')       el.setAttribute('data-motion',  'off');
           })()
         `}} />
       </head>

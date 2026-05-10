@@ -20,12 +20,13 @@ export function FormCard({ form }: { form: Form }) {
         style={{
           background: "var(--surface-3)",
           border: "1px solid var(--border)",
-          padding: "24px",
+          borderRadius: "var(--radius-md)",
+          padding: "var(--space-6)",
           cursor: "pointer",
-          transition: "all 0.15s ease",
+          transition: "all var(--duration) var(--ease)",
           display: "flex",
           flexDirection: "column",
-          gap: "16px",
+          gap: "var(--space-4)",
           height: "160px",
           position: "relative",
           overflow: "hidden",
@@ -44,10 +45,11 @@ export function FormCard({ form }: { form: Form }) {
           <div style={{
             display: "inline-flex",
             alignItems: "center",
-            gap: "6px",
-            padding: "3px 8px",
+            gap: "var(--space-1)",
+            padding: "3px var(--space-2)",
             background: form.published ? "var(--accent-dim)" : "var(--border)",
             border: `1px solid ${form.published ? "var(--accent-border)" : "var(--text-faint)"}`,
+            borderRadius: "var(--radius-full)",
           }}>
             <div style={{
               width: "4px",
@@ -60,7 +62,7 @@ export function FormCard({ form }: { form: Form }) {
               letterSpacing: "1.5px",
               textTransform: "uppercase",
               color: form.published ? "var(--accent)" : "var(--text-dim)",
-              fontFamily: "'DM Mono', monospace",
+              fontFamily: "var(--font-body)",
               fontWeight: 500,
             }}>
               {form.published ? "Live" : "Draft"}
@@ -70,7 +72,7 @@ export function FormCard({ form }: { form: Form }) {
           <span style={{
             fontSize: "11px",
             color: "var(--text-faint)",
-            fontFamily: "'DM Mono', monospace",
+            fontFamily: "var(--font-body)",
             fontWeight: 300,
           }}>
             {form.response_count ?? 0} responses
@@ -79,7 +81,7 @@ export function FormCard({ form }: { form: Form }) {
 
         {/* Title */}
         <div style={{
-          fontFamily: "'Syne', sans-serif",
+          fontFamily: "var(--font-display)",
           fontSize: "17px",
           fontWeight: 700,
           color: "var(--text)",
@@ -94,7 +96,7 @@ export function FormCard({ form }: { form: Form }) {
         <div style={{
           fontSize: "11px",
           color: "var(--text-faint)",
-          fontFamily: "'DM Mono', monospace",
+          fontFamily: "var(--font-body)",
           fontWeight: 300,
         }}>
           Edited {timeAgo}
@@ -109,7 +111,7 @@ export function FormCard({ form }: { form: Form }) {
           height: "2px",
           background: "linear-gradient(90deg, var(--accent), transparent)",
           opacity: 0,
-          transition: "opacity 0.15s ease",
+          transition: `opacity var(--duration) var(--ease)`,
         }} className="card-accent" />
       </div>
     </Link>
