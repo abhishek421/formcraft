@@ -17,12 +17,13 @@ export function ResponsesShell({
   fields: Field[];
   responses: Response[];
 }) {
-  const [selectedId, setSelectedId] = useState<string | null>(
-    responses[0]?.id ?? null
-  );
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const selectedResponse = responses.find((r) => r.id === selectedId) ?? null;
-  const completionRate = responses.length;
+
+  const questionFields = fields.filter(
+    (f) => f.type !== "welcome_screen" && f.type !== "statement"
+  );
 
   const answerMap = (response: Response) =>
     Object.fromEntries(response.answers.map((a) => [a.field_id, a.value]));
@@ -51,21 +52,32 @@ export function ResponsesShell({
     return `${Math.floor(s / 60)}m ${s % 60}s`;
   }
 
-  const questionFields = fields.filter(
-    (f) => f.type !== "welcome_screen" && f.type !== "statement"
-  );
+  const avgCompletion = (() => {
+    const times = responses
+      .filter((r) => r.submitted_at)
+      .map((r) => new Date(r.submitted_at!).getTime() - new Date(r.started_at).getTime());
+    if (!times.length) return "—";
+    const avg = times.reduce((a, b) => a + b, 0) / times.length / 1000;
+    return avg < 60 ? `${Math.round(avg)}s` : `${Math.floor(avg / 60)}m ${Math.round(avg % 60)}s`;
+  })();
+
+  const rendererBase = process.env.NEXT_PUBLIC_RENDERER_URL ?? "http://localhost:3001";
 
   return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
         * { box-sizing: border-box; }
+        .resp-row:hover { background: rgba(240,237,232,0.03) !important; cursor: pointer; }
+        .resp-row:hover td { color: rgba(240,237,232,0.8) !important; }
+        .detail-panel { transform: translateX(100%); transition: transform 0.25s cubic-bezier(0.4,0,0.2,1); }
+        .detail-panel.open { transform: translateX(0); }
       `}</style>
 
       <div style={{
         display: "flex", flexDirection: "column", height: "100vh",
         background: "#080808", color: "#F0EDE8",
-        fontFamily: "'DM Mono', monospace",
+        fontFamily: "'DM Mono', monospace", overflow: "hidden",
       }}>
 
         {/* Top bar */}
@@ -89,13 +101,10 @@ export function ResponsesShell({
             {form.title}
           </span>
 
-          {/* Tab switcher */}
           <div style={{ display: "flex", gap: "4px", marginLeft: "24px" }}>
             {["Builder", "Responses"].map((tab) => {
               const active = tab === "Responses";
-              const href = tab === "Builder"
-                ? `/builder/${form.id}`
-                : `/builder/${form.id}/responses`;
+              const href = tab === "Builder" ? `/builder/${form.id}` : `/builder/${form.id}/responses`;
               return (
                 <Link key={tab} href={href} style={{
                   padding: "5px 14px", textDecoration: "none",
@@ -111,9 +120,9 @@ export function ResponsesShell({
             })}
           </div>
 
-          <div style={{ marginLeft: "auto", display: "flex", gap: "10px", alignItems: "center" }}>
+          <div style={{ marginLeft: "auto" }}>
             <a
-              href={`/f/${form.id}`}
+              href={`${rendererBase}/f/${form.id}`}
               target="_blank"
               rel="noopener noreferrer"
               style={{
@@ -131,31 +140,18 @@ export function ResponsesShell({
 
         {/* Stats row */}
         <div style={{
-          display: "flex", gap: "0",
+          display: "flex",
           borderBottom: "1px solid rgba(240,237,232,0.06)",
           background: "#0D0D0D", flexShrink: 0,
         }}>
           {[
-            { label: "Total Responses", value: completionRate },
+            { label: "Total Responses", value: responses.length },
             { label: "Questions", value: questionFields.length },
-            {
-              label: "Avg. Completion",
-              value: responses.length > 0
-                ? (() => {
-                    const times = responses
-                      .filter((r) => r.submitted_at)
-                      .map((r) => new Date(r.submitted_at!).getTime() - new Date(r.started_at).getTime());
-                    if (!times.length) return "—";
-                    const avg = times.reduce((a, b) => a + b, 0) / times.length / 1000;
-                    return avg < 60 ? `${Math.round(avg)}s` : `${Math.floor(avg / 60)}m ${Math.round(avg % 60)}s`;
-                  })()
-                : "—",
-            },
+            { label: "Avg. Completion", value: avgCompletion },
           ].map((stat, i) => (
             <div key={stat.label} style={{
               padding: "16px 32px",
-              borderRight: "1px solid rgba(240,237,232,0.06)",
-              borderRightWidth: i < 2 ? 1 : 0,
+              borderRight: i < 2 ? "1px solid rgba(240,237,232,0.06)" : "none",
             }}>
               <div style={{
                 fontFamily: "'Syne', sans-serif", fontSize: "24px",
@@ -173,141 +169,164 @@ export function ResponsesShell({
           ))}
         </div>
 
-        {/* Body */}
-        <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+        {/* Table area + detail panel */}
+        <div style={{ flex: 1, overflow: "hidden", position: "relative" }}>
 
-          {/* Response list */}
-          <div style={{
-            width: "280px", flexShrink: 0,
-            borderRight: "1px solid rgba(240,237,232,0.06)",
-            overflowY: "auto", background: "#0D0D0D",
-          }}>
+          {/* Table */}
+          <div style={{ height: "100%", overflowY: "auto", overflowX: "auto" }}>
             {responses.length === 0 ? (
               <div style={{
-                padding: "48px 24px", textAlign: "center",
-                fontSize: "12px", color: "rgba(240,237,232,0.2)",
-                lineHeight: 1.7,
+                display: "flex", flexDirection: "column", alignItems: "center",
+                justifyContent: "center", height: "100%", gap: "12px",
               }}>
-                No responses yet.<br />
-                <a href={`/f/${form.id}`} target="_blank" rel="noopener noreferrer"
-                  style={{ color: "#CAFF00", opacity: 0.7, fontSize: "11px" }}>
+                <div style={{ fontSize: "13px", color: "rgba(240,237,232,0.2)" }}>No responses yet.</div>
+                <a
+                  href={`${rendererBase}/f/${form.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ fontSize: "11px", color: "#CAFF00", opacity: 0.7, textDecoration: "none" }}
+                >
                   Share the form ↗
                 </a>
               </div>
             ) : (
-              responses.map((r, i) => {
-                const selected = r.id === selectedId;
-                const map = answerMap(r);
-                // Show first text answer as preview
-                const preview = questionFields
-                  .map((f) => formatValue(map[f.id]))
-                  .find((v) => v !== "—") ?? "—";
-
-                return (
-                  <div
-                    key={r.id}
-                    onClick={() => setSelectedId(r.id)}
-                    style={{
-                      padding: "14px 16px",
-                      borderBottom: "1px solid rgba(240,237,232,0.04)",
-                      cursor: "pointer",
-                      background: selected ? "rgba(202,255,0,0.05)" : "transparent",
-                      borderLeft: `2px solid ${selected ? "#CAFF00" : "transparent"}`,
-                      transition: "all 0.12s",
-                    }}
-                  >
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "5px" }}>
-                      <span style={{
-                        fontSize: "11px", fontWeight: 500,
-                        color: selected ? "#CAFF00" : "rgba(240,237,232,0.4)",
-                        letterSpacing: "0.5px",
-                      }}>
-                        #{responses.length - i}
-                      </span>
-                      <span style={{ fontSize: "10px", color: "rgba(240,237,232,0.2)" }}>
-                        {timeAgo(r.submitted_at ?? r.started_at)}
-                      </span>
-                    </div>
-                    <div style={{
-                      fontSize: "12px", color: "rgba(240,237,232,0.55)",
-                      fontWeight: 300, overflow: "hidden",
-                      textOverflow: "ellipsis", whiteSpace: "nowrap",
-                    }}>
-                      {preview}
-                    </div>
-                    {completionTime(r) && (
-                      <div style={{ fontSize: "10px", color: "rgba(240,237,232,0.15)", marginTop: "4px" }}>
-                        ⏱ {completionTime(r)}
-                      </div>
-                    )}
-                  </div>
-                );
-              })
+              <table style={{
+                width: "100%", borderCollapse: "collapse",
+                fontSize: "12px", minWidth: "600px",
+              }}>
+                <thead>
+                  <tr style={{ borderBottom: "1px solid rgba(240,237,232,0.08)" }}>
+                    <th style={thStyle}>#</th>
+                    <th style={thStyle}>Submitted</th>
+                    <th style={thStyle}>Time</th>
+                    {questionFields.map((f) => (
+                      <th key={f.id} style={{ ...thStyle, maxWidth: "200px" }}>
+                        <div style={{
+                          overflow: "hidden", textOverflow: "ellipsis",
+                          whiteSpace: "nowrap", maxWidth: "180px",
+                        }}>
+                          {f.title || "Untitled"}
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {responses.map((r, i) => {
+                    const map = answerMap(r);
+                    const selected = r.id === selectedId;
+                    return (
+                      <tr
+                        key={r.id}
+                        className="resp-row"
+                        onClick={() => setSelectedId(r.id)}
+                        style={{
+                          borderBottom: "1px solid rgba(240,237,232,0.04)",
+                          background: selected ? "rgba(202,255,0,0.04)" : "transparent",
+                          transition: "background 0.12s",
+                        }}
+                      >
+                        <td style={{ ...tdStyle, color: selected ? "#CAFF00" : "rgba(240,237,232,0.3)", fontWeight: 500 }}>
+                          #{responses.length - i}
+                        </td>
+                        <td style={{ ...tdStyle, color: "rgba(240,237,232,0.4)", whiteSpace: "nowrap" }}>
+                          {timeAgo(r.submitted_at ?? r.started_at)}
+                        </td>
+                        <td style={{ ...tdStyle, color: "rgba(240,237,232,0.3)", whiteSpace: "nowrap" }}>
+                          {completionTime(r) ?? "—"}
+                        </td>
+                        {questionFields.map((f) => (
+                          <td key={f.id} style={{ ...tdStyle, maxWidth: "200px" }}>
+                            <div style={{
+                              overflow: "hidden", textOverflow: "ellipsis",
+                              whiteSpace: "nowrap", maxWidth: "180px",
+                              color: formatValue(map[f.id]) === "—"
+                                ? "rgba(240,237,232,0.15)"
+                                : "rgba(240,237,232,0.75)",
+                            }}>
+                              {formatValue(map[f.id])}
+                            </div>
+                          </td>
+                        ))}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             )}
           </div>
 
-          {/* Response detail */}
-          <div style={{ flex: 1, overflowY: "auto", padding: "36px 48px" }}>
-            {!selectedResponse ? (
-              <div style={{
-                display: "flex", alignItems: "center", justifyContent: "center",
-                height: "100%", color: "rgba(240,237,232,0.15)", fontSize: "13px",
-              }}>
-                Select a response to view
-              </div>
-            ) : (
-              <div style={{ maxWidth: "640px" }}>
-                {/* Header */}
+          {/* Detail panel — slides in from right */}
+          <div
+            className={`detail-panel${selectedResponse ? " open" : ""}`}
+            style={{
+              position: "absolute", top: 0, right: 0,
+              width: "min(560px, 90vw)", height: "100%",
+              background: "#0D0D0D",
+              borderLeft: "1px solid rgba(240,237,232,0.08)",
+              display: "flex", flexDirection: "column",
+              overflowY: "auto",
+            }}
+          >
+            {selectedResponse && (
+              <>
+                {/* Panel header */}
                 <div style={{
-                  display: "flex", justifyContent: "space-between", alignItems: "flex-start",
-                  marginBottom: "32px",
+                  padding: "20px 28px",
+                  borderBottom: "1px solid rgba(240,237,232,0.06)",
+                  display: "flex", justifyContent: "space-between", alignItems: "center",
+                  flexShrink: 0,
                 }}>
                   <div>
                     <div style={{
-                      fontFamily: "'Syne', sans-serif", fontSize: "20px",
-                      fontWeight: 700, letterSpacing: "-0.3px", marginBottom: "6px",
+                      fontFamily: "'Syne', sans-serif", fontSize: "16px",
+                      fontWeight: 700, letterSpacing: "-0.3px",
                     }}>
                       Response #{responses.length - responses.findIndex((r) => r.id === selectedId)}
                     </div>
-                    <div style={{ fontSize: "11px", color: "rgba(240,237,232,0.25)" }}>
-                      Submitted {new Date(selectedResponse.submitted_at ?? selectedResponse.started_at).toLocaleString()}
-                      {completionTime(selectedResponse) && ` · Took ${completionTime(selectedResponse)}`}
+                    <div style={{ fontSize: "10px", color: "rgba(240,237,232,0.25)", marginTop: "4px" }}>
+                      {new Date(selectedResponse.submitted_at ?? selectedResponse.started_at).toLocaleString()}
+                      {completionTime(selectedResponse) && ` · ${completionTime(selectedResponse)}`}
                     </div>
                   </div>
+                  <button
+                    onClick={() => setSelectedId(null)}
+                    style={{
+                      background: "transparent", border: "none",
+                      color: "rgba(240,237,232,0.3)", fontSize: "18px",
+                      cursor: "pointer", padding: "4px 8px",
+                      transition: "color 0.12s",
+                    }}
+                  >
+                    ✕
+                  </button>
                 </div>
 
                 {/* Answers */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
+                <div style={{ padding: "8px 28px 28px", flex: 1 }}>
                   {questionFields.map((field, idx) => {
                     const map = answerMap(selectedResponse);
                     const val = formatValue(map[field.id]);
                     const empty = val === "—";
-
                     return (
                       <div key={field.id} style={{
-                        padding: "20px 0",
+                        padding: "18px 0",
                         borderBottom: "1px solid rgba(240,237,232,0.05)",
-                        display: "flex", gap: "20px",
+                        display: "flex", gap: "16px",
                       }}>
-                        {/* Number */}
                         <div style={{
-                          width: "24px", flexShrink: 0, paddingTop: "2px",
-                          fontSize: "11px", color: "rgba(240,237,232,0.2)",
-                          fontWeight: 500,
+                          width: "20px", flexShrink: 0, paddingTop: "2px",
+                          fontSize: "10px", color: "rgba(240,237,232,0.2)", fontWeight: 500,
                         }}>
                           {idx + 1}
                         </div>
-
                         <div style={{ flex: 1 }}>
-                          {/* Question */}
                           <div style={{
-                            fontSize: "12px", color: "rgba(240,237,232,0.4)",
-                            fontWeight: 300, marginBottom: "8px", lineHeight: 1.5,
+                            fontSize: "11px", color: "rgba(240,237,232,0.35)",
+                            marginBottom: "7px", lineHeight: 1.5,
                           }}>
-                            {field.title || <em>Untitled question</em>}
+                            {field.title || "Untitled question"}
                           </div>
-
-                          {/* Answer */}
                           <div style={{
                             fontSize: "15px",
                             fontFamily: empty ? "'DM Mono', monospace" : "'Syne', sans-serif",
@@ -322,7 +341,7 @@ export function ResponsesShell({
                     );
                   })}
                 </div>
-              </div>
+              </>
             )}
           </div>
         </div>
@@ -330,3 +349,25 @@ export function ResponsesShell({
     </>
   );
 }
+
+const thStyle: React.CSSProperties = {
+  padding: "10px 16px",
+  textAlign: "left",
+  fontSize: "10px",
+  letterSpacing: "1.5px",
+  textTransform: "uppercase",
+  color: "rgba(240,237,232,0.25)",
+  fontWeight: 500,
+  whiteSpace: "nowrap",
+  background: "#0A0A0A",
+  position: "sticky",
+  top: 0,
+  zIndex: 1,
+};
+
+const tdStyle: React.CSSProperties = {
+  padding: "12px 16px",
+  fontSize: "12px",
+  color: "rgba(240,237,232,0.6)",
+  fontWeight: 300,
+};
