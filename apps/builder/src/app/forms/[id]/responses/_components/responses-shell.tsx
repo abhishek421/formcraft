@@ -137,7 +137,7 @@ export function ResponsesShell({
             onClick={() => handleColMenu(col)}
             style={{
               background: "transparent", border: "none", cursor: "pointer",
-              color: active ? "#CAFF00" : "rgba(240,237,232,0.25)",
+              color: active ? "var(--accent)" : "var(--text-dim)",
               fontSize: "10px", letterSpacing: "1.5px", textTransform: "uppercase",
               fontFamily: "'DM Mono', monospace", fontWeight: 500,
               padding: "2px 0", display: "flex", alignItems: "center", gap: "4px",
@@ -152,7 +152,7 @@ export function ResponsesShell({
               ref={menuRef}
               style={{
                 position: "absolute", top: "100%", left: 0, marginTop: "4px",
-                background: "#1A1A1A", border: "1px solid rgba(240,237,232,0.1)",
+                background: "#1A1A1A", border: "1px solid var(--border-mid)",
                 zIndex: 50, minWidth: "140px",
                 boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
               }}
@@ -163,7 +163,7 @@ export function ResponsesShell({
               <MenuItem onClick={() => { setSortKey(col); setSortDir("desc"); setMenuCol(null); }}>
                 Sort Z → A {sortKey === col && sortDir === "desc" ? "✓" : ""}
               </MenuItem>
-              <div style={{ height: "1px", background: "rgba(240,237,232,0.06)", margin: "2px 0" }} />
+              <div style={{ height: "1px", background: "var(--border)", margin: "2px 0" }} />
               <MenuItem onClick={() => hideCol(col)} danger>Hide column</MenuItem>
             </div>
           )}
@@ -177,12 +177,12 @@ export function ResponsesShell({
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
         * { box-sizing: border-box; }
-        .resp-row:hover { background: rgba(240,237,232,0.03) !important; cursor: pointer; }
+        .resp-row:hover { background: var(--border) !important; cursor: pointer; }
       `}</style>
 
       <div style={{
         display: "flex", height: "100vh",
-        background: "#080808", color: "#F0EDE8",
+        background: "var(--bg)", color: "var(--text)",
         fontFamily: "'DM Mono', monospace", overflow: "hidden",
       }}>
         <AppSidebar email={email} defaultCollapsed={true} />
@@ -192,14 +192,14 @@ export function ResponsesShell({
         {/* Top bar */}
         <div style={{
           height: "56px", display: "flex", alignItems: "center",
-          borderBottom: "1px solid rgba(240,237,232,0.06)",
+          borderBottom: "1px solid var(--border)",
           padding: "0 20px", gap: "16px", flexShrink: 0,
-          background: "#0A0A0A", position: "relative",
+          background: "var(--surface-2)", position: "relative",
         }}>
           <Link href="/forms" style={{
-            color: "rgba(240,237,232,0.3)", textDecoration: "none", fontSize: "12px",
+            color: "var(--text-dim)", textDecoration: "none", fontSize: "12px",
           }}>← Back</Link>
-          <div style={{ width: "1px", height: "20px", background: "rgba(240,237,232,0.08)" }} />
+          <div style={{ width: "1px", height: "20px", background: "var(--text-faint)" }} />
           <span style={{ fontFamily: "'Syne', sans-serif", fontSize: "15px", fontWeight: 700, letterSpacing: "-0.3px" }}>
             {form.title}
           </span>
@@ -208,8 +208,8 @@ export function ResponsesShell({
           <div style={{
             position: "absolute", left: "50%", transform: "translateX(-50%)",
             display: "flex",
-            background: "rgba(240,237,232,0.05)",
-            border: "1px solid rgba(240,237,232,0.08)",
+            background: "var(--border)",
+            border: "1px solid var(--text-faint)",
             borderRadius: "999px",
             padding: "3px",
             gap: "2px",
@@ -222,8 +222,8 @@ export function ResponsesShell({
                 padding: "5px 18px", textDecoration: "none",
                 fontSize: "12px", letterSpacing: "0.3px",
                 borderRadius: "999px",
-                background: tab.active ? "rgba(240,237,232,0.1)" : "transparent",
-                color: tab.active ? "#F0EDE8" : "rgba(240,237,232,0.35)",
+                background: tab.active ? "var(--border-mid)" : "transparent",
+                color: tab.active ? "var(--text)" : "var(--text-dim)",
                 fontFamily: "'DM Mono', monospace",
                 transition: "all 0.15s",
               }}>
@@ -237,8 +237,8 @@ export function ResponsesShell({
               <button
                 onClick={() => setHiddenCols(new Set())}
                 style={{
-                  background: "transparent", border: "1px solid rgba(240,237,232,0.1)",
-                  color: "rgba(240,237,232,0.4)", fontSize: "11px", letterSpacing: "1px",
+                  background: "transparent", border: "1px solid var(--border-mid)",
+                  color: "var(--text-muted)", fontSize: "11px", letterSpacing: "1px",
                   textTransform: "uppercase", cursor: "pointer", padding: "7px 14px",
                   fontFamily: "'DM Mono', monospace",
                 }}
@@ -247,8 +247,8 @@ export function ResponsesShell({
               </button>
             )}
             <a href={`${rendererBase}/f/${form.id}`} target="_blank" rel="noopener noreferrer" style={{
-              padding: "7px 16px", border: "1px solid rgba(240,237,232,0.12)",
-              color: "rgba(240,237,232,0.5)", fontSize: "11px", letterSpacing: "1px",
+              padding: "7px 16px", border: "1px solid var(--border-strong)",
+              color: "var(--text-muted)", fontSize: "11px", letterSpacing: "1px",
               textTransform: "uppercase", textDecoration: "none",
             }}>
               Preview ↗
@@ -257,17 +257,17 @@ export function ResponsesShell({
         </div>
 
         {/* Stats row */}
-        <div style={{ display: "flex", borderBottom: "1px solid rgba(240,237,232,0.06)", background: "#0D0D0D", flexShrink: 0 }}>
+        <div style={{ display: "flex", borderBottom: "1px solid var(--border)", background: "var(--surface)", flexShrink: 0 }}>
           {[
             { label: "Total Responses", value: rawResponses.length },
             { label: "Questions", value: questionFields.length },
             { label: "Avg. Completion", value: avgCompletion },
           ].map((stat, i) => (
-            <div key={stat.label} style={{ padding: "16px 32px", borderRight: i < 2 ? "1px solid rgba(240,237,232,0.06)" : "none" }}>
+            <div key={stat.label} style={{ padding: "16px 32px", borderRight: i < 2 ? "1px solid var(--border)" : "none" }}>
               <div style={{ fontFamily: "'Syne', sans-serif", fontSize: "24px", fontWeight: 800, letterSpacing: "-0.5px" }}>
                 {stat.value}
               </div>
-              <div style={{ fontSize: "10px", letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(240,237,232,0.25)", marginTop: "3px" }}>
+              <div style={{ fontSize: "10px", letterSpacing: "1.5px", textTransform: "uppercase", color: "var(--text-dim)", marginTop: "3px" }}>
                 {stat.label}
               </div>
             </div>
@@ -281,16 +281,16 @@ export function ResponsesShell({
           <div style={{ flex: 1, overflowY: "auto", overflowX: "auto" }}>
             {rawResponses.length === 0 ? (
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", gap: "12px" }}>
-                <div style={{ fontSize: "13px", color: "rgba(240,237,232,0.2)" }}>No responses yet.</div>
+                <div style={{ fontSize: "13px", color: "var(--text-faint)" }}>No responses yet.</div>
                 <a href={`${rendererBase}/f/${form.id}`} target="_blank" rel="noopener noreferrer"
-                  style={{ fontSize: "11px", color: "#CAFF00", opacity: 0.7, textDecoration: "none" }}>
+                  style={{ fontSize: "11px", color: "var(--accent)", opacity: 0.7, textDecoration: "none" }}>
                   Share the form ↗
                 </a>
               </div>
             ) : (
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px", minWidth: "600px" }}>
                 <thead>
-                  <tr style={{ borderBottom: "1px solid rgba(240,237,232,0.08)", background: "#0A0A0A" }}>
+                  <tr style={{ borderBottom: "1px solid var(--text-faint)", background: "var(--surface-2)" }}>
                     <th style={{ ...thStyle, position: "sticky", top: 0, zIndex: 2 }}>#</th>
                     {!hiddenCols.has("submitted") && <ColHeader col="submitted" label="Submitted" />}
                     {!hiddenCols.has("time") && <ColHeader col="time" label="Time" />}
@@ -309,20 +309,20 @@ export function ResponsesShell({
                         className="resp-row"
                         onClick={() => setSelectedId(selected ? null : r.id)}
                         style={{
-                          borderBottom: "1px solid rgba(240,237,232,0.04)",
-                          background: selected ? "rgba(202,255,0,0.04)" : "transparent",
+                          borderBottom: "1px solid var(--border)",
+                          background: selected ? "var(--accent-dim)" : "transparent",
                         }}
                       >
-                        <td style={{ ...tdStyle, color: selected ? "#CAFF00" : "rgba(240,237,232,0.3)", fontWeight: 500 }}>
+                        <td style={{ ...tdStyle, color: selected ? "var(--accent)" : "var(--text-dim)", fontWeight: 500 }}>
                           #{i + 1}
                         </td>
                         {!hiddenCols.has("submitted") && (
-                          <td style={{ ...tdStyle, color: "rgba(240,237,232,0.4)", whiteSpace: "nowrap" }}>
+                          <td style={{ ...tdStyle, color: "var(--text-muted)", whiteSpace: "nowrap" }}>
                             {timeAgo(r.submitted_at ?? r.started_at)}
                           </td>
                         )}
                         {!hiddenCols.has("time") && (
-                          <td style={{ ...tdStyle, color: "rgba(240,237,232,0.3)", whiteSpace: "nowrap" }}>
+                          <td style={{ ...tdStyle, color: "var(--text-dim)", whiteSpace: "nowrap" }}>
                             {formatTime(completionMs(r))}
                           </td>
                         )}
@@ -330,7 +330,7 @@ export function ResponsesShell({
                           <td key={f.id} style={{ ...tdStyle, maxWidth: "200px" }}>
                             <div style={{
                               overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "180px",
-                              color: formatValue(map[f.id]) === "—" ? "rgba(240,237,232,0.15)" : "rgba(240,237,232,0.75)",
+                              color: formatValue(map[f.id]) === "—" ? "var(--text-faint)" : "var(--text-muted)",
                             }}>
                               {formatValue(map[f.id])}
                             </div>
@@ -349,15 +349,15 @@ export function ResponsesShell({
             width: selectedResponse ? "min(520px, 45vw)" : "0",
             flexShrink: 0, overflow: "hidden",
             transition: "width 0.25s cubic-bezier(0.4,0,0.2,1)",
-            borderLeft: selectedResponse ? "1px solid rgba(240,237,232,0.08)" : "none",
-            background: "#0D0D0D", display: "flex", flexDirection: "column",
+            borderLeft: selectedResponse ? "1px solid var(--text-faint)" : "none",
+            background: "var(--surface)", display: "flex", flexDirection: "column",
           }}>
             {selectedResponse && (
               <div style={{ width: "min(520px, 45vw)", height: "100%", display: "flex", flexDirection: "column", overflowY: "auto" }}>
                 {/* Panel header */}
                 <div style={{
                   padding: "20px 24px",
-                  borderBottom: "1px solid rgba(240,237,232,0.06)",
+                  borderBottom: "1px solid var(--border)",
                   display: "flex", justifyContent: "space-between", alignItems: "center",
                   flexShrink: 0,
                 }}>
@@ -365,7 +365,7 @@ export function ResponsesShell({
                     <div style={{ fontFamily: "'Syne', sans-serif", fontSize: "16px", fontWeight: 700, letterSpacing: "-0.3px" }}>
                       Response #{responses.findIndex((r) => r.id === selectedId) + 1}
                     </div>
-                    <div style={{ fontSize: "10px", color: "rgba(240,237,232,0.25)", marginTop: "4px" }}>
+                    <div style={{ fontSize: "10px", color: "var(--text-dim)", marginTop: "4px" }}>
                       {new Date(selectedResponse.submitted_at ?? selectedResponse.started_at).toLocaleString()}
                       {completionMs(selectedResponse) !== null && ` · ${formatTime(completionMs(selectedResponse))}`}
                     </div>
@@ -374,7 +374,7 @@ export function ResponsesShell({
                     onClick={() => setSelectedId(null)}
                     style={{
                       background: "transparent", border: "none",
-                      color: "rgba(240,237,232,0.3)", fontSize: "18px",
+                      color: "var(--text-dim)", fontSize: "18px",
                       cursor: "pointer", padding: "4px 8px",
                     }}
                   >✕</button>
@@ -389,21 +389,21 @@ export function ResponsesShell({
                     return (
                       <div key={field.id} style={{
                         padding: "18px 0",
-                        borderBottom: "1px solid rgba(240,237,232,0.05)",
+                        borderBottom: "1px solid var(--border)",
                         display: "flex", gap: "16px",
                       }}>
-                        <div style={{ width: "20px", flexShrink: 0, paddingTop: "2px", fontSize: "10px", color: "rgba(240,237,232,0.2)", fontWeight: 500 }}>
+                        <div style={{ width: "20px", flexShrink: 0, paddingTop: "2px", fontSize: "10px", color: "var(--text-faint)", fontWeight: 500 }}>
                           {idx + 1}
                         </div>
                         <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: "11px", color: "rgba(240,237,232,0.35)", marginBottom: "7px", lineHeight: 1.5 }}>
+                          <div style={{ fontSize: "11px", color: "var(--text-dim)", marginBottom: "7px", lineHeight: 1.5 }}>
                             {field.title || "Untitled question"}
                           </div>
                           <div style={{
                             fontSize: "15px",
                             fontFamily: empty ? "'DM Mono', monospace" : "'Syne', sans-serif",
                             fontWeight: empty ? 300 : 600,
-                            color: empty ? "rgba(240,237,232,0.15)" : "#F0EDE8",
+                            color: empty ? "var(--text-faint)" : "var(--text)",
                             letterSpacing: empty ? 0 : "-0.2px",
                           }}>
                             {val}
@@ -430,13 +430,13 @@ function MenuItem({ onClick, danger, children }: { onClick: () => void; danger?:
       style={{
         display: "block", width: "100%", textAlign: "left",
         padding: "8px 14px", background: "transparent", border: "none",
-        color: danger ? "rgba(255,100,100,0.7)" : "rgba(240,237,232,0.6)",
+        color: danger ? "rgba(255,100,100,0.7)" : "var(--text-muted)",
         fontSize: "11px", letterSpacing: "0.5px", cursor: "pointer",
         fontFamily: "'DM Mono', monospace",
         transition: "background 0.1s, color 0.1s",
       }}
-      onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(240,237,232,0.05)"; e.currentTarget.style.color = danger ? "rgba(255,100,100,1)" : "#F0EDE8"; }}
-      onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = danger ? "rgba(255,100,100,0.7)" : "rgba(240,237,232,0.6)"; }}
+      onMouseEnter={(e) => { e.currentTarget.style.background = "var(--border)"; e.currentTarget.style.color = danger ? "rgba(255,100,100,1)" : "var(--text)"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = danger ? "rgba(255,100,100,0.7)" : "var(--text-muted)"; }}
     >
       {children}
     </button>
@@ -446,12 +446,12 @@ function MenuItem({ onClick, danger, children }: { onClick: () => void; danger?:
 const thStyle: React.CSSProperties = {
   padding: "10px 16px",
   textAlign: "left",
-  background: "#0A0A0A",
+  background: "var(--surface-2)",
 };
 
 const tdStyle: React.CSSProperties = {
   padding: "12px 16px",
   fontSize: "12px",
-  color: "rgba(240,237,232,0.6)",
+  color: "var(--text-muted)",
   fontWeight: 300,
 };

@@ -27,7 +27,7 @@ export default async function DashboardPage() {
               fontSize: "11px",
               letterSpacing: "3px",
               textTransform: "uppercase",
-              color: "rgba(240,237,232,0.3)",
+              color: "var(--text-dim)",
               fontFamily: "'DM Mono', monospace",
               marginBottom: "8px",
             }}>
@@ -37,7 +37,7 @@ export default async function DashboardPage() {
               fontFamily: "'Syne', sans-serif",
               fontSize: "32px",
               fontWeight: 800,
-              color: "#F0EDE8",
+              color: "var(--text)",
               letterSpacing: "-1px",
             }}>
               Your Forms
@@ -46,8 +46,8 @@ export default async function DashboardPage() {
 
           <form action={createForm}>
             <button type="submit" style={{
-              background: "#CAFF00",
-              color: "#080808",
+              background: "var(--accent)",
+              color: "var(--bg)",
               border: "none",
               fontFamily: "'Syne', sans-serif",
               fontSize: "13px",
@@ -73,8 +73,8 @@ export default async function DashboardPage() {
             gap: "32px",
             marginBottom: "32px",
             padding: "16px 20px",
-            background: "#111111",
-            border: "1px solid rgba(240,237,232,0.06)",
+            background: "var(--surface-3)",
+            border: "1px solid var(--border)",
           }}>
             {[
               { label: "Total Forms", value: forms.length },
@@ -86,14 +86,14 @@ export default async function DashboardPage() {
                   fontSize: "22px",
                   fontFamily: "'Syne', sans-serif",
                   fontWeight: 800,
-                  color: "#F0EDE8",
+                  color: "var(--text)",
                   letterSpacing: "-0.5px",
                 }}>
                   {stat.value}
                 </div>
                 <div style={{
                   fontSize: "11px",
-                  color: "rgba(240,237,232,0.3)",
+                  color: "var(--text-dim)",
                   fontFamily: "'DM Mono', monospace",
                   fontWeight: 300,
                   letterSpacing: "1px",
@@ -139,16 +139,16 @@ function EmptyState() {
       <div style={{
         width: "80px",
         height: "80px",
-        border: "1px solid rgba(240,237,232,0.08)",
+        border: "1px solid var(--text-faint)",
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
         gap: "1px",
-        background: "rgba(240,237,232,0.02)",
+        background: "var(--border)",
         marginBottom: "8px",
       }}>
         {[...Array(4)].map((_, i) => (
           <div key={i} style={{
-            background: i === 0 ? "rgba(202,255,0,0.1)" : "rgba(240,237,232,0.02)",
+            background: i === 0 ? "var(--accent-border)" : "var(--border)",
           }} />
         ))}
       </div>
@@ -158,7 +158,7 @@ function EmptyState() {
           fontFamily: "'Syne', sans-serif",
           fontSize: "22px",
           fontWeight: 700,
-          color: "#F0EDE8",
+          color: "var(--text)",
           letterSpacing: "-0.5px",
           marginBottom: "8px",
         }}>
@@ -166,7 +166,7 @@ function EmptyState() {
         </div>
         <div style={{
           fontSize: "13px",
-          color: "rgba(240,237,232,0.3)",
+          color: "var(--text-dim)",
           fontFamily: "'DM Mono', monospace",
           fontWeight: 300,
           maxWidth: "280px",
@@ -178,8 +178,8 @@ function EmptyState() {
 
       <form action={createForm} style={{ marginTop: "8px" }}>
         <button type="submit" style={{
-          background: "#CAFF00",
-          color: "#080808",
+          background: "var(--accent)",
+          color: "var(--bg)",
           border: "none",
           fontFamily: "'Syne', sans-serif",
           fontSize: "13px",

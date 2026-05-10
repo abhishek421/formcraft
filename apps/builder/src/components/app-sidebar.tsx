@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { logout } from "@/app/login/actions";
+import { useTheme } from "./theme-provider";
 
 const NAV = [
   {
@@ -37,6 +38,7 @@ const EXPANDED_WIDTH = 220;
 
 export function AppSidebar({ email, defaultCollapsed = false }: { email: string; defaultCollapsed?: boolean }) {
   const pathname = usePathname();
+  const { theme, toggle: toggleTheme } = useTheme();
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
   const [mounted, setMounted] = useState(false);
 
@@ -47,23 +49,19 @@ export function AppSidebar({ email, defaultCollapsed = false }: { email: string;
   }, []);
 
   function toggle() {
-    setCollapsed((c) => {
-      localStorage.setItem("sidebar-collapsed", String(!c));
-      return !c;
-    });
+    setCollapsed((c) => !c);
   }
 
   const width = collapsed ? COLLAPSED_WIDTH : EXPANDED_WIDTH;
 
-  // Avoid layout shift on SSR
   if (!mounted) return <div style={{ width: EXPANDED_WIDTH, flexShrink: 0 }} />;
 
   return (
     <aside style={{
       width,
       flexShrink: 0,
-      background: "#0D0D0D",
-      borderRight: "1px solid rgba(240,237,232,0.06)",
+      background: "var(--surface)",
+      borderRight: "1px solid var(--border)",
       display: "flex",
       flexDirection: "column",
       height: "100vh",
@@ -77,7 +75,7 @@ export function AppSidebar({ email, defaultCollapsed = false }: { email: string;
       {/* Logo + toggle */}
       <div style={{
         height: "56px",
-        borderBottom: "1px solid rgba(240,237,232,0.06)",
+        borderBottom: "1px solid var(--border)",
         display: "flex",
         alignItems: "center",
         justifyContent: collapsed ? "center" : "space-between",
@@ -86,34 +84,30 @@ export function AppSidebar({ email, defaultCollapsed = false }: { email: string;
       }}>
         {!collapsed && (
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <div style={{ width: "8px", height: "8px", background: "#CAFF00", borderRadius: "50%", flexShrink: 0 }} />
+            <div style={{ width: "8px", height: "8px", background: "var(--accent)", borderRadius: "50%", flexShrink: 0 }} />
             <span style={{
               fontFamily: "'Syne', sans-serif", fontSize: "17px",
-              fontWeight: 800, color: "#F0EDE8", letterSpacing: "-0.3px",
+              fontWeight: 800, color: "var(--text)", letterSpacing: "-0.3px",
               whiteSpace: "nowrap",
             }}>
               FormCraft
             </span>
           </div>
         )}
-
         {collapsed && (
-          <div style={{ width: "8px", height: "8px", background: "#CAFF00", borderRadius: "50%" }} />
+          <div style={{ width: "8px", height: "8px", background: "var(--accent)", borderRadius: "50%" }} />
         )}
-
         <button
           onClick={toggle}
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           style={{
             background: "transparent", border: "none",
-            color: "rgba(240,237,232,0.25)", cursor: "pointer",
+            color: "var(--text-dim)", cursor: "pointer",
             padding: "4px", display: "flex", alignItems: "center",
             transition: "color 0.12s",
-            position: collapsed ? "absolute" : "relative",
-            bottom: collapsed ? "auto" : "auto",
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(240,237,232,0.7)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(240,237,232,0.25)"; }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--text-muted)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-dim)"; }}
         >
           {collapsed ? (
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -132,7 +126,7 @@ export function AppSidebar({ email, defaultCollapsed = false }: { email: string;
         {!collapsed && (
           <div style={{
             fontSize: "10px", letterSpacing: "2px", textTransform: "uppercase",
-            color: "rgba(240,237,232,0.25)", padding: "4px 12px 12px",
+            color: "var(--text-dim)", padding: "4px 12px 12px",
             fontFamily: "'DM Mono', monospace",
           }}>
             Workspace
@@ -150,15 +144,11 @@ export function AppSidebar({ email, defaultCollapsed = false }: { email: string;
                   title={item.label}
                   style={{
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    width: "36px", height: "36px",
-                    borderRadius: "6px",
-                    color: active ? "#CAFF00" : "rgba(240,237,232,0.3)",
-                    background: active ? "rgba(202,255,0,0.08)" : "transparent",
-                    textDecoration: "none",
-                    transition: "all 0.12s",
+                    width: "36px", height: "36px", borderRadius: "6px",
+                    color: active ? "var(--accent)" : "var(--text-dim)",
+                    background: active ? "var(--accent-dim)" : "transparent",
+                    textDecoration: "none", transition: "all 0.12s",
                   }}
-                  onMouseEnter={(e) => { if (!active) (e.currentTarget as HTMLElement).style.background = "rgba(240,237,232,0.04)"; }}
-                  onMouseLeave={(e) => { if (!active) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                 >
                   {item.icon}
                 </Link>
@@ -175,41 +165,85 @@ export function AppSidebar({ email, defaultCollapsed = false }: { email: string;
                 padding: "9px 12px", borderRadius: "4px",
                 fontSize: "13px", fontFamily: "'DM Mono', monospace",
                 fontWeight: active ? 500 : 300,
-                color: active ? "#F0EDE8" : "rgba(240,237,232,0.4)",
-                background: active ? "rgba(240,237,232,0.06)" : "transparent",
+                color: active ? "var(--text)" : "var(--text-muted)",
+                background: active ? "var(--border-mid)" : "transparent",
                 textDecoration: "none", transition: "all 0.12s ease",
                 marginBottom: "2px", whiteSpace: "nowrap",
               }}
             >
-              <span style={{ color: active ? "#CAFF00" : "rgba(240,237,232,0.3)", flexShrink: 0 }}>
+              <span style={{ color: active ? "var(--accent)" : "var(--text-dim)", flexShrink: 0 }}>
                 {item.icon}
               </span>
               {item.label}
               {active && (
-                <span style={{ marginLeft: "auto", width: "4px", height: "4px", background: "#CAFF00", borderRadius: "50%", flexShrink: 0 }} />
+                <span style={{ marginLeft: "auto", width: "4px", height: "4px", background: "var(--accent)", borderRadius: "50%", flexShrink: 0 }} />
               )}
             </Link>
           );
         })}
       </nav>
 
-      {/* User */}
-      <div style={{ borderTop: "1px solid rgba(240,237,232,0.06)", padding: collapsed ? "12px 0" : "12px" }}>
+      {/* Bottom: theme toggle + user */}
+      <div style={{ borderTop: "1px solid var(--border)", padding: collapsed ? "12px 0" : "12px" }}>
+        {/* Theme toggle */}
+        {collapsed ? (
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: "4px" }}>
+            <button
+              onClick={toggleTheme}
+              title={theme === "dark" ? "Switch to light" : "Switch to dark"}
+              style={{
+                background: "transparent", border: "none",
+                color: "var(--text-dim)", cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                width: "36px", height: "36px", borderRadius: "6px",
+                transition: "color 0.12s",
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = "var(--text-muted)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-dim)"; }}
+            >
+              {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+            </button>
+          </div>
+        ) : (
+          <div style={{ padding: "4px 12px 10px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{
+              fontSize: "11px", color: "var(--text-dim)",
+              fontFamily: "'DM Mono', monospace", fontWeight: 300,
+              overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1,
+            }}>
+              {email}
+            </div>
+            <button
+              onClick={toggleTheme}
+              title={theme === "dark" ? "Switch to light" : "Switch to dark"}
+              style={{
+                background: "transparent", border: "none",
+                color: "var(--text-dim)", cursor: "pointer",
+                display: "flex", alignItems: "center",
+                padding: "4px", marginLeft: "8px",
+                transition: "color 0.12s", flexShrink: 0,
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = "var(--text-muted)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-dim)"; }}
+            >
+              {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+            </button>
+          </div>
+        )}
+
+        {/* Sign out */}
         {collapsed ? (
           <div style={{ display: "flex", justifyContent: "center" }}>
             <form action={logout}>
-              <button
-                type="submit"
-                title="Sign out"
-                style={{
-                  background: "transparent", border: "none",
-                  color: "rgba(240,237,232,0.2)", cursor: "pointer",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  width: "36px", height: "36px", borderRadius: "6px",
-                  transition: "color 0.12s",
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(240,237,232,0.5)"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(240,237,232,0.2)"; }}
+              <button type="submit" title="Sign out" style={{
+                background: "transparent", border: "none",
+                color: "var(--text-faint)", cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                width: "36px", height: "36px", borderRadius: "6px",
+                transition: "color 0.12s",
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = "var(--text-muted)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-faint)"; }}
               >
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                   <path d="M5 2H2v10h3M9 4l3 3-3 3M12 7H5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
@@ -218,18 +252,11 @@ export function AppSidebar({ email, defaultCollapsed = false }: { email: string;
             </form>
           </div>
         ) : (
-          <div style={{ padding: "8px 12px", display: "flex", flexDirection: "column", gap: "6px" }}>
-            <div style={{
-              fontSize: "11px", color: "rgba(240,237,232,0.35)",
-              fontFamily: "'DM Mono', monospace", fontWeight: 300,
-              overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-            }}>
-              {email}
-            </div>
+          <div style={{ padding: "0 12px" }}>
             <form action={logout}>
               <button type="submit" style={{
                 background: "transparent", border: "none", padding: 0,
-                fontSize: "11px", color: "rgba(240,237,232,0.25)",
+                fontSize: "11px", color: "var(--text-faint)",
                 fontFamily: "'DM Mono', monospace", cursor: "pointer",
                 letterSpacing: "0.5px", textAlign: "left",
               }}>
@@ -240,5 +267,22 @@ export function AppSidebar({ email, defaultCollapsed = false }: { email: string;
         )}
       </div>
     </aside>
+  );
+}
+
+function SunIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <circle cx="7" cy="7" r="2.5" stroke="currentColor" strokeWidth="1.2" />
+      <path d="M7 1v1.5M7 11.5V13M1 7h1.5M11.5 7H13M2.9 2.9l1.1 1.1M10 10l1.1 1.1M2.9 11.1L4 10M10 4l1.1-1.1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path d="M11.5 8.5A5 5 0 0 1 5.5 2.5a5 5 0 1 0 6 6z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }

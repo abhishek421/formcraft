@@ -16,8 +16,8 @@ export default async function DashboardLayout({
     <div style={{
       display: "flex",
       minHeight: "100vh",
-      background: "#080808",
-      color: "#F0EDE8",
+      background: "var(--bg)",
+      color: "var(--text)",
     }}>
       <AppSidebar email={user.email!} />
       <main style={{ flex: 1, display: "flex", flexDirection: "column" }}>

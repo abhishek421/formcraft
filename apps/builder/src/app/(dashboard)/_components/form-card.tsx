@@ -18,8 +18,8 @@ export function FormCard({ form }: { form: Form }) {
     <Link href={`/forms/${form.id}/builder`} style={{ textDecoration: "none" }}>
       <div
         style={{
-          background: "#111111",
-          border: "1px solid rgba(240,237,232,0.06)",
+          background: "var(--surface-3)",
+          border: "1px solid var(--border)",
           padding: "24px",
           cursor: "pointer",
           transition: "all 0.15s ease",
@@ -31,12 +31,12 @@ export function FormCard({ form }: { form: Form }) {
           overflow: "hidden",
         }}
         onMouseEnter={(e) => {
-          (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(202,255,0,0.2)";
-          (e.currentTarget as HTMLDivElement).style.background = "#141414";
+          (e.currentTarget as HTMLDivElement).style.borderColor = "var(--accent-border)";
+          (e.currentTarget as HTMLDivElement).style.background = "var(--surface-4)";
         }}
         onMouseLeave={(e) => {
-          (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(240,237,232,0.06)";
-          (e.currentTarget as HTMLDivElement).style.background = "#111111";
+          (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border)";
+          (e.currentTarget as HTMLDivElement).style.background = "var(--surface-3)";
         }}
       >
         {/* Status pill */}
@@ -46,20 +46,20 @@ export function FormCard({ form }: { form: Form }) {
             alignItems: "center",
             gap: "6px",
             padding: "3px 8px",
-            background: form.published ? "rgba(202,255,0,0.08)" : "rgba(240,237,232,0.04)",
-            border: `1px solid ${form.published ? "rgba(202,255,0,0.2)" : "rgba(240,237,232,0.08)"}`,
+            background: form.published ? "var(--accent-dim)" : "var(--border)",
+            border: `1px solid ${form.published ? "var(--accent-border)" : "var(--text-faint)"}`,
           }}>
             <div style={{
               width: "4px",
               height: "4px",
               borderRadius: "50%",
-              background: form.published ? "#CAFF00" : "rgba(240,237,232,0.3)",
+              background: form.published ? "var(--accent)" : "var(--text-dim)",
             }} />
             <span style={{
               fontSize: "10px",
               letterSpacing: "1.5px",
               textTransform: "uppercase",
-              color: form.published ? "#CAFF00" : "rgba(240,237,232,0.3)",
+              color: form.published ? "var(--accent)" : "var(--text-dim)",
               fontFamily: "'DM Mono', monospace",
               fontWeight: 500,
             }}>
@@ -69,7 +69,7 @@ export function FormCard({ form }: { form: Form }) {
 
           <span style={{
             fontSize: "11px",
-            color: "rgba(240,237,232,0.2)",
+            color: "var(--text-faint)",
             fontFamily: "'DM Mono', monospace",
             fontWeight: 300,
           }}>
@@ -82,7 +82,7 @@ export function FormCard({ form }: { form: Form }) {
           fontFamily: "'Syne', sans-serif",
           fontSize: "17px",
           fontWeight: 700,
-          color: "#F0EDE8",
+          color: "var(--text)",
           letterSpacing: "-0.3px",
           lineHeight: 1.3,
           flex: 1,
@@ -93,7 +93,7 @@ export function FormCard({ form }: { form: Form }) {
         {/* Footer */}
         <div style={{
           fontSize: "11px",
-          color: "rgba(240,237,232,0.2)",
+          color: "var(--text-faint)",
           fontFamily: "'DM Mono', monospace",
           fontWeight: 300,
         }}>
@@ -107,7 +107,7 @@ export function FormCard({ form }: { form: Form }) {
           left: 0,
           right: 0,
           height: "2px",
-          background: "linear-gradient(90deg, #CAFF00, transparent)",
+          background: "linear-gradient(90deg, var(--accent), transparent)",
           opacity: 0,
           transition: "opacity 0.15s ease",
         }} className="card-accent" />

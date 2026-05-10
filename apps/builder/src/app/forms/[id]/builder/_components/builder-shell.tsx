@@ -201,7 +201,7 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
         body { margin: 0; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(240,237,232,0.1); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 2px; }
         textarea, input[type=text], input[type=email], input[type=number], input[type=url] {
           outline: none;
           resize: none;
@@ -209,7 +209,7 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
         .field-row:hover .field-delete { opacity: 1 !important; }
       `}</style>
 
-      <div style={{ display: "flex", height: "100vh", background: "#080808", color: "#F0EDE8", fontFamily: "'DM Mono', monospace" }}>
+      <div style={{ display: "flex", height: "100vh", background: "var(--bg)", color: "var(--text)", fontFamily: "'DM Mono', monospace" }}>
         <AppSidebar email={email} defaultCollapsed={true} />
 
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
@@ -217,17 +217,17 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
         {/* ── Top bar ── */}
         <div style={{
           height: "56px", display: "flex", alignItems: "center",
-          borderBottom: "1px solid rgba(240,237,232,0.06)",
+          borderBottom: "1px solid var(--border)",
           padding: "0 20px", gap: "16px", flexShrink: 0,
-          background: "#0A0A0A", position: "relative",
+          background: "var(--surface-2)", position: "relative",
         }}>
           <Link href="/forms" style={{
-            color: "rgba(240,237,232,0.3)", textDecoration: "none",
+            color: "var(--text-dim)", textDecoration: "none",
             fontSize: "12px", fontFamily: "'DM Mono', monospace",
             transition: "color 0.12s",
           }}>← Back</Link>
 
-          <div style={{ width: "1px", height: "20px", background: "rgba(240,237,232,0.08)" }} />
+          <div style={{ width: "1px", height: "20px", background: "var(--text-faint)" }} />
 
           <input
             value={formTitle}
@@ -238,7 +238,7 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
             style={{
               background: "transparent", border: "none",
               fontFamily: "'Syne', sans-serif", fontSize: "15px",
-              fontWeight: 700, color: "#F0EDE8", letterSpacing: "-0.3px",
+              fontWeight: 700, color: "var(--text)", letterSpacing: "-0.3px",
               width: "200px",
             }}
             placeholder="Untitled Form"
@@ -248,8 +248,8 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
           <div style={{
             position: "absolute", left: "50%", transform: "translateX(-50%)",
             display: "flex",
-            background: "rgba(240,237,232,0.05)",
-            border: "1px solid rgba(240,237,232,0.08)",
+            background: "var(--border)",
+            border: "1px solid var(--text-faint)",
             borderRadius: "999px",
             padding: "3px",
             gap: "2px",
@@ -262,8 +262,8 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
                 padding: "5px 18px", textDecoration: "none",
                 fontSize: "12px", letterSpacing: "0.3px",
                 borderRadius: "999px",
-                background: tab.active ? "rgba(240,237,232,0.1)" : "transparent",
-                color: tab.active ? "#F0EDE8" : "rgba(240,237,232,0.35)",
+                background: tab.active ? "var(--border-mid)" : "transparent",
+                color: tab.active ? "var(--text)" : "var(--text-dim)",
                 fontFamily: "'DM Mono', monospace",
                 transition: "all 0.15s",
               }}>
@@ -274,7 +274,7 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
 
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginLeft: "auto" }}>
             <div style={{
-              fontSize: "11px", color: "rgba(240,237,232,0.25)",
+              fontSize: "11px", color: "var(--text-dim)",
               fontFamily: "'DM Mono', monospace",
             }}>
               {fields.length} question{fields.length !== 1 ? "s" : ""}
@@ -284,9 +284,9 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
               onClick={copyShareLink}
               style={{
                 padding: "7px 16px",
-                background: copied ? "rgba(202,255,0,0.08)" : "transparent",
-                border: `1px solid ${copied ? "rgba(202,255,0,0.3)" : "rgba(240,237,232,0.12)"}`,
-                color: copied ? "#CAFF00" : "rgba(240,237,232,0.5)",
+                background: copied ? "var(--accent-dim)" : "transparent",
+                border: `1px solid ${copied ? "var(--accent-border)" : "var(--border-strong)"}`,
+                color: copied ? "var(--accent)" : "var(--text-muted)",
                 fontFamily: "'DM Mono', monospace",
                 fontSize: "11px", cursor: "pointer",
                 letterSpacing: "1px", textTransform: "uppercase",
@@ -303,8 +303,8 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
               style={{
                 padding: "7px 16px",
                 background: "transparent",
-                border: "1px solid rgba(240,237,232,0.12)",
-                color: "rgba(240,237,232,0.5)",
+                border: "1px solid var(--border-strong)",
+                color: "var(--text-muted)",
                 fontFamily: "'DM Mono', monospace",
                 fontSize: "11px", cursor: "pointer",
                 letterSpacing: "1px", textTransform: "uppercase",
@@ -319,9 +319,9 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
               onClick={handlePublish}
               style={{
                 padding: "7px 16px",
-                background: published ? "rgba(202,255,0,0.1)" : "transparent",
-                border: `1px solid ${published ? "rgba(202,255,0,0.3)" : "rgba(240,237,232,0.12)"}`,
-                color: published ? "#CAFF00" : "rgba(240,237,232,0.5)",
+                background: published ? "var(--accent-border)" : "transparent",
+                border: `1px solid ${published ? "var(--accent-border)" : "var(--border-strong)"}`,
+                color: published ? "var(--accent)" : "var(--text-muted)",
                 fontFamily: "'DM Mono', monospace",
                 fontSize: "11px", cursor: "pointer",
                 letterSpacing: "1px", textTransform: "uppercase",
@@ -339,22 +339,22 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
           {/* ── Left: Field list ── */}
           <div style={{
             width: "260px", flexShrink: 0,
-            borderRight: "1px solid rgba(240,237,232,0.06)",
+            borderRight: "1px solid var(--border)",
             display: "flex", flexDirection: "column",
-            background: "#0D0D0D", overflow: "hidden",
+            background: "var(--surface)", overflow: "hidden",
           }}>
             <div style={{
               padding: "14px 16px 10px",
-              borderBottom: "1px solid rgba(240,237,232,0.06)",
+              borderBottom: "1px solid var(--border)",
               display: "flex", alignItems: "center", justifyContent: "space-between",
             }}>
-              <span style={{ fontSize: "10px", letterSpacing: "2px", textTransform: "uppercase", color: "rgba(240,237,232,0.25)" }}>
+              <span style={{ fontSize: "10px", letterSpacing: "2px", textTransform: "uppercase", color: "var(--text-dim)" }}>
                 Questions
               </span>
               <button
                 onClick={() => setShowWidgetPicker(true)}
                 style={{
-                  background: "#CAFF00", border: "none", color: "#080808",
+                  background: "var(--accent)", border: "none", color: "var(--bg)",
                   width: "22px", height: "22px", cursor: "pointer",
                   fontSize: "16px", lineHeight: 1, fontWeight: 700,
                   display: "flex", alignItems: "center", justifyContent: "center",
@@ -383,7 +383,7 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
               {fields.length === 0 && (
                 <div style={{
                   padding: "32px 16px", textAlign: "center",
-                  fontSize: "12px", color: "rgba(240,237,232,0.2)",
+                  fontSize: "12px", color: "var(--text-faint)",
                   lineHeight: 1.6,
                 }}>
                   No questions yet.<br />Hit + to add one.
@@ -396,19 +396,19 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
               style={{
                 margin: "12px", padding: "10px",
                 background: "transparent",
-                border: "1px dashed rgba(240,237,232,0.1)",
-                color: "rgba(240,237,232,0.3)",
+                border: "1px dashed var(--border-mid)",
+                color: "var(--text-dim)",
                 fontFamily: "'DM Mono', monospace",
                 fontSize: "12px", cursor: "pointer",
                 transition: "all 0.15s",
               }}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(202,255,0,0.3)";
-                (e.currentTarget as HTMLButtonElement).style.color = "#CAFF00";
+                (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent-border)";
+                (e.currentTarget as HTMLButtonElement).style.color = "var(--accent)";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(240,237,232,0.1)";
-                (e.currentTarget as HTMLButtonElement).style.color = "rgba(240,237,232,0.3)";
+                (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border-mid)";
+                (e.currentTarget as HTMLButtonElement).style.color = "var(--text-dim)";
               }}
             >
               + Add question
@@ -423,7 +423,7 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
               <div style={{
                 display: "flex", flexDirection: "column", alignItems: "center",
                 justifyContent: "center", gap: "16px", height: "100%",
-                color: "rgba(240,237,232,0.2)", fontSize: "13px",
+                color: "var(--text-faint)", fontSize: "13px",
               }}>
                 <div style={{ fontSize: "32px", opacity: 0.3 }}>⊞</div>
                 Select a question or add a new one
@@ -435,8 +435,8 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
           {selectedField && (
             <div style={{
               width: "240px", flexShrink: 0,
-              borderLeft: "1px solid rgba(240,237,232,0.06)",
-              background: "#0D0D0D", overflowY: "auto",
+              borderLeft: "1px solid var(--border)",
+              background: "var(--surface)", overflowY: "auto",
               padding: "20px 16px",
               display: "flex", flexDirection: "column", gap: "24px",
             }}>
@@ -482,8 +482,8 @@ function SortableFieldRow({
         display: "flex", alignItems: "center", gap: "8px",
         padding: "8px 10px",
         marginBottom: "2px",
-        background: isSelected ? "rgba(202,255,0,0.06)" : "transparent",
-        border: `1px solid ${isSelected ? "rgba(202,255,0,0.15)" : "transparent"}`,
+        background: isSelected ? "var(--accent-dim)" : "transparent",
+        border: `1px solid ${isSelected ? "var(--accent-border)" : "transparent"}`,
         cursor: "pointer",
         borderRadius: "2px",
         position: "relative",
@@ -496,7 +496,7 @@ function SortableFieldRow({
         {...listeners}
         onClick={(e) => e.stopPropagation()}
         style={{
-          cursor: "grab", color: "rgba(240,237,232,0.2)",
+          cursor: "grab", color: "var(--text-faint)",
           fontSize: "10px", lineHeight: 1, userSelect: "none",
           flexShrink: 0,
         }}
@@ -507,10 +507,10 @@ function SortableFieldRow({
       {/* Number */}
       <div style={{
         width: "18px", height: "18px", flexShrink: 0,
-        background: isSelected ? "#CAFF00" : "rgba(240,237,232,0.08)",
+        background: isSelected ? "var(--accent)" : "var(--text-faint)",
         display: "flex", alignItems: "center", justifyContent: "center",
         fontSize: "9px", fontWeight: 700,
-        color: isSelected ? "#080808" : "rgba(240,237,232,0.4)",
+        color: isSelected ? "var(--bg)" : "var(--text-muted)",
         fontFamily: "'Syne', sans-serif",
       }}>
         {index + 1}
@@ -518,7 +518,7 @@ function SortableFieldRow({
 
       {/* Type icon */}
       <div style={{
-        fontSize: "10px", color: isSelected ? "#CAFF00" : "rgba(240,237,232,0.3)",
+        fontSize: "10px", color: isSelected ? "var(--accent)" : "var(--text-dim)",
         flexShrink: 0, width: "16px", textAlign: "center",
       }}>
         {getTypeIcon(field.type)}
@@ -527,7 +527,7 @@ function SortableFieldRow({
       {/* Title */}
       <div style={{
         flex: 1, fontSize: "12px", fontWeight: 300,
-        color: isSelected ? "#F0EDE8" : "rgba(240,237,232,0.5)",
+        color: isSelected ? "var(--text)" : "var(--text-muted)",
         overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
       }}>
         {field.title || <em style={{ opacity: 0.4 }}>Untitled</em>}
@@ -539,7 +539,7 @@ function SortableFieldRow({
         onClick={(e) => { e.stopPropagation(); onDelete(); }}
         style={{
           opacity: 0, background: "transparent", border: "none",
-          color: "rgba(240,237,232,0.3)", cursor: "pointer",
+          color: "var(--text-dim)", cursor: "pointer",
           fontSize: "14px", padding: "0 2px", lineHeight: 1,
           transition: "opacity 0.12s",
           flexShrink: 0,
@@ -559,10 +559,10 @@ function FieldEditor({ field, onChange }: { field: Field; onChange: (u: Partial<
       {/* Type label */}
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         <div style={{
-          padding: "4px 10px", background: "rgba(202,255,0,0.08)",
-          border: "1px solid rgba(202,255,0,0.15)",
+          padding: "4px 10px", background: "var(--accent-dim)",
+          border: "1px solid var(--accent-border)",
           fontSize: "10px", letterSpacing: "2px", textTransform: "uppercase",
-          color: "#CAFF00", fontFamily: "'DM Mono', monospace",
+          color: "var(--accent)", fontFamily: "'DM Mono', monospace",
         }}>
           {getTypeIcon(field.type)} {getTypeLabel(field.type)}
         </div>
@@ -587,7 +587,7 @@ function FieldEditor({ field, onChange }: { field: Field; onChange: (u: Partial<
         style={{
           background: "transparent", border: "none",
           fontFamily: "'Syne', sans-serif", fontSize: "28px",
-          fontWeight: 700, color: "#F0EDE8", letterSpacing: "-0.5px",
+          fontWeight: 700, color: "var(--text)", letterSpacing: "-0.5px",
           lineHeight: 1.3, width: "100%",
         }}
       />
@@ -601,12 +601,12 @@ function FieldEditor({ field, onChange }: { field: Field; onChange: (u: Partial<
         style={{
           background: "transparent", border: "none",
           fontFamily: "'DM Mono', monospace", fontSize: "14px",
-          fontWeight: 300, color: "rgba(240,237,232,0.4)", width: "100%",
+          fontWeight: 300, color: "var(--text-muted)", width: "100%",
           lineHeight: 1.6,
         }}
       />
 
-      <div style={{ height: "1px", background: "rgba(240,237,232,0.06)" }} />
+      <div style={{ height: "1px", background: "var(--border)" }} />
 
       {/* Type-specific UI */}
       <FieldTypePreview field={field} onChange={onChange} />
@@ -618,8 +618,8 @@ function FieldEditor({ field, onChange }: { field: Field; onChange: (u: Partial<
 
 function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Partial<Field>) => void }) {
   const inputStyle = {
-    background: "#111111", border: "1px solid rgba(240,237,232,0.08)",
-    color: "rgba(240,237,232,0.3)", fontFamily: "'DM Mono', monospace",
+    background: "var(--surface-3)", border: "1px solid var(--text-faint)",
+    color: "var(--text-dim)", fontFamily: "'DM Mono', monospace",
     fontSize: "14px", fontWeight: 300,
     padding: "14px 16px", width: "100%",
     pointerEvents: "none" as const,
@@ -654,9 +654,9 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
       <div style={{ display: "flex", gap: "12px" }}>
         {["Yes", "No"].map((opt) => (
           <div key={opt} style={{
-            padding: "12px 32px", border: "1px solid rgba(240,237,232,0.1)",
+            padding: "12px 32px", border: "1px solid var(--border-mid)",
             fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "14px",
-            color: "rgba(240,237,232,0.4)",
+            color: "var(--text-muted)",
           }}>
             {opt}
           </div>
@@ -672,9 +672,9 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
         {Array.from({ length: steps }, (_, i) => (
           <div key={i} style={{
             width: "40px", height: "40px",
-            border: "1px solid rgba(240,237,232,0.1)",
+            border: "1px solid var(--border-mid)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            color: "rgba(240,237,232,0.3)", fontSize: "18px",
+            color: "var(--text-dim)", fontSize: "18px",
           }}>★</div>
         ))}
       </div>
@@ -688,9 +688,9 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
         {Array.from({ length: steps }, (_, i) => (
           <div key={i} style={{
             width: "36px", height: "36px",
-            border: "1px solid rgba(240,237,232,0.1)",
+            border: "1px solid var(--border-mid)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: "12px", color: "rgba(240,237,232,0.3)",
+            fontSize: "12px", color: "var(--text-dim)",
             fontFamily: "'DM Mono', monospace",
           }}>
             {i + 1}
@@ -708,7 +708,7 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
           <div key={choice.id} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <div style={{
               width: "18px", height: "18px", flexShrink: 0,
-              border: "1px solid rgba(240,237,232,0.15)",
+              border: "1px solid var(--border-strong)",
               borderRadius: field.type === "multiple_choice" && !(field.config.allow_multiple) ? "50%" : "0",
             }} />
             <input
@@ -721,8 +721,8 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
               }}
               style={{
                 background: "transparent", border: "none",
-                borderBottom: "1px solid rgba(240,237,232,0.08)",
-                color: "#F0EDE8", fontFamily: "'DM Mono', monospace",
+                borderBottom: "1px solid var(--text-faint)",
+                color: "var(--text)", fontFamily: "'DM Mono', monospace",
                 fontSize: "14px", fontWeight: 300, padding: "6px 0",
                 flex: 1,
               }}
@@ -733,7 +733,7 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
               }}
               style={{
                 background: "transparent", border: "none",
-                color: "rgba(240,237,232,0.2)", cursor: "pointer", fontSize: "16px",
+                color: "var(--text-faint)", cursor: "pointer", fontSize: "16px",
               }}
             >×</button>
           </div>
@@ -744,8 +744,8 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
             onChange({ config: { ...field.config, choices: [...choices, newChoice] } });
           }}
           style={{
-            background: "transparent", border: "1px dashed rgba(240,237,232,0.1)",
-            color: "rgba(240,237,232,0.3)", fontFamily: "'DM Mono', monospace",
+            background: "transparent", border: "1px dashed var(--border-mid)",
+            color: "var(--text-dim)", fontFamily: "'DM Mono', monospace",
             fontSize: "12px", padding: "8px", cursor: "pointer",
             textAlign: "left", marginTop: "4px",
           }}
@@ -759,9 +759,9 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
   if (field.type === "statement" || field.type === "welcome_screen") {
     return (
       <div style={{
-        padding: "20px", background: "rgba(202,255,0,0.04)",
-        border: "1px solid rgba(202,255,0,0.08)",
-        fontSize: "13px", color: "rgba(240,237,232,0.3)",
+        padding: "20px", background: "var(--accent-dim)",
+        border: "1px solid var(--accent-dim)",
+        fontSize: "13px", color: "var(--text-dim)",
         fontFamily: "'DM Mono', monospace", lineHeight: 1.6,
       }}>
         {field.type === "welcome_screen"
@@ -774,8 +774,8 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
   if (field.type === "file_upload") {
     return (
       <div style={{
-        border: "2px dashed rgba(240,237,232,0.1)", padding: "40px",
-        textAlign: "center", color: "rgba(240,237,232,0.2)",
+        border: "2px dashed var(--border-mid)", padding: "40px",
+        textAlign: "center", color: "var(--text-faint)",
         fontFamily: "'DM Mono', monospace", fontSize: "13px",
       }}>
         ↑ Drop file here or click to upload
@@ -792,18 +792,18 @@ function FieldSettings({ field, allFields, onChange }: { field: Field; allFields
   return (
     <>
       <div>
-        <div style={{ fontSize: "10px", letterSpacing: "2px", textTransform: "uppercase", color: "rgba(240,237,232,0.25)", marginBottom: "12px" }}>
+        <div style={{ fontSize: "10px", letterSpacing: "2px", textTransform: "uppercase", color: "var(--text-dim)", marginBottom: "12px" }}>
           Field Settings
         </div>
 
         {/* Required toggle */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
-          <label style={{ fontSize: "12px", color: "rgba(240,237,232,0.5)", fontWeight: 300 }}>Required</label>
+          <label style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: 300 }}>Required</label>
           <button
             onClick={() => onChange({ required: !field.required })}
             style={{
               width: "36px", height: "20px",
-              background: field.required ? "#CAFF00" : "rgba(240,237,232,0.08)",
+              background: field.required ? "var(--accent)" : "var(--text-faint)",
               border: "none", borderRadius: "10px", cursor: "pointer",
               position: "relative", transition: "background 0.15s",
             }}
@@ -812,7 +812,7 @@ function FieldSettings({ field, allFields, onChange }: { field: Field; allFields
               position: "absolute", top: "3px",
               left: field.required ? "19px" : "3px",
               width: "14px", height: "14px", borderRadius: "50%",
-              background: field.required ? "#080808" : "rgba(240,237,232,0.3)",
+              background: field.required ? "var(--bg)" : "var(--text-dim)",
               transition: "left 0.15s",
             }} />
           </button>
@@ -820,7 +820,7 @@ function FieldSettings({ field, allFields, onChange }: { field: Field; allFields
 
         {/* Variable name */}
         <div style={{ marginBottom: "16px" }}>
-          <label style={{ fontSize: "10px", letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(240,237,232,0.25)", display: "block", marginBottom: "6px" }}>
+          <label style={{ fontSize: "10px", letterSpacing: "1.5px", textTransform: "uppercase", color: "var(--text-dim)", display: "block", marginBottom: "6px" }}>
             Variable
           </label>
           <input
@@ -829,13 +829,13 @@ function FieldSettings({ field, allFields, onChange }: { field: Field; allFields
             onChange={(e) => onChange({ variable: e.target.value })}
             placeholder="e.g. first_name"
             style={{
-              width: "100%", background: "#111111",
-              border: "1px solid rgba(240,237,232,0.08)",
-              color: "#F0EDE8", fontFamily: "'DM Mono', monospace",
+              width: "100%", background: "var(--surface-3)",
+              border: "1px solid var(--text-faint)",
+              color: "var(--text)", fontFamily: "'DM Mono', monospace",
               fontSize: "12px", fontWeight: 300, padding: "8px 10px",
             }}
           />
-          <div style={{ fontSize: "10px", color: "rgba(240,237,232,0.2)", marginTop: "6px", lineHeight: 1.5 }}>
+          <div style={{ fontSize: "10px", color: "var(--text-faint)", marginTop: "6px", lineHeight: 1.5 }}>
             Use {`{{${field.variable || "variable"}}}`} in later questions
           </div>
         </div>
@@ -844,7 +844,7 @@ function FieldSettings({ field, allFields, onChange }: { field: Field; allFields
       {/* Type-specific settings */}
       {(field.type === "rating" || field.type === "opinion_scale") && (
         <div>
-          <label style={{ fontSize: "10px", letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(240,237,232,0.25)", display: "block", marginBottom: "6px" }}>
+          <label style={{ fontSize: "10px", letterSpacing: "1.5px", textTransform: "uppercase", color: "var(--text-dim)", display: "block", marginBottom: "6px" }}>
             Steps
           </label>
           <input
@@ -854,9 +854,9 @@ function FieldSettings({ field, allFields, onChange }: { field: Field; allFields
             value={(field.config.steps as number) ?? (field.type === "rating" ? 5 : 10)}
             onChange={(e) => onChange({ config: { ...field.config, steps: parseInt(e.target.value) } })}
             style={{
-              width: "100%", background: "#111111",
-              border: "1px solid rgba(240,237,232,0.08)",
-              color: "#F0EDE8", fontFamily: "'DM Mono', monospace",
+              width: "100%", background: "var(--surface-3)",
+              border: "1px solid var(--text-faint)",
+              color: "var(--text)", fontFamily: "'DM Mono', monospace",
               fontSize: "12px", padding: "8px 10px",
             }}
           />
@@ -866,12 +866,12 @@ function FieldSettings({ field, allFields, onChange }: { field: Field; allFields
       {field.type === "multiple_choice" && (
         <div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <label style={{ fontSize: "12px", color: "rgba(240,237,232,0.5)", fontWeight: 300 }}>Multiple select</label>
+            <label style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: 300 }}>Multiple select</label>
             <button
               onClick={() => onChange({ config: { ...field.config, allow_multiple: !field.config.allow_multiple } })}
               style={{
                 width: "36px", height: "20px",
-                background: field.config.allow_multiple ? "#CAFF00" : "rgba(240,237,232,0.08)",
+                background: field.config.allow_multiple ? "var(--accent)" : "var(--text-faint)",
                 border: "none", borderRadius: "10px", cursor: "pointer",
                 position: "relative", transition: "background 0.15s",
               }}
@@ -880,7 +880,7 @@ function FieldSettings({ field, allFields, onChange }: { field: Field; allFields
                 position: "absolute", top: "3px",
                 left: field.config.allow_multiple ? "19px" : "3px",
                 width: "14px", height: "14px", borderRadius: "50%",
-                background: field.config.allow_multiple ? "#080808" : "rgba(240,237,232,0.3)",
+                background: field.config.allow_multiple ? "var(--bg)" : "var(--text-dim)",
                 transition: "left 0.15s",
               }} />
             </button>
@@ -996,24 +996,24 @@ function LogicEditor({
 
   const labelStyle: React.CSSProperties = {
     fontSize: "10px", letterSpacing: "2px", textTransform: "uppercase",
-    color: "rgba(240,237,232,0.25)", marginBottom: "10px",
+    color: "var(--text-dim)", marginBottom: "10px",
     fontFamily: "'DM Mono', monospace",
   };
 
   const selectStyle: React.CSSProperties = {
-    background: "#111111", border: "1px solid rgba(240,237,232,0.08)",
-    color: "#F0EDE8", fontFamily: "'DM Mono', monospace",
+    background: "var(--surface-3)", border: "1px solid var(--text-faint)",
+    color: "var(--text)", fontFamily: "'DM Mono', monospace",
     fontSize: "11px", padding: "6px 8px", width: "100%",
     cursor: "pointer",
   };
 
   return (
-    <div style={{ borderTop: "1px solid rgba(240,237,232,0.06)", paddingTop: "20px" }}>
+    <div style={{ borderTop: "1px solid var(--border)", paddingTop: "20px" }}>
       <div style={labelStyle}>Logic</div>
 
       {rules.length === 0 && (
         <div style={{
-          fontSize: "11px", color: "rgba(240,237,232,0.2)",
+          fontSize: "11px", color: "var(--text-faint)",
           marginBottom: "12px", lineHeight: 1.6,
         }}>
           No rules yet. Add a rule to control where users go based on their answer.
@@ -1023,11 +1023,11 @@ function LogicEditor({
       <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "10px" }}>
         {rules.map((rule) => (
           <div key={rule.id} style={{
-            background: "#111111", border: "1px solid rgba(240,237,232,0.06)",
+            background: "var(--surface-3)", border: "1px solid var(--border)",
             padding: "10px", display: "flex", flexDirection: "column", gap: "6px",
           }}>
             {/* IF row */}
-            <div style={{ fontSize: "10px", color: "rgba(240,237,232,0.25)", letterSpacing: "1px" }}>IF answer</div>
+            <div style={{ fontSize: "10px", color: "var(--text-dim)", letterSpacing: "1px" }}>IF answer</div>
 
             {/* Operator */}
             <select
@@ -1064,7 +1064,7 @@ function LogicEditor({
             )}
 
             {/* THEN row */}
-            <div style={{ fontSize: "10px", color: "rgba(240,237,232,0.25)", letterSpacing: "1px", marginTop: "2px" }}>THEN jump to</div>
+            <div style={{ fontSize: "10px", color: "var(--text-dim)", letterSpacing: "1px", marginTop: "2px" }}>THEN jump to</div>
             <select
               value={rule.destination_field_id ?? "__end__"}
               onChange={(e) => updateRule(rule.id, {
@@ -1085,7 +1085,7 @@ function LogicEditor({
               onClick={() => deleteRule(rule.id)}
               style={{
                 background: "transparent", border: "none",
-                color: "rgba(240,237,232,0.2)", cursor: "pointer",
+                color: "var(--text-faint)", cursor: "pointer",
                 fontSize: "11px", textAlign: "left", padding: "0",
                 marginTop: "2px",
               }}
@@ -1099,18 +1099,18 @@ function LogicEditor({
       <button
         onClick={addRule}
         style={{
-          background: "transparent", border: "1px dashed rgba(240,237,232,0.1)",
-          color: "rgba(240,237,232,0.3)", fontFamily: "'DM Mono', monospace",
+          background: "transparent", border: "1px dashed var(--border-mid)",
+          color: "var(--text-dim)", fontFamily: "'DM Mono', monospace",
           fontSize: "11px", padding: "8px", cursor: "pointer", width: "100%",
           transition: "all 0.12s",
         }}
         onMouseEnter={(e) => {
-          (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(202,255,0,0.3)";
-          (e.currentTarget as HTMLButtonElement).style.color = "#CAFF00";
+          (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent-border)";
+          (e.currentTarget as HTMLButtonElement).style.color = "var(--accent)";
         }}
         onMouseLeave={(e) => {
-          (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(240,237,232,0.1)";
-          (e.currentTarget as HTMLButtonElement).style.color = "rgba(240,237,232,0.3)";
+          (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border-mid)";
+          (e.currentTarget as HTMLButtonElement).style.color = "var(--text-dim)";
         }}
       >
         + Add rule
@@ -1126,7 +1126,7 @@ function WidgetPicker({ onSelect, onClose }: { onSelect: (type: string) => void;
     <div
       style={{
         position: "fixed", inset: 0, zIndex: 50,
-        background: "rgba(8,8,8,0.85)",
+        background: "rgba(8,8,8,0.85)", /* modal backdrop — intentionally direct */
         display: "flex", alignItems: "center", justifyContent: "center",
         backdropFilter: "blur(4px)",
       }}
@@ -1134,7 +1134,7 @@ function WidgetPicker({ onSelect, onClose }: { onSelect: (type: string) => void;
     >
       <div
         style={{
-          background: "#111111", border: "1px solid rgba(240,237,232,0.1)",
+          background: "var(--surface-3)", border: "1px solid var(--border-mid)",
           padding: "24px", width: "480px", maxHeight: "70vh", overflowY: "auto",
         }}
         onClick={(e) => e.stopPropagation()}
@@ -1145,14 +1145,14 @@ function WidgetPicker({ onSelect, onClose }: { onSelect: (type: string) => void;
           <div style={{ fontFamily: "'Syne', sans-serif", fontSize: "16px", fontWeight: 700, letterSpacing: "-0.3px" }}>
             Add Question
           </div>
-          <button onClick={onClose} style={{ background: "transparent", border: "none", color: "rgba(240,237,232,0.3)", cursor: "pointer", fontSize: "20px" }}>×</button>
+          <button onClick={onClose} style={{ background: "transparent", border: "none", color: "var(--text-dim)", cursor: "pointer", fontSize: "20px" }}>×</button>
         </div>
 
         {WIDGET_GROUPS.map((group) => (
           <div key={group.label} style={{ marginBottom: "20px" }}>
             <div style={{
               fontSize: "10px", letterSpacing: "2px", textTransform: "uppercase",
-              color: "rgba(240,237,232,0.25)", marginBottom: "10px",
+              color: "var(--text-dim)", marginBottom: "10px",
               fontFamily: "'DM Mono', monospace",
             }}>
               {group.label}
@@ -1163,24 +1163,24 @@ function WidgetPicker({ onSelect, onClose }: { onSelect: (type: string) => void;
                   key={t.type}
                   onClick={() => onSelect(t.type)}
                   style={{
-                    background: "#0D0D0D", border: "1px solid rgba(240,237,232,0.06)",
-                    color: "#F0EDE8", cursor: "pointer",
+                    background: "var(--surface)", border: "1px solid var(--border)",
+                    color: "var(--text)", cursor: "pointer",
                     padding: "12px 10px", textAlign: "left",
                     display: "flex", flexDirection: "column", gap: "6px",
                     transition: "all 0.12s",
                     fontFamily: "'DM Mono', monospace",
                   }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(202,255,0,0.25)";
-                    (e.currentTarget as HTMLButtonElement).style.background = "rgba(202,255,0,0.04)";
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent-border)";
+                    (e.currentTarget as HTMLButtonElement).style.background = "var(--accent-dim)";
                   }}
                   onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(240,237,232,0.06)";
-                    (e.currentTarget as HTMLButtonElement).style.background = "#0D0D0D";
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)";
+                    (e.currentTarget as HTMLButtonElement).style.background = "var(--surface)";
                   }}
                 >
-                  <span style={{ fontSize: "16px", color: "rgba(240,237,232,0.4)" }}>{t.icon}</span>
-                  <span style={{ fontSize: "11px", fontWeight: 400, color: "rgba(240,237,232,0.6)" }}>{t.label}</span>
+                  <span style={{ fontSize: "16px", color: "var(--text-muted)" }}>{t.icon}</span>
+                  <span style={{ fontSize: "11px", fontWeight: 400, color: "var(--text-muted)" }}>{t.label}</span>
                 </button>
               ))}
             </div>
