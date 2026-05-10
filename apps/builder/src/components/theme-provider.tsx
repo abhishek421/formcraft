@@ -52,7 +52,7 @@ type ThemeCtx = DesignSettings & {
 };
 
 const defaults: DesignSettings = {
-  theme:       "lavender",
+  theme:       "linen",
   mode:        "dark",
   radius:      "sharp",
   density:     "default",
