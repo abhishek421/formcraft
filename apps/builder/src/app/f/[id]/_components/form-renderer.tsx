@@ -792,18 +792,109 @@ function FieldInput({
   }
 
   if (field.type === "file_upload") {
+    return <FileUploadInput value={value} onChange={onChange} primaryColor={primaryColor} />;
+  }
+
+  return null;
+}
+
+function FileUploadInput({
+  value,
+  onChange,
+  primaryColor,
+}: {
+  value: unknown;
+  onChange: (val: unknown) => void;
+  primaryColor: string;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
+  const uploaded = value as { url: string; name: string; size: number } | undefined;
+
+  const upload = async (file: File) => {
+    if (file.size > 5 * 1024 * 1024) {
+      setError("File exceeds 5MB limit.");
+      return;
+    }
+    setError(null);
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error ?? "Upload failed."); return; }
+      onChange(data);
+    } catch {
+      setError("Upload failed. Please try again.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files[0];
+    if (file) upload(file);
+  };
+
+  if (uploaded) {
     return (
       <div style={{
-        border: "2px dashed rgba(240,237,232,0.1)",
-        padding: "48px", textAlign: "center",
-        color: "rgba(240,237,232,0.3)",
-        fontSize: "14px", cursor: "pointer",
-        transition: "border-color 0.15s",
+        border: `1px solid ${primaryColor}40`,
+        padding: "16px 20px",
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        background: `${primaryColor}08`,
       }}>
-        ↑ Click or drag a file here
+        <div>
+          <div style={{ fontSize: "14px", color: "#F0EDE8" }}>{uploaded.name}</div>
+          <div style={{ fontSize: "12px", color: "rgba(240,237,232,0.4)", marginTop: "2px" }}>
+            {(uploaded.size / 1024).toFixed(0)} KB · uploaded
+          </div>
+        </div>
+        <button
+          onClick={() => onChange(undefined)}
+          style={{
+            background: "transparent", border: "none",
+            color: "rgba(240,237,232,0.3)", cursor: "pointer", fontSize: "18px",
+          }}
+        >×</button>
       </div>
     );
   }
 
-  return null;
+  return (
+    <div>
+      <label
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={handleDrop}
+        style={{
+          display: "block",
+          border: `2px dashed ${dragOver ? primaryColor : "rgba(240,237,232,0.1)"}`,
+          padding: "48px", textAlign: "center",
+          color: uploading ? primaryColor : "rgba(240,237,232,0.3)",
+          fontSize: "14px", cursor: "pointer",
+          transition: "border-color 0.15s, color 0.15s",
+        }}
+      >
+        <input
+          type="file"
+          style={{ display: "none" }}
+          onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f); }}
+        />
+        {uploading ? "Uploading..." : "↑ Click or drag a file here"}
+        <div style={{ fontSize: "11px", marginTop: "8px", color: "rgba(240,237,232,0.2)" }}>
+          Max 5MB
+        </div>
+      </label>
+      {error && (
+        <div style={{ fontSize: "12px", color: "#FF6B6B", marginTop: "8px" }}>
+          ! {error}
+        </div>
+      )}
+    </div>
+  );
 }
