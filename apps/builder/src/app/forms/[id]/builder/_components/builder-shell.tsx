@@ -53,6 +53,15 @@ type Form = {
   theme: Record<string, unknown>;
 };
 
+function isLightColor(hex: string): boolean {
+  const h = hex.replace("#", "");
+  if (h.length < 6) return false;
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return (r * 299 + g * 587 + b * 114) / 1000 > 128;
+}
+
 type FormThemeTokens = {
   bg: string; primary: string; dFont: string; bFont: string;
   bRadius: string; textColor: string; textMuted: string;
@@ -243,7 +252,7 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
         .field-row:hover .field-delete { opacity: 1 !important; }
       `}</style>
 
-      <div style={{ display: "flex", height: "100vh", background: "var(--bg)", color: "var(--text)", fontFamily: "var(--font-body)" }}>
+      <div suppressHydrationWarning style={{ display: "flex", height: "100vh", background: "var(--bg)", color: "var(--text)", fontFamily: "var(--font-body)" }}>
         <AppSidebar email={email} defaultCollapsed={true} />
 
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
@@ -489,8 +498,9 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
             const dFont = (formTheme.display_font as string) ?? "Syne";
             const bFont = (formTheme.body_font as string) ?? "DM Mono";
             const bRadius = (formTheme.button_radius as string) ?? "0px";
-            const textColor = "#F0EDE8";
-            const textMuted = "rgba(240,237,232,0.45)";
+            const isLight = isLightColor(bg);
+            const textColor = isLight ? "#1A1A1A" : "#F0EDE8";
+            const textMuted = isLight ? "rgba(0,0,0,0.4)" : "rgba(240,237,232,0.45)";
             return (
               <div style={{ flex: 1, overflowY: "auto", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "48px 32px", background: bg }}>
                 {selectedField ? (

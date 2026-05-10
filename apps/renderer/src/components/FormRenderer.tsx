@@ -66,6 +66,15 @@ async function submitResponse(formId: string, answers: Answers, startedAt: strin
   }
 }
 
+function isLightColor(hex: string): boolean {
+  const h = hex.replace("#", "");
+  if (h.length < 6) return false;
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return (r * 299 + g * 587 + b * 114) / 1000 > 128;
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 type Phase = "welcome" | "form" | "done";
@@ -184,10 +193,15 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
   window.addEventListener("keydown", handler);
   onCleanup(() => window.removeEventListener("keydown", handler));
 
+  const light = () => isLightColor(bgColor());
+  const textRgb = () => light() ? "20,20,20" : "240,237,232";
+  const textColor = () => light() ? "#141414" : "#F0EDE8";
+  const textMuted = () => `rgba(${textRgb()},0.45)`;
+
   const wrapStyle = () => ({
     "min-height": "100vh",
     background: bgColor(),
-    color: "#F0EDE8",
+    color: textColor(),
     "font-family": `'${bodyFont()}', monospace`,
     display: "flex",
     "flex-direction": "column" as const,
@@ -242,7 +256,7 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
                 <div style={{
                   position: "absolute", top: "20px", left: "24px",
                   "font-size": "13px", "font-family": `'${displayFont()}', sans-serif`,
-                  "font-weight": "700", color: "rgba(240,237,232,0.2)",
+                  "font-weight": "700", color: `rgba(${textRgb()},0.2)`,
                   "letter-spacing": "-0.3px", "z-index": "10",
                 }}>
                   FormCraft
@@ -258,8 +272,8 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
                     disabled={currentIdx() === 0}
                     style={{
                       background: "transparent",
-                      border: "1px solid rgba(240,237,232,0.1)",
-                      color: currentIdx() === 0 ? "rgba(240,237,232,0.1)" : "rgba(240,237,232,0.4)",
+                      border: `1px solid rgba(${textRgb()},0.1)`,
+                      color: currentIdx() === 0 ? `rgba(${textRgb()},0.1)` : `rgba(${textRgb()},0.4)`,
                       width: "32px", height: "32px",
                       cursor: currentIdx() === 0 ? "default" : "pointer",
                       "font-size": "14px", display: "flex",
@@ -270,8 +284,8 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
                     onClick={goNext}
                     style={{
                       background: "transparent",
-                      border: "1px solid rgba(240,237,232,0.1)",
-                      color: "rgba(240,237,232,0.4)",
+                      border: `1px solid rgba(${textRgb()},0.1)`,
+                      color: `rgba(${textRgb()},0.4)`,
                       width: "32px", height: "32px", cursor: "pointer",
                       "font-size": "14px", display: "flex",
                       "align-items": "center", "justify-content": "center",
@@ -291,7 +305,7 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
                         <span style={{ "font-size": "13px", "font-weight": "500", color: primaryColor(), "font-family": `'${bodyFont()}', monospace` }}>
                           {questionNumber()}
                         </span>
-                        <span style={{ "font-size": "13px", color: "rgba(240,237,232,0.3)" }}>→</span>
+                        <span style={{ "font-size": "13px", color: `rgba(${textRgb()},0.3)` }}>→</span>
                         <Show when={field().required}>
                           <span style={{ "font-size": "10px", color: "rgba(255,100,100,0.6)", "letter-spacing": "1.5px", "text-transform": "uppercase" }}>
                             *required
@@ -305,14 +319,14 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
                       "font-family": `'${displayFont()}', sans-serif`,
                       "font-size": "clamp(22px, 3.5vw, 34px)",
                       "font-weight": "700", "letter-spacing": "-0.5px",
-                      color: "#F0EDE8", "margin-bottom": "10px", "line-height": "1.2",
+                      color: textColor(), "margin-bottom": "10px", "line-height": "1.2",
                     }}>
                       {title() || <span style={{ opacity: "0.3" }}>Untitled question</span>}
                     </h2>
 
                     {/* Description */}
                     <Show when={description()}>
-                      <p style={{ "font-size": "14px", color: "rgba(240,237,232,0.45)", "line-height": "1.7", "margin-bottom": "28px" }}>
+                      <p style={{ "font-size": "14px", color: textMuted(), "line-height": "1.7", "margin-bottom": "28px" }}>
                         {description()}
                       </p>
                     </Show>
@@ -328,6 +342,8 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
                           bodyFont={bodyFont()}
                           buttonRadius={buttonRadius()}
                           bgColor={bgColor()}
+                          textColor={textColor()}
+                          textRgb={textRgb()}
                           onEnter={goNext}
                         />
                       </div>
@@ -358,7 +374,7 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
                         {submitting() ? "Submitting..." : isLastField() ? "Submit" : isStatement() ? "Continue" : "OK"}
                       </button>
                       <Show when={!isStatement() && !isLastField()}>
-                        <span style={{ "font-size": "11px", color: "rgba(240,237,232,0.2)", "letter-spacing": "0.5px" }}>
+                        <span style={{ "font-size": "11px", color: `rgba(${textRgb()},0.2)`, "letter-spacing": "0.5px" }}>
                           press Enter ↵
                         </span>
                       </Show>
@@ -382,16 +398,16 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
               transform: visible() ? "translateY(0)" : "translateY(20px)",
               transition: "all 0.4s ease",
             }}>
-              <div style={{ "font-size": "48px", "margin-bottom": "24px", color: "#CAFF00" }}>✓</div>
+              <div style={{ "font-size": "48px", "margin-bottom": "24px", color: primaryColor() }}>✓</div>
               <h1 style={{
                 "font-family": `'${displayFont()}', sans-serif`,
                 "font-size": "clamp(28px, 4vw, 44px)",
                 "font-weight": "800", "letter-spacing": "-1px",
-                color: "#F0EDE8", "margin-bottom": "12px",
+                color: textColor(), "margin-bottom": "12px",
               }}>
                 All done!
               </h1>
-              <p style={{ "font-size": "14px", color: "rgba(240,237,232,0.4)", "line-height": "1.7" }}>
+              <p style={{ "font-size": "14px", color: textMuted(), "line-height": "1.7" }}>
                 Your response has been recorded. Thank you.
               </p>
             </div>
@@ -421,12 +437,12 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
               "font-family": `'${displayFont()}', sans-serif`,
               "font-size": "clamp(32px, 5vw, 56px)",
               "font-weight": "800", "letter-spacing": "-1.5px",
-              color: "#F0EDE8", "margin-bottom": "16px", "line-height": "1.1",
+              color: textColor(), "margin-bottom": "16px", "line-height": "1.1",
             }}>
               {welcomeField()?.title || props.form.title}
             </h1>
             <Show when={welcomeField()?.description}>
-              <p style={{ "font-size": "15px", color: "rgba(240,237,232,0.5)", "line-height": "1.7", "max-width": "480px", margin: "0 auto" }}>
+              <p style={{ "font-size": "15px", color: textMuted(), "line-height": "1.7", "max-width": "480px", margin: "0 auto" }}>
                 {welcomeField()!.description}
               </p>
             </Show>
@@ -452,7 +468,7 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
             Start →
           </button>
 
-          <div style={{ "font-size": "11px", color: "rgba(240,237,232,0.2)" }}>
+          <div style={{ "font-size": "11px", color: `rgba(${textRgb()},0.2)` }}>
             {totalQuestions()} question{totalQuestions() !== 1 ? "s" : ""}
           </div>
         </div>
@@ -471,13 +487,15 @@ function FieldInput(props: {
   bodyFont: string;
   buttonRadius: string;
   bgColor: string;
+  textColor: string;
+  textRgb: string;
   onEnter: () => void;
 }) {
   const baseInput = {
     background: "transparent",
     border: "none",
-    "border-bottom": "2px solid rgba(240,237,232,0.15)",
-    color: "#F0EDE8",
+    "border-bottom": `2px solid rgba(${props.textRgb},0.15)`,
+    color: props.textColor,
     "font-family": `'${props.bodyFont}', monospace`,
     "font-size": "clamp(16px, 2.5vw, 22px)",
     "font-weight": "300",
@@ -502,9 +520,9 @@ function FieldInput(props: {
                     <Show when={t() === "file_upload"} fallback={null}>
                       {/* File upload */}
                       <div style={{
-                        border: "2px dashed rgba(240,237,232,0.1)",
+                        border: `2px dashed rgba(${props.textRgb},0.1)`,
                         padding: "48px", "text-align": "center",
-                        color: "rgba(240,237,232,0.3)",
+                        color: `rgba(${props.textRgb},0.3)`,
                         "font-size": "14px", cursor: "pointer",
                       }}>
                         ↑ Click or drag a file here
@@ -512,11 +530,11 @@ function FieldInput(props: {
                     </Show>
                   }>
                     {/* Multiple choice / dropdown */}
-                    <MultipleChoiceInput field={f()} value={props.value} onChange={props.onChange} primaryColor={props.primaryColor} bodyFont={props.bodyFont} onEnter={props.onEnter} />
+                    <MultipleChoiceInput field={f()} value={props.value} onChange={props.onChange} primaryColor={props.primaryColor} bodyFont={props.bodyFont} textColor={props.textColor} textRgb={props.textRgb} onEnter={props.onEnter} />
                   </Show>
                 }>
                   {/* Opinion scale */}
-                  <OpinionScaleInput field={f()} value={props.value} onChange={props.onChange} primaryColor={props.primaryColor} bodyFont={props.bodyFont} />
+                  <OpinionScaleInput field={f()} value={props.value} onChange={props.onChange} primaryColor={props.primaryColor} bodyFont={props.bodyFont} bgColor={props.bgColor} textRgb={props.textRgb} />
                 </Show>
               }>
                 {/* Rating */}
@@ -534,8 +552,8 @@ function FieldInput(props: {
                         style={{
                           padding: "14px 40px",
                           background: selected() ? props.primaryColor : "transparent",
-                          border: `1px solid ${selected() ? props.primaryColor : "rgba(240,237,232,0.15)"}`,
-                          color: selected() ? props.bgColor : "#F0EDE8",
+                          border: `1px solid ${selected() ? props.primaryColor : `rgba(${props.textRgb},0.15)`}`,
+                          color: selected() ? props.bgColor : props.textColor,
                           "font-family": `'${props.bodyFont}', sans-serif`,
                           "font-size": "15px", "font-weight": "700",
                           cursor: "pointer", transition: "all 0.15s",
@@ -568,7 +586,7 @@ function FieldInput(props: {
             style={{
               ...baseInput,
               "border-bottom": "none",
-              border: "1px solid rgba(240,237,232,0.1)",
+              border: `1px solid rgba(${props.textRgb},0.1)`,
               padding: "14px",
               resize: "none",
               "line-height": "1.7",
@@ -631,7 +649,7 @@ function RatingInput(props: { field: Field; value: unknown; onChange: (v: unknow
   );
 }
 
-function OpinionScaleInput(props: { field: Field; value: unknown; onChange: (v: unknown) => void; primaryColor: string; bodyFont: string }) {
+function OpinionScaleInput(props: { field: Field; value: unknown; onChange: (v: unknown) => void; primaryColor: string; bodyFont: string; bgColor: string; textRgb: string }) {
   const steps = () => (props.field.config.steps as number) ?? 10;
   const current = () => props.value as number;
 
@@ -646,8 +664,8 @@ function OpinionScaleInput(props: { field: Field; value: unknown; onChange: (v: 
               style={{
                 width: "44px", height: "44px",
                 background: selected() ? props.primaryColor : "transparent",
-                border: `1px solid ${selected() ? props.primaryColor : "rgba(240,237,232,0.15)"}`,
-                color: selected() ? "#080808" : "rgba(240,237,232,0.6)",
+                border: `1px solid ${selected() ? props.primaryColor : `rgba(${props.textRgb},0.15)`}`,
+                color: selected() ? props.bgColor : `rgba(${props.textRgb},0.6)`,
                 "font-family": `'${props.bodyFont}', monospace`,
                 "font-size": "14px", cursor: "pointer",
                 transition: "all 0.12s",
@@ -668,6 +686,8 @@ function MultipleChoiceInput(props: {
   onChange: (v: unknown) => void;
   primaryColor: string;
   bodyFont: string;
+  textColor: string;
+  textRgb: string;
   onEnter: () => void;
 }) {
   const choices = () => (props.field.config.choices as { id: string; label: string }[]) ?? [];
@@ -698,8 +718,8 @@ function MultipleChoiceInput(props: {
                 display: "flex", "align-items": "center", gap: "14px",
                 padding: "14px 18px", "text-align": "left",
                 background: isSelected() ? `${props.primaryColor}12` : "transparent",
-                border: `1px solid ${isSelected() ? props.primaryColor : "rgba(240,237,232,0.1)"}`,
-                color: "#F0EDE8", cursor: "pointer",
+                border: `1px solid ${isSelected() ? props.primaryColor : `rgba(${props.textRgb},0.1)`}`,
+                color: props.textColor, cursor: "pointer",
                 "font-family": `'${props.bodyFont}', monospace`,
                 "font-size": "14px", "font-weight": "300",
                 transition: "all 0.12s",
@@ -707,7 +727,7 @@ function MultipleChoiceInput(props: {
             >
               <div style={{
                 width: "16px", height: "16px", "flex-shrink": "0",
-                border: `1px solid ${isSelected() ? props.primaryColor : "rgba(240,237,232,0.2)"}`,
+                border: `1px solid ${isSelected() ? props.primaryColor : `rgba(${props.textRgb},0.2)`}`,
                 "border-radius": !allowMultiple() ? "50%" : "0",
                 background: isSelected() ? props.primaryColor : "transparent",
                 display: "flex", "align-items": "center", "justify-content": "center",
