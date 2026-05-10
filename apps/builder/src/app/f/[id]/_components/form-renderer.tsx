@@ -49,8 +49,10 @@ function evaluateLogic(field: Field, answers: Answers): string | null | undefine
       case "contains":     match = answerStr.toLowerCase().includes(rule.value.toLowerCase()); break;
       case "greater_than": match = Number(answer) > Number(rule.value); break;
       case "less_than":    match = Number(answer) < Number(rule.value); break;
-      case "is_filled":    match = answer !== undefined && answer !== null && answer !== ""; break;
-      case "is_empty":     match = !answer; break;
+      case "is_filled":
+      case "is_answered":  match = answer !== undefined && answer !== null && answer !== "" && !(Array.isArray(answer) && answer.length === 0); break;
+      case "is_empty":
+      case "is_skipped":   match = !answer || (Array.isArray(answer) && answer.length === 0); break;
     }
     if (match) return rule.destination_field_id; // null = end of form
   }

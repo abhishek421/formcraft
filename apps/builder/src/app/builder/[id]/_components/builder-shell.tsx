@@ -933,7 +933,8 @@ function LogicEditor({
     return [];
   };
 
-  const noValueNeeded = (op: string) => op === "is_filled" || op === "is_empty";
+  const noValueNeeded = (op: string) =>
+    op === "is_filled" || op === "is_empty" || op === "is_answered" || op === "is_skipped";
 
   const addRule = () => {
     const ops = operatorsFor(field.type);
