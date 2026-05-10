@@ -53,6 +53,11 @@ type Form = {
   theme: Record<string, unknown>;
 };
 
+type FormThemeTokens = {
+  bg: string; primary: string; dFont: string; bFont: string;
+  bRadius: string; textColor: string; textMuted: string;
+};
+
 // ─── Widget config ────────────────────────────────────────────────────────────
 
 const WIDGET_GROUPS = [
@@ -156,6 +161,20 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
     void _id; void _fid; void _ca;
     saveField(id, safe);
   }, [saveField]);
+
+  useEffect(() => {
+    const dFont = (formTheme.display_font as string) ?? "Syne";
+    const bFont = (formTheme.body_font as string) ?? "DM Mono";
+    const id = "form-fonts-link";
+    let link = document.getElementById(id) as HTMLLinkElement | null;
+    if (!link) {
+      link = document.createElement("link");
+      link.id = id;
+      link.rel = "stylesheet";
+      document.head.appendChild(link);
+    }
+    link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(dFont)}:wght@400;700;800&family=${encodeURIComponent(bFont)}:wght@300;400;500&display=swap`;
+  }, [formTheme.display_font, formTheme.body_font]);
 
   const saveTheme = useDebounce((theme: Record<string, unknown>) => {
     startTransition(() => { updateFormTheme(form.id, theme); });
@@ -443,20 +462,35 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
           </div>
 
           {/* ── Center: Field editor ── */}
-          <div style={{ flex: 1, overflowY: "auto", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "48px 32px" }}>
-            {selectedField ? (
-              <FieldEditor field={selectedField} onChange={(updates) => patchField(selectedField.id, updates)} />
-            ) : (
-              <div style={{
-                display: "flex", flexDirection: "column", alignItems: "center",
-                justifyContent: "center", gap: "16px", height: "100%",
-                color: "var(--text-faint)", fontSize: "13px",
-              }}>
-                <div style={{ fontSize: "32px", opacity: 0.3 }}>⊞</div>
-                Select a question or add a new one
+          {(() => {
+            const bg = (formTheme.background_color as string) ?? "#080808";
+            const primary = (formTheme.primary_color as string) ?? "#CAFF00";
+            const dFont = (formTheme.display_font as string) ?? "Syne";
+            const bFont = (formTheme.body_font as string) ?? "DM Mono";
+            const bRadius = (formTheme.button_radius as string) ?? "0px";
+            const textColor = "#F0EDE8";
+            const textMuted = "rgba(240,237,232,0.45)";
+            return (
+              <div style={{ flex: 1, overflowY: "auto", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "48px 32px", background: bg }}>
+                {selectedField ? (
+                  <FieldEditor
+                    field={selectedField}
+                    onChange={(updates) => patchField(selectedField.id, updates)}
+                    theme={{ bg, primary, dFont, bFont, bRadius, textColor, textMuted }}
+                  />
+                ) : (
+                  <div style={{
+                    display: "flex", flexDirection: "column", alignItems: "center",
+                    justifyContent: "center", gap: "16px", height: "100%",
+                    color: textMuted, fontSize: "13px", fontFamily: `'${bFont}', monospace`,
+                  }}>
+                    <div style={{ fontSize: "32px", opacity: 0.3 }}>⊞</div>
+                    Select a question or add a new one
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            );
+          })()}
 
           {/* ── Right: Settings ── */}
           {selectedField && (
@@ -580,31 +614,39 @@ function SortableFieldRow({
 
 // ─── Field editor (center) ────────────────────────────────────────────────────
 
-function FieldEditor({ field, onChange }: { field: Field; onChange: (u: Partial<Field>) => void }) {
+function FieldEditor({ field, onChange, theme: t }: { field: Field; onChange: (u: Partial<Field>) => void; theme: FormThemeTokens }) {
   return (
     <div style={{ width: "100%", maxWidth: "600px", display: "flex", flexDirection: "column", gap: "24px" }}>
-      {/* Type label */}
+      {/* Type + required badges */}
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         <div style={{
-          padding: "4px 10px", background: "var(--accent-dim)",
-          border: "1px solid var(--accent-border)",
-          borderRadius: "var(--radius-sm)",
+          padding: "4px 10px",
+          background: `${t.primary}18`,
+          border: `1px solid ${t.primary}40`,
+          borderRadius: t.bRadius || "4px",
           fontSize: "10px", letterSpacing: "2px", textTransform: "uppercase",
-          color: "var(--accent)", fontFamily: "var(--font-body)",
+          color: t.primary, fontFamily: `'${t.bFont}', monospace`,
         }}>
           {getTypeIcon(field.type)} {getTypeLabel(field.type)}
         </div>
         {field.required && (
           <div style={{
-            padding: "4px 10px", background: "var(--error-bg)",
-            border: "1px solid var(--error)",
-            borderRadius: "var(--radius-sm)",
+            padding: "4px 10px",
+            background: "rgba(255,80,80,0.08)",
+            border: "1px solid rgba(255,80,80,0.3)",
+            borderRadius: t.bRadius || "4px",
             fontSize: "10px", letterSpacing: "2px", textTransform: "uppercase",
-            color: "var(--error)", fontFamily: "var(--font-body)",
+            color: "rgba(255,120,120,0.9)", fontFamily: `'${t.bFont}', monospace`,
           }}>
             Required
           </div>
         )}
+      </div>
+
+      {/* Question number hint */}
+      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <span style={{ fontSize: "13px", fontWeight: 500, color: t.primary, fontFamily: `'${t.bFont}', monospace` }}>1</span>
+        <span style={{ fontSize: "13px", color: t.textMuted }}>→</span>
       </div>
 
       {/* Title */}
@@ -615,9 +657,9 @@ function FieldEditor({ field, onChange }: { field: Field; onChange: (u: Partial<
         rows={2}
         style={{
           background: "transparent", border: "none",
-          fontFamily: "var(--font-display)", fontSize: "28px",
-          fontWeight: 700, color: "var(--text)", letterSpacing: "-0.5px",
-          lineHeight: 1.3, width: "100%",
+          fontFamily: `'${t.dFont}', sans-serif`, fontSize: "clamp(22px, 3.5vw, 34px)",
+          fontWeight: 700, color: t.textColor, letterSpacing: "-0.5px",
+          lineHeight: 1.2, width: "100%",
         }}
       />
 
@@ -629,29 +671,43 @@ function FieldEditor({ field, onChange }: { field: Field; onChange: (u: Partial<
         rows={2}
         style={{
           background: "transparent", border: "none",
-          fontFamily: "var(--font-body)", fontSize: "14px",
-          fontWeight: 300, color: "var(--text-muted)", width: "100%",
-          lineHeight: 1.6,
+          fontFamily: `'${t.bFont}', monospace`, fontSize: "14px",
+          fontWeight: 300, color: t.textMuted, width: "100%",
+          lineHeight: 1.7,
         }}
       />
 
-      <div style={{ height: "1px", background: "var(--border)" }} />
-
       {/* Type-specific UI */}
-      <FieldTypePreview field={field} onChange={onChange} />
+      <FieldTypePreview field={field} onChange={onChange} theme={t} />
+
+      {/* OK button */}
+      <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "8px" }}>
+        <div style={{
+          background: t.primary, color: t.bg,
+          padding: "10px 24px", fontFamily: `'${t.dFont}', sans-serif`,
+          fontSize: "13px", fontWeight: 700, letterSpacing: "0.5px",
+          borderRadius: t.bRadius, pointerEvents: "none",
+        }}>
+          OK
+        </div>
+        <span style={{ fontSize: "11px", color: t.textMuted, fontFamily: `'${t.bFont}', monospace` }}>
+          press Enter ↵
+        </span>
+      </div>
     </div>
   );
 }
 
 // ─── Field type preview ───────────────────────────────────────────────────────
 
-function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Partial<Field>) => void }) {
+function FieldTypePreview({ field, onChange, theme: t }: { field: Field; onChange: (u: Partial<Field>) => void; theme: FormThemeTokens }) {
   const inputStyle = {
-    background: "var(--surface-3)", border: "1px solid var(--text-faint)",
-    borderRadius: "var(--radius-sm)",
-    color: "var(--text-dim)", fontFamily: "var(--font-body)",
-    fontSize: "14px", fontWeight: 300,
-    padding: "var(--space-3) var(--space-4)", width: "100%",
+    background: "transparent",
+    borderBottom: `2px solid rgba(240,237,232,0.15)`,
+    borderTop: "none", borderLeft: "none", borderRight: "none",
+    color: t.textMuted, fontFamily: `'${t.bFont}', monospace`,
+    fontSize: "clamp(16px, 2.5vw, 22px)", fontWeight: 300,
+    padding: "10px 0", width: "100%",
     pointerEvents: "none" as const,
   };
 
@@ -662,15 +718,20 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
          field.type === "phone" ? "+1 (555) 000-0000" :
          field.type === "url" ? "https://" :
          field.type === "number" ? "0" :
-         "Type your answer here..."}
+         "Type your answer..."}
       </div>
     );
   }
 
   if (field.type === "long_text") {
     return (
-      <div style={{ ...inputStyle, height: "120px", display: "flex", alignItems: "flex-start" }}>
-        Type your answer here...
+      <div style={{
+        background: "transparent", border: `1px solid rgba(240,237,232,0.1)`,
+        padding: "14px", color: t.textMuted,
+        fontFamily: `'${t.bFont}', monospace`, fontSize: "14px", fontWeight: 300,
+        height: "120px", pointerEvents: "none",
+      }}>
+        Type your answer...
       </div>
     );
   }
@@ -684,10 +745,10 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
       <div style={{ display: "flex", gap: "12px" }}>
         {["Yes", "No"].map((opt) => (
           <div key={opt} style={{
-            padding: "var(--space-3) var(--space-8)", border: "1px solid var(--border-mid)",
-            borderRadius: "var(--radius-sm)",
-            fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "14px",
-            color: "var(--text-muted)",
+            padding: "14px 40px", border: `1px solid rgba(240,237,232,0.15)`,
+            borderRadius: t.bRadius,
+            fontFamily: `'${t.dFont}', sans-serif`, fontWeight: 700, fontSize: "15px",
+            color: t.textColor, pointerEvents: "none",
           }}>
             {opt}
           </div>
@@ -702,11 +763,10 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
       <div style={{ display: "flex", gap: "8px" }}>
         {Array.from({ length: steps }, (_, i) => (
           <div key={i} style={{
-            width: "40px", height: "40px",
-            border: "1px solid var(--border-mid)",
-            borderRadius: "var(--radius-sm)",
+            width: "44px", height: "44px",
             display: "flex", alignItems: "center", justifyContent: "center",
-            color: "var(--text-dim)", fontSize: "18px",
+            color: i === 0 ? t.primary : `rgba(240,237,232,0.2)`, fontSize: "24px",
+            pointerEvents: "none",
           }}>★</div>
         ))}
       </div>
@@ -716,15 +776,17 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
   if (field.type === "opinion_scale") {
     const steps = (field.config.steps as number) ?? 10;
     return (
-      <div style={{ display: "flex", gap: "6px" }}>
+      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
         {Array.from({ length: steps }, (_, i) => (
           <div key={i} style={{
-            width: "36px", height: "36px",
-            border: "1px solid var(--border-mid)",
-            borderRadius: "var(--radius-xs)",
+            width: "44px", height: "44px",
+            border: i === 0 ? `1px solid ${t.primary}` : `1px solid rgba(240,237,232,0.15)`,
+            background: i === 0 ? t.primary : "transparent",
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: "12px", color: "var(--text-dim)",
-            fontFamily: "var(--font-body)",
+            fontSize: "14px",
+            color: i === 0 ? t.bg : "rgba(240,237,232,0.6)",
+            fontFamily: `'${t.bFont}', monospace`,
+            pointerEvents: "none",
           }}>
             {i + 1}
           </div>
@@ -738,10 +800,10 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         {choices.map((choice, i) => (
-          <div key={choice.id} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div key={choice.id} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "14px 18px", border: `1px solid rgba(240,237,232,0.1)` }}>
             <div style={{
-              width: "18px", height: "18px", flexShrink: 0,
-              border: "1px solid var(--border-strong)",
+              width: "16px", height: "16px", flexShrink: 0,
+              border: `1px solid rgba(240,237,232,0.2)`,
               borderRadius: field.type === "multiple_choice" && !(field.config.allow_multiple) ? "50%" : "0",
             }} />
             <input
@@ -754,9 +816,8 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
               }}
               style={{
                 background: "transparent", border: "none",
-                borderBottom: "1px solid var(--text-faint)",
-                color: "var(--text)", fontFamily: "var(--font-body)",
-                fontSize: "14px", fontWeight: 300, padding: "6px 0",
+                color: t.textColor, fontFamily: `'${t.bFont}', monospace`,
+                fontSize: "14px", fontWeight: 300, padding: "0",
                 flex: 1,
               }}
             />
@@ -766,7 +827,7 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
               }}
               style={{
                 background: "transparent", border: "none",
-                color: "var(--text-faint)", cursor: "pointer", fontSize: "16px",
+                color: t.textMuted, cursor: "pointer", fontSize: "16px",
               }}
             >×</button>
           </div>
@@ -777,9 +838,9 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
             onChange({ config: { ...field.config, choices: [...choices, newChoice] } });
           }}
           style={{
-            background: "transparent", border: "1px dashed var(--border-mid)",
-            color: "var(--text-dim)", fontFamily: "var(--font-body)",
-            fontSize: "12px", padding: "8px", cursor: "pointer",
+            background: "transparent", border: `1px dashed rgba(240,237,232,0.15)`,
+            color: t.textMuted, fontFamily: `'${t.bFont}', monospace`,
+            fontSize: "12px", padding: "10px", cursor: "pointer",
             textAlign: "left", marginTop: "4px",
           }}
         >
@@ -792,11 +853,12 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
   if (field.type === "statement" || field.type === "welcome_screen") {
     return (
       <div style={{
-        padding: "var(--space-5)", background: "var(--accent-dim)",
-        border: "1px solid var(--accent-border)",
-        borderRadius: "var(--radius-md)",
-        fontSize: "13px", color: "var(--text-dim)",
-        fontFamily: "var(--font-body)", lineHeight: 1.6,
+        padding: "20px",
+        background: `${t.primary}10`,
+        border: `1px solid ${t.primary}30`,
+        borderRadius: t.bRadius || "4px",
+        fontSize: "13px", color: t.textMuted,
+        fontFamily: `'${t.bFont}', monospace`, lineHeight: 1.6,
       }}>
         {field.type === "welcome_screen"
           ? "This is the opening screen. Users will see a 'Start' button."
@@ -808,12 +870,11 @@ function FieldTypePreview({ field, onChange }: { field: Field; onChange: (u: Par
   if (field.type === "file_upload") {
     return (
       <div style={{
-        border: "2px dashed var(--border-mid)", padding: "var(--space-10)",
-        borderRadius: "var(--radius-md)",
-        textAlign: "center", color: "var(--text-faint)",
-        fontFamily: "var(--font-body)", fontSize: "13px",
+        border: "2px dashed rgba(240,237,232,0.1)", padding: "48px",
+        textAlign: "center", color: t.textMuted,
+        fontFamily: `'${t.bFont}', monospace`, fontSize: "14px",
       }}>
-        ↑ Drop file here or click to upload
+        ↑ Click or drag a file here
       </div>
     );
   }
