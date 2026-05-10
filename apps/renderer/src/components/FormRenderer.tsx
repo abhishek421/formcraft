@@ -44,12 +44,13 @@ function interpolate(text: string, fields: Field[], answers: Answers): string {
 
 // ── Submit response ───────────────────────────────────────────────────────────
 
-async function submitResponse(formId: string, answers: Answers) {
+async function submitResponse(formId: string, answers: Answers, startedAt: string) {
   const responseId = crypto.randomUUID();
 
   const { error: rErr } = await supabase.from("responses").insert({
     id: responseId,
     form_id: formId,
+    started_at: startedAt,
     submitted_at: new Date().toISOString(),
   });
   if (rErr) throw rErr;
@@ -83,6 +84,7 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
   const initialPhase: Phase = props.fields[0]?.type === "welcome_screen" ? "welcome" : "form";
 
   const [phase, setPhase] = createSignal<Phase>(initialPhase);
+  const [startedAt] = createSignal(new Date().toISOString());
   const [currentIdx, setCurrentIdx] = createSignal(0);
   const [answers, setAnswers] = createSignal<Answers>({});
   const [animDir, setAnimDir] = createSignal<"up" | "down">("up");
@@ -110,7 +112,7 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
   async function handleSubmit() {
     setSubmitting(true);
     try {
-      await submitResponse(props.form.id, answers());
+      await submitResponse(props.form.id, answers(), startedAt());
       transition("up", () => setPhase("done"));
     } catch {
       setError("Something went wrong. Please try again.");
