@@ -333,21 +333,21 @@ export default async function LoginPage({
           </div>
 
           <div className="hero-text">
-            <div className="hero-label">AI-Native Form Builder</div>
+            <div className="hero-label">Modern Form Builder</div>
             <div className="hero-heading">
               Forms that<br />
-              <em>think</em> with<br />
-              your team.
+              feel like<br />
+              <em>conversations.</em>
             </div>
             <p className="hero-sub">
-              Variable interpolation, logic branching, and MCP-ready APIs.
-              Build forms that feel like conversations.
+              One question at a time. Logic branching, variable interpolation,
+              per-form theming, and a full REST API.
             </p>
             <div className="feature-list">
-              <div className="feature-item">Conversational multi-step flows</div>
-              <div className="feature-item">Variables + logic branching</div>
-              <div className="feature-item">Full MCP server — control via AI</div>
-              <div className="feature-item">Drop-off analytics + partial capture</div>
+              <div className="feature-item">Conversational one-at-a-time flows</div>
+              <div className="feature-item">Logic branching + variable interpolation</div>
+              <div className="feature-item">Per-form theming and branding</div>
+              <div className="feature-item">REST API + API key management</div>
             </div>
           </div>
 
