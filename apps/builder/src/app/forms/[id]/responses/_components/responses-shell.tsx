@@ -194,7 +194,7 @@ export function ResponsesShell({
           height: "56px", display: "flex", alignItems: "center",
           borderBottom: "1px solid rgba(240,237,232,0.06)",
           padding: "0 20px", gap: "16px", flexShrink: 0,
-          background: "#0A0A0A",
+          background: "#0A0A0A", position: "relative",
         }}>
           <Link href="/forms" style={{
             color: "rgba(240,237,232,0.3)", textDecoration: "none", fontSize: "12px",
@@ -204,21 +204,32 @@ export function ResponsesShell({
             {form.title}
           </span>
 
-          <div style={{ display: "flex", gap: "4px", marginLeft: "24px" }}>
-            {["Builder", "Responses"].map((tab) => {
-              const active = tab === "Responses";
-              const href = tab === "Builder" ? `/forms/${form.id}/builder` : `/forms/${form.id}/responses`;
-              return (
-                <Link key={tab} href={href} style={{
-                  padding: "5px 14px", textDecoration: "none", fontSize: "12px", letterSpacing: "0.5px",
-                  background: active ? "rgba(240,237,232,0.07)" : "transparent",
-                  border: `1px solid ${active ? "rgba(240,237,232,0.12)" : "transparent"}`,
-                  color: active ? "#F0EDE8" : "rgba(240,237,232,0.35)",
-                }}>
-                  {tab}
-                </Link>
-              );
-            })}
+          {/* Tab switcher — centered */}
+          <div style={{
+            position: "absolute", left: "50%", transform: "translateX(-50%)",
+            display: "flex",
+            background: "rgba(240,237,232,0.05)",
+            border: "1px solid rgba(240,237,232,0.08)",
+            borderRadius: "999px",
+            padding: "3px",
+            gap: "2px",
+          }}>
+            {[
+              { label: "Builder", href: `/forms/${form.id}/builder`, active: false },
+              { label: "Responses", href: `/forms/${form.id}/responses`, active: true },
+            ].map((tab) => (
+              <Link key={tab.label} href={tab.href} style={{
+                padding: "5px 18px", textDecoration: "none",
+                fontSize: "12px", letterSpacing: "0.3px",
+                borderRadius: "999px",
+                background: tab.active ? "rgba(240,237,232,0.1)" : "transparent",
+                color: tab.active ? "#F0EDE8" : "rgba(240,237,232,0.35)",
+                fontFamily: "'DM Mono', monospace",
+                transition: "all 0.15s",
+              }}>
+                {tab.label}
+              </Link>
+            ))}
           </div>
 
           <div style={{ marginLeft: "auto", display: "flex", gap: "10px", alignItems: "center" }}>

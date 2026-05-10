@@ -219,7 +219,7 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
           height: "56px", display: "flex", alignItems: "center",
           borderBottom: "1px solid rgba(240,237,232,0.06)",
           padding: "0 20px", gap: "16px", flexShrink: 0,
-          background: "#0A0A0A",
+          background: "#0A0A0A", position: "relative",
         }}>
           <Link href="/forms" style={{
             color: "rgba(240,237,232,0.3)", textDecoration: "none",
@@ -244,26 +244,32 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
             placeholder="Untitled Form"
           />
 
-          {/* Tab switcher */}
-          <div style={{ display: "flex", gap: "4px", marginLeft: "8px" }}>
-            {["Builder", "Responses"].map((tab) => {
-              const active = tab === "Builder";
-              const href = tab === "Responses"
-                ? `/forms/${form.id}/responses`
-                : `/forms/${form.id}/builder`;
-              return (
-                <Link key={tab} href={href} style={{
-                  padding: "5px 14px", textDecoration: "none",
-                  fontSize: "12px", letterSpacing: "0.5px",
-                  background: active ? "rgba(240,237,232,0.07)" : "transparent",
-                  border: `1px solid ${active ? "rgba(240,237,232,0.12)" : "transparent"}`,
-                  color: active ? "#F0EDE8" : "rgba(240,237,232,0.35)",
-                  transition: "all 0.12s",
-                }}>
-                  {tab}
-                </Link>
-              );
-            })}
+          {/* Tab switcher — centered */}
+          <div style={{
+            position: "absolute", left: "50%", transform: "translateX(-50%)",
+            display: "flex",
+            background: "rgba(240,237,232,0.05)",
+            border: "1px solid rgba(240,237,232,0.08)",
+            borderRadius: "999px",
+            padding: "3px",
+            gap: "2px",
+          }}>
+            {[
+              { label: "Builder", href: `/forms/${form.id}/builder`, active: true },
+              { label: "Responses", href: `/forms/${form.id}/responses`, active: false },
+            ].map((tab) => (
+              <Link key={tab.label} href={tab.href} style={{
+                padding: "5px 18px", textDecoration: "none",
+                fontSize: "12px", letterSpacing: "0.3px",
+                borderRadius: "999px",
+                background: tab.active ? "rgba(240,237,232,0.1)" : "transparent",
+                color: tab.active ? "#F0EDE8" : "rgba(240,237,232,0.35)",
+                fontFamily: "'DM Mono', monospace",
+                transition: "all 0.15s",
+              }}>
+                {tab.label}
+              </Link>
+            ))}
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginLeft: "auto" }}>
