@@ -27,6 +27,7 @@ import {
   reorderFields,
   updateFormTitle,
   togglePublish,
+  updateFormTheme,
 } from "../actions";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -115,6 +116,8 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
   const [published, setPublished] = useState(form.published);
   const [showWidgetPicker, setShowWidgetPicker] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [leftTab, setLeftTab] = useState<"questions" | "style">("questions");
+  const [formTheme, setFormTheme] = useState<Record<string, unknown>>(form.theme ?? {});
   const [, startTransition] = useTransition();
 
   const rendererBase = process.env.NEXT_PUBLIC_RENDERER_URL ?? "http://localhost:3001";
@@ -153,6 +156,18 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
     void _id; void _fid; void _ca;
     saveField(id, safe);
   }, [saveField]);
+
+  const saveTheme = useDebounce((theme: Record<string, unknown>) => {
+    startTransition(() => { updateFormTheme(form.id, theme); });
+  }, 500);
+
+  const patchTheme = useCallback((updates: Record<string, unknown>) => {
+    setFormTheme((prev) => {
+      const next = { ...prev, ...updates };
+      saveTheme(next);
+      return next;
+    });
+  }, [saveTheme]);
 
   // Add field
   const handleAddField = async (type: string) => {
@@ -339,86 +354,92 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
         {/* ── Body ── */}
         <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
 
-          {/* ── Left: Field list ── */}
+          {/* ── Left panel ── */}
           <div style={{
             width: "260px", flexShrink: 0,
             borderRight: "1px solid var(--border)",
             display: "flex", flexDirection: "column",
             background: "var(--surface)", overflow: "hidden",
           }}>
+            {/* Tab header */}
             <div style={{
-              padding: "14px 16px 10px",
+              padding: "0 8px",
               borderBottom: "1px solid var(--border)",
-              display: "flex", alignItems: "center", justifyContent: "space-between",
+              display: "flex", alignItems: "center",
+              flexShrink: 0,
             }}>
-              <span style={{ fontSize: "10px", letterSpacing: "2px", textTransform: "uppercase", color: "var(--text-dim)" }}>
-                Questions
-              </span>
-              <button
-                onClick={() => setShowWidgetPicker(true)}
-                style={{
-                  background: "var(--accent)", border: "none", color: "var(--accent-text)",
-                  width: "22px", height: "22px", cursor: "pointer",
-                  borderRadius: "var(--radius-xs)",
-                  fontSize: "16px", lineHeight: 1, fontWeight: 700,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  transition: "opacity var(--duration) var(--ease)",
-                }}
-              >
-                +
-              </button>
-            </div>
-
-            <div style={{ flex: 1, overflowY: "auto", padding: "8px" }}>
-              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
-                  {fields.map((field, idx) => (
-                    <SortableFieldRow
-                      key={field.id}
-                      field={field}
-                      index={idx}
-                      isSelected={field.id === selectedId}
-                      onSelect={() => setSelectedId(field.id)}
-                      onDelete={() => handleDeleteField(field.id)}
-                    />
-                  ))}
-                </SortableContext>
-              </DndContext>
-
-              {fields.length === 0 && (
-                <div style={{
-                  padding: "32px 16px", textAlign: "center",
-                  fontSize: "12px", color: "var(--text-faint)",
-                  lineHeight: 1.6,
+              {(["questions", "style"] as const).map((t) => (
+                <button key={t} onClick={() => setLeftTab(t)} style={{
+                  flex: 1, padding: "12px 0", cursor: "pointer",
+                  background: "transparent", border: "none",
+                  borderBottom: leftTab === t ? "2px solid var(--accent)" : "2px solid transparent",
+                  color: leftTab === t ? "var(--text)" : "var(--text-dim)",
+                  fontFamily: "var(--font-body)", fontSize: "11px",
+                  letterSpacing: "0.5px", textTransform: "capitalize",
+                  transition: "all var(--duration) var(--ease)",
+                  marginBottom: "-1px",
                 }}>
-                  No questions yet.<br />Hit + to add one.
-                </div>
-              )}
+                  {t === "questions" ? "Questions" : "Style"}
+                </button>
+              ))}
             </div>
 
-            <button
-              onClick={() => setShowWidgetPicker(true)}
-              style={{
-                margin: "var(--space-3)", padding: "var(--space-2) var(--space-3)",
-                background: "transparent",
-                border: "1px dashed var(--border-mid)",
-                borderRadius: "var(--radius-sm)",
-                color: "var(--text-dim)",
-                fontFamily: "var(--font-body)",
-                fontSize: "12px", cursor: "pointer",
-                transition: "all var(--duration) var(--ease)",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent-border)";
-                (e.currentTarget as HTMLButtonElement).style.color = "var(--accent)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border-mid)";
-                (e.currentTarget as HTMLButtonElement).style.color = "var(--text-dim)";
-              }}
-            >
-              + Add question
-            </button>
+            {leftTab === "questions" ? (
+              <>
+                <div style={{ flex: 1, overflowY: "auto", padding: "8px" }}>
+                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                    <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
+                      {fields.map((field, idx) => (
+                        <SortableFieldRow
+                          key={field.id}
+                          field={field}
+                          index={idx}
+                          isSelected={field.id === selectedId}
+                          onSelect={() => setSelectedId(field.id)}
+                          onDelete={() => handleDeleteField(field.id)}
+                        />
+                      ))}
+                    </SortableContext>
+                  </DndContext>
+
+                  {fields.length === 0 && (
+                    <div style={{
+                      padding: "32px 16px", textAlign: "center",
+                      fontSize: "12px", color: "var(--text-faint)",
+                      lineHeight: 1.6,
+                    }}>
+                      No questions yet.<br />Hit + to add one.
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => setShowWidgetPicker(true)}
+                  style={{
+                    margin: "var(--space-3)", padding: "var(--space-2) var(--space-3)",
+                    background: "transparent",
+                    border: "1px dashed var(--border-mid)",
+                    borderRadius: "var(--radius-sm)",
+                    color: "var(--text-dim)",
+                    fontFamily: "var(--font-body)",
+                    fontSize: "12px", cursor: "pointer",
+                    transition: "all var(--duration) var(--ease)",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent-border)";
+                    (e.currentTarget as HTMLButtonElement).style.color = "var(--accent)";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border-mid)";
+                    (e.currentTarget as HTMLButtonElement).style.color = "var(--text-dim)";
+                  }}
+                >
+                  + Add question
+                </button>
+              </>
+            ) : (
+              <FormStylePanel theme={formTheme} onChange={patchTheme} />
+            )}
           </div>
 
           {/* ── Center: Field editor ── */}
@@ -1206,6 +1227,254 @@ function WidgetPicker({ onSelect, onClose }: { onSelect: (type: string) => void;
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+// ── Form Style Panel ──────────────────────────────────────────────────────────
+
+const FORM_FONTS = [
+  { id: "Syne", label: "Syne" },
+  { id: "DM Sans", label: "DM Sans" },
+  { id: "Inter", label: "Inter" },
+  { id: "Space Grotesk", label: "Space Grotesk" },
+  { id: "Playfair Display", label: "Playfair" },
+];
+
+const FORM_BODY_FONTS = [
+  { id: "DM Mono", label: "DM Mono" },
+  { id: "Inter", label: "Inter" },
+  { id: "Instrument Sans", label: "Instrument" },
+  { id: "IBM Plex Mono", label: "IBM Plex Mono" },
+];
+
+const RADIUS_PRESETS = [
+  { label: "Sharp", value: "0px" },
+  { label: "Subtle", value: "4px" },
+  { label: "Rounded", value: "8px" },
+  { label: "Soft", value: "12px" },
+];
+
+const PALETTE_PRESETS = [
+  { bg: "#080808", primary: "#CAFF00", label: "Hacker" },
+  { bg: "#0F0F1A", primary: "#A78BFA", label: "Violet" },
+  { bg: "#FDF6EE", primary: "#E07A4F", label: "Linen" },
+  { bg: "#F5F5F0", primary: "#4A7C59", label: "Sage" },
+  { bg: "#0A0A0A", primary: "#60A5FA", label: "Cobalt" },
+  { bg: "#1A0F0F", primary: "#FB923C", label: "Ember" },
+];
+
+function StyleLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{
+      fontSize: "9px", letterSpacing: "2px", textTransform: "uppercase",
+      color: "var(--text-dim)", marginBottom: "8px", fontFamily: "var(--font-body)",
+    }}>
+      {children}
+    </div>
+  );
+}
+
+function FormStylePanel({ theme, onChange }: {
+  theme: Record<string, unknown>;
+  onChange: (updates: Record<string, unknown>) => void;
+}) {
+  const bg = (theme.background_color as string) ?? "#080808";
+  const primary = (theme.primary_color as string) ?? "#CAFF00";
+  const displayFont = (theme.display_font as string) ?? "Syne";
+  const bodyFont = (theme.body_font as string) ?? "DM Mono";
+  const radius = (theme.button_radius as string) ?? "0px";
+
+  return (
+    <div style={{ flex: 1, overflowY: "auto", padding: "16px", display: "flex", flexDirection: "column", gap: "20px" }}>
+
+      {/* Palette presets */}
+      <div>
+        <StyleLabel>Palette</StyleLabel>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "6px" }}>
+          {PALETTE_PRESETS.map((p) => {
+            const active = bg === p.bg && primary === p.primary;
+            return (
+              <button
+                key={p.label}
+                onClick={() => onChange({ background_color: p.bg, primary_color: p.primary })}
+                title={p.label}
+                style={{
+                  height: "40px", borderRadius: "4px", cursor: "pointer",
+                  border: active ? "2px solid var(--accent)" : "2px solid transparent",
+                  background: p.bg, position: "relative", overflow: "hidden",
+                  transition: "border-color var(--duration) var(--ease)",
+                }}
+              >
+                <span style={{
+                  position: "absolute", bottom: "5px", right: "5px",
+                  width: "10px", height: "10px", borderRadius: "50%",
+                  background: p.primary,
+                }} />
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Colors */}
+      <div>
+        <StyleLabel>Colors</StyleLabel>
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: "11px", color: "var(--text-muted)", fontFamily: "var(--font-body)" }}>Background</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <span style={{ fontSize: "10px", color: "var(--text-dim)", fontFamily: "var(--font-body)" }}>{bg}</span>
+              <input
+                type="color"
+                value={bg}
+                onChange={(e) => onChange({ background_color: e.target.value })}
+                style={{ width: "24px", height: "24px", border: "none", borderRadius: "4px", cursor: "pointer", padding: 0 }}
+              />
+            </div>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: "11px", color: "var(--text-muted)", fontFamily: "var(--font-body)" }}>Accent</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <span style={{ fontSize: "10px", color: "var(--text-dim)", fontFamily: "var(--font-body)" }}>{primary}</span>
+              <input
+                type="color"
+                value={primary}
+                onChange={(e) => onChange({ primary_color: e.target.value })}
+                style={{ width: "24px", height: "24px", border: "none", borderRadius: "4px", cursor: "pointer", padding: 0 }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Display font */}
+      <div>
+        <StyleLabel>Display font</StyleLabel>
+        <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
+          {FORM_FONTS.map((f) => {
+            const active = displayFont === f.id;
+            return (
+              <button
+                key={f.id}
+                onClick={() => onChange({ display_font: f.id })}
+                style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  background: active ? "var(--accent-dim)" : "transparent",
+                  border: active ? "1px solid var(--accent-border)" : "1px solid transparent",
+                  borderRadius: "var(--radius-sm)",
+                  padding: "6px 10px", cursor: "pointer",
+                  color: active ? "var(--text)" : "var(--text-muted)",
+                  fontFamily: "var(--font-body)", fontSize: "12px",
+                  transition: "all var(--duration) var(--ease)",
+                }}
+              >
+                <span>{f.label}</span>
+                <span style={{ fontFamily: `'${f.id}', sans-serif`, fontSize: "15px", fontWeight: 700 }}>Aa</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Body font */}
+      <div>
+        <StyleLabel>Body font</StyleLabel>
+        <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
+          {FORM_BODY_FONTS.map((f) => {
+            const active = bodyFont === f.id;
+            return (
+              <button
+                key={f.id}
+                onClick={() => onChange({ body_font: f.id })}
+                style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  background: active ? "var(--accent-dim)" : "transparent",
+                  border: active ? "1px solid var(--accent-border)" : "1px solid transparent",
+                  borderRadius: "var(--radius-sm)",
+                  padding: "6px 10px", cursor: "pointer",
+                  color: active ? "var(--text)" : "var(--text-muted)",
+                  fontFamily: "var(--font-body)", fontSize: "12px",
+                  transition: "all var(--duration) var(--ease)",
+                }}
+              >
+                <span>{f.label}</span>
+                <span style={{ fontFamily: `'${f.id}', monospace`, fontSize: "13px" }}>Aa</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Border radius */}
+      <div>
+        <StyleLabel>Roundness</StyleLabel>
+        <div style={{ display: "flex", gap: "6px" }}>
+          {RADIUS_PRESETS.map((r) => {
+            const active = radius === r.value;
+            return (
+              <button
+                key={r.value}
+                onClick={() => onChange({ button_radius: r.value })}
+                title={r.label}
+                style={{
+                  flex: 1, aspectRatio: "1", cursor: "pointer",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  background: active ? "var(--accent-dim)" : "var(--surface-2)",
+                  border: active ? "1px solid var(--accent-border)" : "1px solid var(--border)",
+                  borderRadius: r.value,
+                  transition: "all var(--duration) var(--ease)",
+                }}
+              >
+                <span style={{
+                  width: "12px", height: "12px",
+                  background: active ? "var(--accent)" : "var(--border-strong)",
+                  borderRadius: r.value,
+                  transition: "all var(--duration) var(--ease)",
+                }} />
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Live preview swatch */}
+      <div>
+        <StyleLabel>Preview</StyleLabel>
+        <div style={{
+          borderRadius: "6px", overflow: "hidden",
+          border: "1px solid var(--border)",
+        }}>
+          <div style={{ background: bg, padding: "16px" }}>
+            <div style={{
+              fontSize: "13px", fontWeight: 700, color: "#F0EDE8",
+              fontFamily: `'${displayFont}', sans-serif`,
+              marginBottom: "8px",
+            }}>
+              What is your name?
+            </div>
+            <div style={{
+              borderBottom: `2px solid ${primary}`,
+              paddingBottom: "4px",
+              fontSize: "12px", color: "rgba(240,237,232,0.5)",
+              fontFamily: `'${bodyFont}', monospace`,
+            }}>
+              Type your answer...
+            </div>
+            <button style={{
+              marginTop: "12px",
+              background: primary, color: bg,
+              border: "none", padding: "6px 16px",
+              fontFamily: `'${displayFont}', sans-serif`,
+              fontSize: "11px", fontWeight: 700, cursor: "pointer",
+              borderRadius: radius,
+            }}>
+              OK
+            </button>
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 }

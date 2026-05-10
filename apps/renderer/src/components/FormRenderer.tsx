@@ -78,6 +78,9 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
 
   const primaryColor = () => props.form.theme?.primary_color ?? "#CAFF00";
   const bgColor = () => props.form.theme?.background_color ?? "#080808";
+  const displayFont = () => (props.form.theme?.display_font as string) ?? "Syne";
+  const bodyFont = () => (props.form.theme?.body_font as string) ?? "DM Mono";
+  const buttonRadius = () => (props.form.theme?.button_radius as string) ?? "0px";
   const showProgress = () => props.form.settings?.show_progress_bar !== false;
   const showNumbers = () => props.form.settings?.show_question_number !== false;
 
@@ -185,7 +188,7 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
     "min-height": "100vh",
     background: bgColor(),
     color: "#F0EDE8",
-    "font-family": "'DM Mono', monospace",
+    "font-family": `'${bodyFont()}', monospace`,
     display: "flex",
     "flex-direction": "column" as const,
     position: "relative" as const,
@@ -219,7 +222,7 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
             return (
               <div style={wrapStyle()}>
                 <style>{`
-                  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@300;400;500&display=swap');
+                  @import url('https://fonts.googleapis.com/css2?family=${encodeURIComponent(displayFont())}:wght@400;700;800&family=${encodeURIComponent(bodyFont())}:wght@300;400;500&display=swap');
                   * { box-sizing: border-box; margin: 0; padding: 0; }
                   input:focus, textarea:focus { border-bottom-color: ${primaryColor()} !important; }
                   input[type=date]::-webkit-calendar-picker-indicator { filter: invert(1) opacity(0.3); }
@@ -238,7 +241,7 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
                 {/* Branding */}
                 <div style={{
                   position: "absolute", top: "20px", left: "24px",
-                  "font-size": "13px", "font-family": "'Syne', sans-serif",
+                  "font-size": "13px", "font-family": `'${displayFont()}', sans-serif`,
                   "font-weight": "700", color: "rgba(240,237,232,0.2)",
                   "letter-spacing": "-0.3px", "z-index": "10",
                 }}>
@@ -285,7 +288,7 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
                     {/* Question number */}
                     <Show when={showNumbers() && !isStatement() && questionNumber() > 0}>
                       <div style={{ display: "flex", "align-items": "center", gap: "8px", "margin-bottom": "20px" }}>
-                        <span style={{ "font-size": "13px", "font-weight": "500", color: primaryColor(), "font-family": "'DM Mono', monospace" }}>
+                        <span style={{ "font-size": "13px", "font-weight": "500", color: primaryColor(), "font-family": `'${bodyFont()}', monospace` }}>
                           {questionNumber()}
                         </span>
                         <span style={{ "font-size": "13px", color: "rgba(240,237,232,0.3)" }}>→</span>
@@ -299,7 +302,7 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
 
                     {/* Title */}
                     <h2 style={{
-                      "font-family": "'Syne', sans-serif",
+                      "font-family": `'${displayFont()}', sans-serif`,
                       "font-size": "clamp(22px, 3.5vw, 34px)",
                       "font-weight": "700", "letter-spacing": "-0.5px",
                       color: "#F0EDE8", "margin-bottom": "10px", "line-height": "1.2",
@@ -322,6 +325,9 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
                           value={answers()[field().id]}
                           onChange={(val) => setAnswer(field().id, val)}
                           primaryColor={primaryColor()}
+                          bodyFont={bodyFont()}
+                          buttonRadius={buttonRadius()}
+                          bgColor={bgColor()}
                           onEnter={goNext}
                         />
                       </div>
@@ -340,11 +346,11 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
                         onClick={goNext}
                         disabled={submitting()}
                         style={{
-                          background: primaryColor(), color: "#080808",
-                          border: "none", "font-family": "'Syne', sans-serif",
+                          background: primaryColor(), color: bgColor(),
+                          border: "none", "font-family": `'${displayFont()}', sans-serif`,
                           "font-size": "13px", "font-weight": "700",
                           padding: "12px 24px", cursor: "pointer",
-                          "letter-spacing": "0.5px",
+                          "letter-spacing": "0.5px", "border-radius": buttonRadius(),
                           opacity: submitting() ? "0.6" : "1",
                           transition: "all 0.15s ease",
                         }}
@@ -366,7 +372,7 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
       }>
         {/* Done screen */}
         <div style={wrapStyle()}>
-          <style>{`@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@300;400;500&display=swap'); * { box-sizing: border-box; margin: 0; padding: 0; }`}</style>
+          <style>{`@import url('https://fonts.googleapis.com/css2?family=${encodeURIComponent(displayFont())}:wght@400;700;800&family=${encodeURIComponent(bodyFont())}:wght@300;400;500&display=swap'); * { box-sizing: border-box; margin: 0; padding: 0; }`}</style>
           <div style={{
             flex: "1", display: "flex", "align-items": "center", "justify-content": "center",
             padding: "80px 24px", "flex-direction": "column", gap: "24px", "text-align": "center",
@@ -378,7 +384,7 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
             }}>
               <div style={{ "font-size": "48px", "margin-bottom": "24px", color: "#CAFF00" }}>✓</div>
               <h1 style={{
-                "font-family": "'Syne', sans-serif",
+                "font-family": `'${displayFont()}', sans-serif`,
                 "font-size": "clamp(28px, 4vw, 44px)",
                 "font-weight": "800", "letter-spacing": "-1px",
                 color: "#F0EDE8", "margin-bottom": "12px",
@@ -395,7 +401,7 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
     }>
       {/* Welcome screen */}
       <div style={wrapStyle()}>
-        <style>{`@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@300;400;500&display=swap'); * { box-sizing: border-box; margin: 0; padding: 0; }`}</style>
+        <style>{`@import url('https://fonts.googleapis.com/css2?family=${encodeURIComponent(displayFont())}:wght@400;700;800&family=${encodeURIComponent(bodyFont())}:wght@300;400;500&display=swap'); * { box-sizing: border-box; margin: 0; padding: 0; }`}</style>
         <div style={{
           flex: "1", display: "flex", "align-items": "center", "justify-content": "center",
           padding: "80px 24px", "flex-direction": "column", gap: "40px",
@@ -407,12 +413,12 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
           }}>
             <div style={{
               "font-size": "12px", "letter-spacing": "3px", "text-transform": "uppercase",
-              color: primaryColor(), "margin-bottom": "20px", "font-family": "'DM Mono', monospace",
+              color: primaryColor(), "margin-bottom": "20px", "font-family": `'${bodyFont()}', monospace`,
             }}>
               {props.form.title}
             </div>
             <h1 style={{
-              "font-family": "'Syne', sans-serif",
+              "font-family": `'${displayFont()}', sans-serif`,
               "font-size": "clamp(32px, 5vw, 56px)",
               "font-weight": "800", "letter-spacing": "-1.5px",
               color: "#F0EDE8", "margin-bottom": "16px", "line-height": "1.1",
@@ -435,11 +441,12 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
               });
             }}
             style={{
-              background: primaryColor(), color: "#080808",
-              border: "none", "font-family": "'Syne', sans-serif",
+              background: primaryColor(), color: bgColor(),
+              border: "none", "font-family": `'${displayFont()}', sans-serif`,
               "font-size": "14px", "font-weight": "700",
               padding: "16px 48px", cursor: "pointer",
               "letter-spacing": "0.5px", transition: "transform 0.15s ease",
+              "border-radius": buttonRadius(),
             }}
           >
             Start →
@@ -461,6 +468,9 @@ function FieldInput(props: {
   value: unknown;
   onChange: (val: unknown) => void;
   primaryColor: string;
+  bodyFont: string;
+  buttonRadius: string;
+  bgColor: string;
   onEnter: () => void;
 }) {
   const baseInput = {
@@ -468,7 +478,7 @@ function FieldInput(props: {
     border: "none",
     "border-bottom": "2px solid rgba(240,237,232,0.15)",
     color: "#F0EDE8",
-    "font-family": "'DM Mono', monospace",
+    "font-family": `'${props.bodyFont}', monospace`,
     "font-size": "clamp(16px, 2.5vw, 22px)",
     "font-weight": "300",
     padding: "10px 0",
@@ -502,11 +512,11 @@ function FieldInput(props: {
                     </Show>
                   }>
                     {/* Multiple choice / dropdown */}
-                    <MultipleChoiceInput field={f()} value={props.value} onChange={props.onChange} primaryColor={props.primaryColor} onEnter={props.onEnter} />
+                    <MultipleChoiceInput field={f()} value={props.value} onChange={props.onChange} primaryColor={props.primaryColor} bodyFont={props.bodyFont} onEnter={props.onEnter} />
                   </Show>
                 }>
                   {/* Opinion scale */}
-                  <OpinionScaleInput field={f()} value={props.value} onChange={props.onChange} primaryColor={props.primaryColor} />
+                  <OpinionScaleInput field={f()} value={props.value} onChange={props.onChange} primaryColor={props.primaryColor} bodyFont={props.bodyFont} />
                 </Show>
               }>
                 {/* Rating */}
@@ -525,11 +535,11 @@ function FieldInput(props: {
                           padding: "14px 40px",
                           background: selected() ? props.primaryColor : "transparent",
                           border: `1px solid ${selected() ? props.primaryColor : "rgba(240,237,232,0.15)"}`,
-                          color: selected() ? "#080808" : "#F0EDE8",
-                          "font-family": "'Syne', sans-serif",
+                          color: selected() ? props.bgColor : "#F0EDE8",
+                          "font-family": `'${props.bodyFont}', sans-serif`,
                           "font-size": "15px", "font-weight": "700",
                           cursor: "pointer", transition: "all 0.15s",
-                          "letter-spacing": "0.5px",
+                          "letter-spacing": "0.5px", "border-radius": props.buttonRadius,
                         }}
                       >
                         {opt}
@@ -621,7 +631,7 @@ function RatingInput(props: { field: Field; value: unknown; onChange: (v: unknow
   );
 }
 
-function OpinionScaleInput(props: { field: Field; value: unknown; onChange: (v: unknown) => void; primaryColor: string }) {
+function OpinionScaleInput(props: { field: Field; value: unknown; onChange: (v: unknown) => void; primaryColor: string; bodyFont: string }) {
   const steps = () => (props.field.config.steps as number) ?? 10;
   const current = () => props.value as number;
 
@@ -638,7 +648,7 @@ function OpinionScaleInput(props: { field: Field; value: unknown; onChange: (v: 
                 background: selected() ? props.primaryColor : "transparent",
                 border: `1px solid ${selected() ? props.primaryColor : "rgba(240,237,232,0.15)"}`,
                 color: selected() ? "#080808" : "rgba(240,237,232,0.6)",
-                "font-family": "'DM Mono', monospace",
+                "font-family": `'${props.bodyFont}', monospace`,
                 "font-size": "14px", cursor: "pointer",
                 transition: "all 0.12s",
               }}
@@ -657,6 +667,7 @@ function MultipleChoiceInput(props: {
   value: unknown;
   onChange: (v: unknown) => void;
   primaryColor: string;
+  bodyFont: string;
   onEnter: () => void;
 }) {
   const choices = () => (props.field.config.choices as { id: string; label: string }[]) ?? [];
@@ -689,7 +700,7 @@ function MultipleChoiceInput(props: {
                 background: isSelected() ? `${props.primaryColor}12` : "transparent",
                 border: `1px solid ${isSelected() ? props.primaryColor : "rgba(240,237,232,0.1)"}`,
                 color: "#F0EDE8", cursor: "pointer",
-                "font-family": "'DM Mono', monospace",
+                "font-family": `'${props.bodyFont}', monospace`,
                 "font-size": "14px", "font-weight": "300",
                 transition: "all 0.12s",
               }}

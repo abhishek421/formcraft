@@ -68,6 +68,11 @@ export async function deleteField(fieldId: string) {
   await supabase.from("fields").delete().eq("id", fieldId);
 }
 
+export async function updateFormTheme(formId: string, theme: Record<string, unknown>) {
+  const supabase = await createClient();
+  await supabase.from("forms").update({ theme }).eq("id", formId);
+}
+
 export async function reorderFields(fields: { id: string; position: number }[]) {
   const supabase = await createClient();
   await Promise.all(
