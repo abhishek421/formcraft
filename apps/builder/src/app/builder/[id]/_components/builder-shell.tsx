@@ -886,22 +886,41 @@ function LogicEditor({
   const operatorsFor = (type: string): { value: string; label: string }[] => {
     if (type === "yes_no") return [
       { value: "equals", label: "is" },
+      { value: "is_filled", label: "is answered" },
     ];
     if (type === "multiple_choice" || type === "dropdown") return [
       { value: "equals", label: "is" },
       { value: "not_equals", label: "is not" },
+      { value: "is_filled", label: "is answered" },
+      { value: "is_empty", label: "is skipped" },
     ];
     if (type === "rating" || type === "opinion_scale" || type === "number") return [
       { value: "equals", label: "=" },
       { value: "not_equals", label: "≠" },
       { value: "greater_than", label: ">" },
       { value: "less_than", label: "<" },
+      { value: "is_filled", label: "is answered" },
+      { value: "is_empty", label: "is skipped" },
     ];
+    if (type === "date") return [
+      { value: "equals", label: "is exactly" },
+      { value: "not_equals", label: "is not" },
+      { value: "greater_than", label: "is after" },
+      { value: "less_than", label: "is before" },
+      { value: "is_filled", label: "is answered" },
+      { value: "is_empty", label: "is skipped" },
+    ];
+    if (type === "short_text" || type === "long_text") return [
+      { value: "equals", label: "equals" },
+      { value: "not_equals", label: "does not equal" },
+      { value: "contains", label: "contains" },
+      { value: "is_filled", label: "is filled" },
+      { value: "is_empty", label: "is empty" },
+    ];
+    // email, phone, url, file_upload
     return [
       { value: "is_filled", label: "is filled" },
       { value: "is_empty", label: "is empty" },
-      { value: "equals", label: "equals" },
-      { value: "contains", label: "contains" },
     ];
   };
 
