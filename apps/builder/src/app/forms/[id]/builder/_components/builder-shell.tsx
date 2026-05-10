@@ -405,56 +405,77 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
 
             {leftTab === "questions" ? (
               <>
-                <div style={{ flex: 1, overflowY: "auto", padding: "8px" }}>
-                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                    <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
-                      {fields.map((field, idx) => (
-                        <SortableFieldRow
-                          key={field.id}
-                          field={field}
-                          index={idx}
-                          isSelected={field.id === selectedId}
-                          onSelect={() => setSelectedId(field.id)}
-                          onDelete={() => handleDeleteField(field.id)}
-                        />
-                      ))}
-                    </SortableContext>
-                  </DndContext>
-
-                  {fields.length === 0 && (
-                    <div style={{
-                      padding: "32px 16px", textAlign: "center",
-                      fontSize: "12px", color: "var(--text-faint)",
-                      lineHeight: 1.6,
-                    }}>
-                      No questions yet.<br />Hit + to add one.
+                <div style={{ flex: 1, overflowY: "auto", padding: "8px", display: "flex", flexDirection: "column" }}>
+                  {fields.length === 0 ? (
+                    <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "12px", padding: "32px 16px" }}>
+                      <div style={{ fontSize: "24px", opacity: 0.2 }}>⊞</div>
+                      <div style={{ fontSize: "12px", color: "var(--text-faint)", textAlign: "center", lineHeight: 1.6 }}>
+                        No questions yet
+                      </div>
+                      <button
+                        onClick={() => setShowWidgetPicker(true)}
+                        style={{
+                          padding: "8px 16px", background: "transparent",
+                          border: "1px dashed var(--border-mid)",
+                          borderRadius: "var(--radius-sm)",
+                          color: "var(--text-dim)", fontFamily: "var(--font-body)",
+                          fontSize: "12px", cursor: "pointer",
+                          transition: "all var(--duration) var(--ease)",
+                        }}
+                        onMouseEnter={(e) => {
+                          (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent-border)";
+                          (e.currentTarget as HTMLButtonElement).style.color = "var(--accent)";
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border-mid)";
+                          (e.currentTarget as HTMLButtonElement).style.color = "var(--text-dim)";
+                        }}
+                      >
+                        + Add question
+                      </button>
                     </div>
+                  ) : (
+                    <>
+                      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                        <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
+                          {fields.map((field, idx) => (
+                            <SortableFieldRow
+                              key={field.id}
+                              field={field}
+                              index={idx}
+                              isSelected={field.id === selectedId}
+                              onSelect={() => setSelectedId(field.id)}
+                              onDelete={() => handleDeleteField(field.id)}
+                            />
+                          ))}
+                        </SortableContext>
+                      </DndContext>
+                      <button
+                        onClick={() => setShowWidgetPicker(true)}
+                        style={{
+                          margin: "4px 0 8px", padding: "var(--space-2) var(--space-3)",
+                          background: "transparent",
+                          border: "1px dashed var(--border-mid)",
+                          borderRadius: "var(--radius-sm)",
+                          color: "var(--text-dim)", fontFamily: "var(--font-body)",
+                          fontSize: "12px", cursor: "pointer",
+                          transition: "all var(--duration) var(--ease)",
+                          width: "100%",
+                        }}
+                        onMouseEnter={(e) => {
+                          (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent-border)";
+                          (e.currentTarget as HTMLButtonElement).style.color = "var(--accent)";
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border-mid)";
+                          (e.currentTarget as HTMLButtonElement).style.color = "var(--text-dim)";
+                        }}
+                      >
+                        + Add question
+                      </button>
+                    </>
                   )}
                 </div>
-
-                <button
-                  onClick={() => setShowWidgetPicker(true)}
-                  style={{
-                    margin: "var(--space-3)", padding: "var(--space-2) var(--space-3)",
-                    background: "transparent",
-                    border: "1px dashed var(--border-mid)",
-                    borderRadius: "var(--radius-sm)",
-                    color: "var(--text-dim)",
-                    fontFamily: "var(--font-body)",
-                    fontSize: "12px", cursor: "pointer",
-                    transition: "all var(--duration) var(--ease)",
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent-border)";
-                    (e.currentTarget as HTMLButtonElement).style.color = "var(--accent)";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border-mid)";
-                    (e.currentTarget as HTMLButtonElement).style.color = "var(--text-dim)";
-                  }}
-                >
-                  + Add question
-                </button>
               </>
             ) : (
               <FormStylePanel theme={formTheme} onChange={patchTheme} />
