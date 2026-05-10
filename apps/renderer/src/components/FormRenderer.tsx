@@ -95,12 +95,27 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
   const showProgress = () => props.form.settings?.show_progress_bar !== false;
   const showNumbers = () => props.form.settings?.show_question_number !== false;
 
-  const initialPhase: Phase = props.fields[0]?.type === "welcome_screen" ? "welcome" : "form";
+  const storageKey = `fc_draft_${props.form.id}`;
+
+  function loadDraft(): { phase: Phase; idx: number; answers: Answers; startedAt: string } | null {
+    try {
+      const raw = localStorage.getItem(storageKey);
+      return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
+  }
+
+  function saveDraft(phase: Phase, idx: number, answers: Answers, startedAt: string) {
+    if (phase === "done") { localStorage.removeItem(storageKey); return; }
+    try { localStorage.setItem(storageKey, JSON.stringify({ phase, idx, answers, startedAt })); } catch {}
+  }
+
+  const draft = loadDraft();
+  const initialPhase: Phase = draft?.phase ?? (props.fields[0]?.type === "welcome_screen" ? "welcome" : "form");
 
   const [phase, setPhase] = createSignal<Phase>(initialPhase);
-  const [startedAt] = createSignal(new Date().toISOString());
-  const [currentIdx, setCurrentIdx] = createSignal(0);
-  const [answers, setAnswers] = createSignal<Answers>({});
+  const [startedAt] = createSignal(draft?.startedAt ?? new Date().toISOString());
+  const [currentIdx, setCurrentIdx] = createSignal(draft?.idx ?? 0);
+  const [answers, setAnswers] = createSignal<Answers>(draft?.answers ?? {});
   const [animDir, setAnimDir] = createSignal<"up" | "down">("up");
   const [visible, setVisible] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
@@ -119,7 +134,11 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
   }
 
   function setAnswer(fieldId: string, value: unknown) {
-    setAnswers((prev) => ({ ...prev, [fieldId]: value }));
+    setAnswers((prev) => {
+      const next = { ...prev, [fieldId]: value };
+      saveDraft(phase(), currentIdx(), next, startedAt());
+      return next;
+    });
     setError(null);
   }
 
@@ -127,6 +146,7 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
     setSubmitting(true);
     try {
       await submitResponse(props.form.id, answers(), startedAt());
+      saveDraft("done", currentIdx(), answers(), startedAt());
       transition("up", () => setPhase("done"));
     } catch {
       setError("Something went wrong. Please try again.");
@@ -169,7 +189,11 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
     }
 
     if (currentIdx() < allFields().length - 1) {
-      transition("up", () => setCurrentIdx((i) => i + 1));
+      transition("up", () => {
+        const next = currentIdx() + 1;
+        setCurrentIdx(next);
+        saveDraft(phase(), next, answers(), startedAt());
+      });
     } else {
       handleSubmit();
     }
@@ -177,7 +201,11 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
 
   function goPrev() {
     if (currentIdx() > 0) {
-      transition("down", () => setCurrentIdx((i) => i - 1));
+      transition("down", () => {
+        const prev = currentIdx() - 1;
+        setCurrentIdx(prev);
+        saveDraft(phase(), prev, answers(), startedAt());
+      });
       setError(null);
     }
   }
@@ -272,6 +300,31 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
                     </Show>
                   </div>
                 </Show>
+
+                {/* Start over — bottom-left */}
+                <div style={{ position: "absolute", bottom: "20px", left: "24px", "z-index": "10" }}>
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem(storageKey);
+                      setAnswers({});
+                      setError(null);
+                      const firstNonWelcome = allFields().findIndex((f) => f.type !== "welcome_screen");
+                      transition("down", () => {
+                        setCurrentIdx(firstNonWelcome > 0 ? firstNonWelcome : 0);
+                      });
+                    }}
+                    style={{
+                      background: "transparent", border: "none",
+                      "font-size": "11px", color: `rgba(${textRgb()},0.2)`,
+                      cursor: "pointer", "font-family": `'${bodyFont()}', monospace`,
+                      "letter-spacing": "0.3px", transition: "color 0.15s",
+                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = `rgba(${textRgb()},0.45)`; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = `rgba(${textRgb()},0.2)`; }}
+                  >
+                    ↺ restart
+                  </button>
+                </div>
 
                 {/* FormCraft badge bottom-right */}
                 <div style={{
@@ -488,9 +541,11 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
           <button
             onClick={() => {
               const firstNonWelcome = allFields().findIndex((f) => f.type !== "welcome_screen");
+              const startIdx = firstNonWelcome > 0 ? firstNonWelcome : 0;
               transition("up", () => {
-                setCurrentIdx(firstNonWelcome > 0 ? firstNonWelcome : 0);
+                setCurrentIdx(startIdx);
                 setPhase("form");
+                saveDraft("form", startIdx, answers(), startedAt());
               });
             }}
             style={{
@@ -505,8 +560,31 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
             Start →
           </button>
 
-          <div style={{ "font-size": "11px", color: `rgba(${textRgb()},0.2)` }}>
-            {totalQuestions()} question{totalQuestions() !== 1 ? "s" : ""}
+          <div style={{ display: "flex", "flex-direction": "column", "align-items": "center", gap: "12px" }}>
+            <div style={{ "font-size": "11px", color: `rgba(${textRgb()},0.2)` }}>
+              {totalQuestions()} question{totalQuestions() !== 1 ? "s" : ""}
+            </div>
+            <Show when={!!loadDraft()}>
+              <button
+                onClick={() => {
+                  localStorage.removeItem(storageKey);
+                  setAnswers({});
+                  setCurrentIdx(0);
+                }}
+                style={{
+                  background: "transparent", border: "none",
+                  "font-size": "11px", color: `rgba(${textRgb()},0.25)`,
+                  cursor: "pointer", "text-decoration": "underline",
+                  "font-family": `'${bodyFont()}', monospace`,
+                  "letter-spacing": "0.3px",
+                  transition: "color 0.15s",
+                }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = `rgba(${textRgb()},0.5)`; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = `rgba(${textRgb()},0.25)`; }}
+              >
+                start over
+              </button>
+            </Show>
           </div>
         </div>
       </div>
