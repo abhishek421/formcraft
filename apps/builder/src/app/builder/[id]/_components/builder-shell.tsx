@@ -239,6 +239,25 @@ export function BuilderShell({ form, initialFields }: { form: Form; initialField
               {fields.length} question{fields.length !== 1 ? "s" : ""}
             </div>
 
+            <a
+              href={`/f/${form.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                padding: "7px 16px",
+                background: "transparent",
+                border: "1px solid rgba(240,237,232,0.12)",
+                color: "rgba(240,237,232,0.5)",
+                fontFamily: "'DM Mono', monospace",
+                fontSize: "11px", cursor: "pointer",
+                letterSpacing: "1px", textTransform: "uppercase",
+                textDecoration: "none",
+                transition: "all 0.15s",
+              }}
+            >
+              Preview ↗
+            </a>
+
             <button
               onClick={handlePublish}
               style={{
