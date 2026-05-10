@@ -1376,6 +1376,8 @@ function FormStylePanel({ theme, onChange }: {
   const displayFont = (theme.display_font as string) ?? "Syne";
   const bodyFont = (theme.body_font as string) ?? "DM Mono";
   const radius = (theme.button_radius as string) ?? "0px";
+  const brandName = (theme.brand_name as string) ?? "";
+  const brandLogo = (theme.brand_logo_url as string) ?? "";
 
   return (
     <div style={{ flex: 1, overflowY: "auto", padding: "16px", display: "flex", flexDirection: "column", gap: "20px" }}>
@@ -1532,6 +1534,53 @@ function FormStylePanel({ theme, onChange }: {
 
       {/* Live preview swatch */}
       <div>
+        {/* Brand */}
+        <div>
+          <StyleLabel>Brand</StyleLabel>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <input
+              type="text"
+              value={brandName}
+              onChange={(e) => onChange({ brand_name: e.target.value })}
+              placeholder="Company name"
+              style={{
+                background: "var(--surface-2)", border: "1px solid var(--border)",
+                borderRadius: "var(--radius-sm)", padding: "7px 10px",
+                color: "var(--text)", fontFamily: "var(--font-body)", fontSize: "12px",
+                width: "100%",
+              }}
+            />
+            <input
+              type="url"
+              value={brandLogo}
+              onChange={(e) => onChange({ brand_logo_url: e.target.value })}
+              placeholder="Logo URL (https://...)"
+              style={{
+                background: "var(--surface-2)", border: "1px solid var(--border)",
+                borderRadius: "var(--radius-sm)", padding: "7px 10px",
+                color: "var(--text)", fontFamily: "var(--font-body)", fontSize: "12px",
+                width: "100%",
+              }}
+            />
+            {(brandName || brandLogo) && (
+              <div style={{
+                display: "flex", alignItems: "center", gap: "8px",
+                padding: "8px 10px", background: "var(--surface-2)",
+                borderRadius: "var(--radius-sm)", border: "1px solid var(--border)",
+              }}>
+                {brandLogo && (
+                  <img src={brandLogo} alt="" style={{ height: "18px", width: "auto", objectFit: "contain", borderRadius: "2px" }} />
+                )}
+                {brandName && (
+                  <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--text)", fontFamily: "var(--font-body)" }}>
+                    {brandName}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
         <StyleLabel>Preview</StyleLabel>
         <div style={{
           borderRadius: "6px", overflow: "hidden",

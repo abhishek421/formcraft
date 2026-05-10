@@ -90,6 +90,8 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
   const displayFont = () => (props.form.theme?.display_font as string) ?? "Syne";
   const bodyFont = () => (props.form.theme?.body_font as string) ?? "DM Mono";
   const buttonRadius = () => (props.form.theme?.button_radius as string) ?? "0px";
+  const brandName = () => (props.form.theme?.brand_name as string) ?? "";
+  const brandLogo = () => (props.form.theme?.brand_logo_url as string) ?? "";
   const showProgress = () => props.form.settings?.show_progress_bar !== false;
   const showNumbers = () => props.form.settings?.show_question_number !== false;
 
@@ -252,14 +254,45 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
                   }} />
                 </Show>
 
-                {/* Branding */}
+                {/* User brand top-left */}
+                <Show when={brandName() || brandLogo()}>
+                  <div style={{
+                    position: "absolute", top: "20px", left: "24px",
+                    display: "flex", "align-items": "center", gap: "8px", "z-index": "10",
+                  }}>
+                    <Show when={brandLogo()}>
+                      <img src={brandLogo()} alt="" style={{ height: "22px", width: "auto", "object-fit": "contain" }} />
+                    </Show>
+                    <Show when={brandName()}>
+                      <span style={{
+                        "font-size": "13px", "font-family": `'${displayFont()}', sans-serif`,
+                        "font-weight": "700", color: textColor(),
+                        "letter-spacing": "-0.3px",
+                      }}>{brandName()}</span>
+                    </Show>
+                  </div>
+                </Show>
+
+                {/* FormCraft badge bottom-right */}
                 <div style={{
-                  position: "absolute", top: "20px", left: "24px",
-                  "font-size": "13px", "font-family": `'${displayFont()}', sans-serif`,
-                  "font-weight": "700", color: `rgba(${textRgb()},0.2)`,
-                  "letter-spacing": "-0.3px", "z-index": "10",
+                  position: "absolute", bottom: "20px", right: "24px", "z-index": "10",
                 }}>
-                  FormCraft
+                  <a
+                    href="https://formcraft.so"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: "flex", "align-items": "center", gap: "5px",
+                      "font-size": "11px", "font-family": `'${bodyFont()}', monospace`,
+                      color: `rgba(${textRgb()},0.25)`, "text-decoration": "none",
+                      "letter-spacing": "0.3px",
+                      transition: "color 0.15s ease",
+                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = `rgba(${textRgb()},0.5)`; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = `rgba(${textRgb()},0.25)`; }}
+                  >
+                    Made with <strong style={{ "font-weight": 600 }}>FormCraft</strong> ✦
+                  </a>
                 </div>
 
                 {/* Nav arrows */}
@@ -389,6 +422,8 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
         {/* Done screen */}
         <div style={wrapStyle()}>
           <style>{`@import url('https://fonts.googleapis.com/css2?family=${encodeURIComponent(displayFont())}:wght@400;700;800&family=${encodeURIComponent(bodyFont())}:wght@300;400;500&display=swap'); * { box-sizing: border-box; margin: 0; padding: 0; }`}</style>
+          <BrandHeader brandName={brandName()} brandLogo={brandLogo()} displayFont={displayFont()} textColor={textColor()} />
+          <FormCraftBadge bodyFont={bodyFont()} textRgb={textRgb()} />
           <div style={{
             flex: "1", display: "flex", "align-items": "center", "justify-content": "center",
             padding: "80px 24px", "flex-direction": "column", gap: "24px", "text-align": "center",
@@ -418,6 +453,8 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
       {/* Welcome screen */}
       <div style={wrapStyle()}>
         <style>{`@import url('https://fonts.googleapis.com/css2?family=${encodeURIComponent(displayFont())}:wght@400;700;800&family=${encodeURIComponent(bodyFont())}:wght@300;400;500&display=swap'); * { box-sizing: border-box; margin: 0; padding: 0; }`}</style>
+        <BrandHeader brandName={brandName()} brandLogo={brandLogo()} displayFont={displayFont()} textColor={textColor()} />
+        <FormCraftBadge bodyFont={bodyFont()} textRgb={textRgb()} />
         <div style={{
           flex: "1", display: "flex", "align-items": "center", "justify-content": "center",
           padding: "80px 24px", "flex-direction": "column", gap: "40px",
@@ -745,6 +782,50 @@ function MultipleChoiceInput(props: {
           );
         }}
       </For>
+    </div>
+  );
+}
+
+function BrandHeader(props: { brandName: string; brandLogo: string; displayFont: string; textColor: string }) {
+  if (!props.brandName && !props.brandLogo) return null;
+  return (
+    <div style={{
+      position: "absolute", top: "20px", left: "24px",
+      display: "flex", "align-items": "center", gap: "8px", "z-index": "10",
+    }}>
+      {props.brandLogo && (
+        <img src={props.brandLogo} alt="" style={{ height: "22px", width: "auto", "object-fit": "contain" }} />
+      )}
+      {props.brandName && (
+        <span style={{
+          "font-size": "13px", "font-family": `'${props.displayFont}', sans-serif`,
+          "font-weight": "700", color: props.textColor, "letter-spacing": "-0.3px",
+        }}>
+          {props.brandName}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function FormCraftBadge(props: { bodyFont: string; textRgb: string }) {
+  return (
+    <div style={{ position: "absolute", bottom: "20px", right: "24px", "z-index": "10" }}>
+      <a
+        href="https://formcraft.so"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          display: "flex", "align-items": "center", gap: "4px",
+          "font-size": "11px", "font-family": `'${props.bodyFont}', monospace`,
+          color: `rgba(${props.textRgb},0.25)`, "text-decoration": "none",
+          "letter-spacing": "0.3px", transition: "color 0.15s ease",
+        }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = `rgba(${props.textRgb},0.5)`; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = `rgba(${props.textRgb},0.25)`; }}
+      >
+        Made with <strong style={{ "font-weight": 600 }}>FormCraft</strong> ✦
+      </a>
     </div>
   );
 }
