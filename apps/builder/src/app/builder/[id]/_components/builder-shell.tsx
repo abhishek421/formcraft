@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useTransition, useRef } from "react";
+import { useState, useCallback, useTransition, useRef, useEffect } from "react";
 import Link from "next/link";
 import {
   DndContext,
@@ -113,7 +113,18 @@ export function BuilderShell({ form, initialFields }: { form: Form; initialField
   const [formTitle, setFormTitle] = useState(form.title);
   const [published, setPublished] = useState(form.published);
   const [showWidgetPicker, setShowWidgetPicker] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [, startTransition] = useTransition();
+
+  const rendererBase = process.env.NEXT_PUBLIC_RENDERER_URL ?? "http://localhost:3001";
+  const shareUrl = `${rendererBase}/f/${form.id}`;
+
+  const copyShareLink = () => {
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
 
   const selectedField = fields.find((f) => f.id === selectedId) ?? null;
 
@@ -262,8 +273,24 @@ export function BuilderShell({ form, initialFields }: { form: Form; initialField
               {fields.length} question{fields.length !== 1 ? "s" : ""}
             </div>
 
+            <button
+              onClick={copyShareLink}
+              style={{
+                padding: "7px 16px",
+                background: copied ? "rgba(202,255,0,0.08)" : "transparent",
+                border: `1px solid ${copied ? "rgba(202,255,0,0.3)" : "rgba(240,237,232,0.12)"}`,
+                color: copied ? "#CAFF00" : "rgba(240,237,232,0.5)",
+                fontFamily: "'DM Mono', monospace",
+                fontSize: "11px", cursor: "pointer",
+                letterSpacing: "1px", textTransform: "uppercase",
+                transition: "all 0.2s",
+              }}
+            >
+              {copied ? "Copied ✓" : "Copy Link"}
+            </button>
+
             <a
-              href={`http://localhost:3001/f/${form.id}`}
+              href={shareUrl}
               target="_blank"
               rel="noopener noreferrer"
               style={{
