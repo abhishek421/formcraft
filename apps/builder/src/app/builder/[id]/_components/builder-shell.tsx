@@ -263,7 +263,7 @@ export function BuilderShell({ form, initialFields }: { form: Form; initialField
             </div>
 
             <a
-              href={`/f/${form.id}`}
+              href={`http://localhost:3001/f/${form.id}`}
               target="_blank"
               rel="noopener noreferrer"
               style={{
