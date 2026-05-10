@@ -451,32 +451,32 @@ export default async function LoginPage({
             </div>
 
             <div className="hero-heading">
-              Forms that<br />
-              feel like
-              <span className="accent-word">conversations.</span>
+              Stop asking<br />
+              people to fill
+              <span className="accent-word">out forms.</span>
             </div>
 
             <p className="hero-sub">
-              One question at a time. Logic branching, variable interpolation,
-              per-form theming, and a full REST API — all in one tool.
+              One question at a time, only when it matters.
+              FormCraft makes data collection feel effortless — for you and whoever's answering.
             </p>
 
             <div className="features">
               <div className="feature">
                 <div className="feature-dot" />
-                <span className="feature-text">Conversational one-at-a-time flows</span>
+                <span className="feature-text">Qualify leads before they reach your inbox</span>
               </div>
               <div className="feature">
                 <div className="feature-dot" />
-                <span className="feature-text">Logic branching + variable interpolation</span>
+                <span className="feature-text">Skip irrelevant questions — ask what matters</span>
               </div>
               <div className="feature">
                 <div className="feature-dot" />
-                <span className="feature-text">Per-form theming and branding</span>
+                <span className="feature-text">Looks like your brand, not ours</span>
               </div>
               <div className="feature">
                 <div className="feature-dot" />
-                <span className="feature-text">REST API + API key management</span>
+                <span className="feature-text">Plug into any stack via REST API</span>
               </div>
             </div>
           </div>
