@@ -1,13 +1,11 @@
 import { NextRequest } from "next/server";
-import { createClient } from "@/lib/supabase/server";
 import { authenticateApiKey, unauthorized, badRequest } from "@/lib/api-auth";
 
 export async function GET(req: NextRequest) {
   const auth = await authenticateApiKey(req);
   if (!auth) return unauthorized();
 
-  const supabase = await createClient();
-  const { data } = await supabase
+  const { data } = await auth.supabase
     .from("forms")
     .select("id, title, description, published, created_at, updated_at")
     .eq("user_id", auth.userId)
@@ -23,8 +21,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   if (!body?.title) return badRequest("title is required");
 
-  const supabase = await createClient();
-  const { data, error } = await supabase
+  const { data, error } = await auth.supabase
     .from("forms")
     .insert({
       user_id: auth.userId,

@@ -1,5 +1,4 @@
 import { NextRequest } from "next/server";
-import { createClient } from "@/lib/supabase/server";
 import { authenticateApiKey, unauthorized, notFound } from "@/lib/api-auth";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -7,8 +6,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   if (!auth) return unauthorized();
 
   const { id } = await params;
-  const supabase = await createClient();
-  const { data: form } = await supabase.from("forms").select("id").eq("id", id).eq("user_id", auth.userId).single();
+  const { data: form } = await auth.supabase.from("forms").select("id").eq("id", id).eq("user_id", auth.userId).single();
   if (!form) return notFound();
 
   const url = new URL(req.url);
@@ -16,7 +14,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const limit = Math.min(100, Math.max(1, Number(url.searchParams.get("limit") ?? 20)));
   const offset = (page - 1) * limit;
 
-  const { data: responses, count } = await supabase
+  const { data: responses, count } = await auth.supabase
     .from("responses")
     .select("id, started_at, submitted_at, metadata, answers(field_id, value)", { count: "exact" })
     .eq("form_id", id)

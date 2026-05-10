@@ -1,5 +1,4 @@
 import { NextRequest } from "next/server";
-import { createClient } from "@/lib/supabase/server";
 import { authenticateApiKey, unauthorized, notFound } from "@/lib/api-auth";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string; responseId: string }> }) {
@@ -7,11 +6,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   if (!auth) return unauthorized();
 
   const { id, responseId } = await params;
-  const supabase = await createClient();
-  const { data: form } = await supabase.from("forms").select("id").eq("id", id).eq("user_id", auth.userId).single();
+  const { data: form } = await auth.supabase.from("forms").select("id").eq("id", id).eq("user_id", auth.userId).single();
   if (!form) return notFound();
 
-  const { data: response } = await supabase
+  const { data: response } = await auth.supabase
     .from("responses")
     .select("id, started_at, submitted_at, metadata, answers(field_id, value)")
     .eq("id", responseId)
