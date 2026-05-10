@@ -18,7 +18,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!field) return notFound();
 
   const body = await req.json().catch(() => ({}));
-  const allowed = ["title", "description", "required", "position", "variable", "config", "logic"];
+  const allowed = ["title", "description", "required", "position", "variable", "config", "logic", "question_group_id"];
   const updates = Object.fromEntries(Object.entries(body).filter(([k]) => allowed.includes(k)));
 
   const { data, error } = await auth.supabase.from("fields").update(updates).eq("id", fieldId).select().single();

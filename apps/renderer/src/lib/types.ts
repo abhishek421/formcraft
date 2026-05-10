@@ -8,6 +8,17 @@ export type Field = {
   variable?: string;
   config: Record<string, unknown>;
   logic?: LogicJump[];
+  question_group_id?: string | null;
+};
+
+export type VariantAssignment = {
+  question_group_id: string;
+  variant_id: string;
+  title?: string;
+  description?: string;
+  type?: string;
+  config?: Record<string, unknown>;
+  logic?: LogicJump[];
 };
 
 export type LogicJump = {

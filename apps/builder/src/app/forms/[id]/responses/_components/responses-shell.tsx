@@ -227,6 +227,7 @@ export function ResponsesShell({
             {[
               { label: "Builder", href: `/forms/${form.id}/builder`, active: false },
               { label: "Responses", href: `/forms/${form.id}/responses`, active: true },
+              { label: "Experiments", href: `/forms/${form.id}/experiments`, active: false },
             ].map((tab) => (
               <Link key={tab.label} href={tab.href} style={{
                 padding: "5px 18px", textDecoration: "none",

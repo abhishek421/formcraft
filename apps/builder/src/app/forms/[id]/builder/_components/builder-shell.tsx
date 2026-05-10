@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useTransition, useRef, useEffect } from "react";
 import Link from "next/link";
+import { VariantEditor } from "./variant-editor";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   DndContext,
@@ -41,6 +42,7 @@ type Field = {
   required: boolean;
   position: number;
   variable?: string;
+  question_group_id?: string | null;
   config: Record<string, unknown>;
   logic: unknown[];
 };
@@ -300,6 +302,7 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
             {[
               { label: "Builder", href: `/forms/${form.id}/builder`, active: true },
               { label: "Responses", href: `/forms/${form.id}/responses`, active: false },
+              { label: "Experiments", href: `/forms/${form.id}/experiments`, active: false },
             ].map((tab) => (
               <Link key={tab.label} href={tab.href} style={{
                 padding: "5px 18px", textDecoration: "none",
@@ -532,7 +535,13 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
               padding: "20px 16px",
               display: "flex", flexDirection: "column", gap: "24px",
             }}>
-              <FieldSettings field={selectedField} allFields={fields} onChange={(updates) => patchField(selectedField.id, updates)} />
+              <FieldSettings
+                field={selectedField}
+                allFields={fields}
+                formId={form.id}
+                onChange={(updates) => patchField(selectedField.id, updates)}
+                onFieldUpdated={(groupId) => patchField(selectedField.id, { question_group_id: groupId ?? null })}
+              />
             </div>
           )}
         </div>
@@ -624,6 +633,22 @@ function SortableFieldRow({
       }}>
         {field.title || <em style={{ opacity: 0.4 }}>Untitled</em>}
       </div>
+
+      {/* A/B badge */}
+      {field.question_group_id && (
+        <div style={{
+          fontSize: "9px", fontWeight: 700, letterSpacing: "0.5px",
+          padding: "2px 5px",
+          background: "rgba(167,139,250,0.12)",
+          border: "1px solid rgba(167,139,250,0.35)",
+          borderRadius: "var(--radius-full)",
+          color: "rgba(167,139,250,0.9)",
+          flexShrink: 0, lineHeight: 1,
+          fontFamily: "var(--font-body)",
+        }}>
+          A/B
+        </div>
+      )}
 
       {/* Delete */}
       <button
@@ -915,7 +940,7 @@ function FieldTypePreview({ field, onChange, theme: t }: { field: Field; onChang
 
 // ─── Field settings (right panel) ────────────────────────────────────────────
 
-function FieldSettings({ field, allFields, onChange }: { field: Field; allFields: Field[]; onChange: (u: Partial<Field>) => void }) {
+function FieldSettings({ field, allFields, formId, onChange, onFieldUpdated }: { field: Field; allFields: Field[]; formId: string; onChange: (u: Partial<Field>) => void; onFieldUpdated: (groupId: string | null) => void }) {
   return (
     <>
       <div>
@@ -1021,6 +1046,9 @@ function FieldSettings({ field, allFields, onChange }: { field: Field; allFields
       {field.type !== "welcome_screen" && field.type !== "statement" && (
         <LogicEditor field={field} allFields={allFields} onChange={onChange} />
       )}
+
+      {/* Experiments */}
+      <VariantEditor field={field} formId={formId} onFieldUpdated={onFieldUpdated} />
     </>
   );
 }

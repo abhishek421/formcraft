@@ -1,6 +1,43 @@
-import { createSignal, For, Show, onCleanup } from "solid-js";
+import { createSignal, For, Show, onMount, onCleanup } from "solid-js";
 import { supabase } from "../lib/supabase";
-import type { Field, Form, Answers, LogicJump } from "../lib/types";
+import type { Field, Form, Answers, LogicJump, VariantAssignment } from "../lib/types";
+
+// ── Event tracking ────────────────────────────────────────────────────────────
+
+const API_BASE = `${import.meta.env.VITE_BUILDER_URL}/api/v1`;
+
+type EventPayload = {
+  variant_id?: string;
+  field_id?: string;
+  event_type: string;
+  duration_ms?: number;
+  metadata?: Record<string, unknown>;
+};
+
+let eventBuffer: EventPayload[] = [];
+
+async function flushEvents(sessionId: string) {
+  if (!eventBuffer.length || !sessionId) return;
+  const batch = eventBuffer.splice(0);
+  try {
+    await fetch(`${API_BASE}/sessions/${sessionId}/events`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ events: batch }),
+    });
+  } catch {
+    // best effort — drop on failure
+  }
+}
+
+function beaconEvents(sessionId: string) {
+  if (!eventBuffer.length || !sessionId) return;
+  const batch = eventBuffer.splice(0);
+  navigator.sendBeacon(
+    `${API_BASE}/sessions/${sessionId}/events`,
+    JSON.stringify({ events: batch })
+  );
+}
 
 // ── Logic evaluation ──────────────────────────────────────────────────────────
 
@@ -79,7 +116,13 @@ function isLightColor(hex: string): boolean {
 
 type Phase = "welcome" | "form" | "done";
 
-export function FormRenderer(props: { form: Form; fields: Field[] }) {
+export function FormRenderer(props: {
+  form: Form;
+  fields: Field[];
+  sessionId: string | null;
+  variantAssignments: VariantAssignment[];
+  onRestart?: () => void;
+}) {
   const allFields = () => props.fields;
   const questionFields = () => props.fields.filter(
     (f) => f.type !== "welcome_screen" && f.type !== "statement"
@@ -127,6 +170,73 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
   const progress = () => totalQuestions() > 0 ? (Math.max(0, questionNumber() - 1) / totalQuestions()) * 100 : 0;
   const isLastField = () => currentIdx() === allFields().length - 1;
 
+  // ── Event tracking helpers ─────────────────────────────────────────────────
+
+  const shownAt: Record<string, number> = {};
+
+  function variantIdForField(field: Field): string | undefined {
+    if (!field.question_group_id) return undefined;
+    return props.variantAssignments.find(
+      (a) => a.question_group_id === field.question_group_id
+    )?.variant_id;
+  }
+
+  function pushEvent(field: Field, event_type: string, extra?: Partial<EventPayload>) {
+    const payload: EventPayload = {
+      field_id: field.id,
+      event_type,
+      ...extra,
+    };
+    const vid = variantIdForField(field);
+    if (vid) payload.variant_id = vid;
+    eventBuffer.push(payload);
+  }
+
+  function trackShown(field: Field) {
+    shownAt[field.id] = Date.now();
+    pushEvent(field, "shown");
+  }
+
+  function trackAnswered(field: Field) {
+    const duration_ms = shownAt[field.id] !== undefined
+      ? Date.now() - shownAt[field.id]
+      : undefined;
+    pushEvent(field, "answered", { duration_ms });
+  }
+
+  function trackSkipped(field: Field) {
+    const duration_ms = shownAt[field.id] !== undefined
+      ? Date.now() - shownAt[field.id]
+      : undefined;
+    pushEvent(field, "skipped", { duration_ms });
+  }
+
+  function trackBacktracked(field: Field) {
+    pushEvent(field, "backtracked");
+  }
+
+  // Track shown for the initial field
+  const initialField = allFields()[currentIdx()];
+  if (initialField) trackShown(initialField);
+
+  onMount(() => {
+    const interval = setInterval(() => {
+      if (props.sessionId) flushEvents(props.sessionId);
+    }, 5000);
+
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden" && props.sessionId) {
+        beaconEvents(props.sessionId);
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
+    onCleanup(() => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisibility);
+    });
+  });
+
   function transition(dir: "up" | "down", fn: () => void) {
     setAnimDir(dir);
     setVisible(false);
@@ -145,7 +255,19 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
   async function handleSubmit() {
     setSubmitting(true);
     try {
+      if (props.sessionId) await flushEvents(props.sessionId);
       await submitResponse(props.form.id, answers(), startedAt());
+      if (props.sessionId) {
+        try {
+          await fetch(`${API_BASE}/sessions/${props.sessionId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ completed_at: new Date().toISOString() }),
+          });
+        } catch {
+          // best effort
+        }
+      }
       saveDraft("done", currentIdx(), answers(), startedAt());
       transition("up", () => setPhase("done"));
     } catch {
@@ -173,6 +295,17 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
 
     setError(null);
 
+    // Track answered or skipped
+    const val = answers()[field.id];
+    const hasAnswer = val !== undefined && val !== null && val !== "" && !(Array.isArray(val) && val.length === 0);
+    if (field.type !== "statement" && field.type !== "welcome_screen") {
+      if (hasAnswer) {
+        trackAnswered(field);
+      } else {
+        trackSkipped(field);
+      }
+    }
+
     const destination = evaluateLogic(field, answers());
 
     if (destination === null) {
@@ -183,7 +316,11 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
     if (destination !== undefined) {
       const destIdx = allFields().findIndex((f) => f.id === destination);
       if (destIdx !== -1) {
-        transition("up", () => setCurrentIdx(destIdx));
+        transition("up", () => {
+          setCurrentIdx(destIdx);
+          const nextField = allFields()[destIdx];
+          if (nextField) trackShown(nextField);
+        });
         return;
       }
     }
@@ -193,6 +330,8 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
         const next = currentIdx() + 1;
         setCurrentIdx(next);
         saveDraft(phase(), next, answers(), startedAt());
+        const nextField = allFields()[next];
+        if (nextField) trackShown(nextField);
       });
     } else {
       handleSubmit();
@@ -201,10 +340,14 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
 
   function goPrev() {
     if (currentIdx() > 0) {
+      const field = currentField();
+      if (field) trackBacktracked(field);
       transition("down", () => {
         const prev = currentIdx() - 1;
         setCurrentIdx(prev);
         saveDraft(phase(), prev, answers(), startedAt());
+        const prevField = allFields()[prev];
+        if (prevField) trackShown(prevField);
       });
       setError(null);
     }
@@ -308,6 +451,13 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
                       localStorage.removeItem(storageKey);
                       setAnswers({});
                       setError(null);
+                      // Clear tracking state
+                      for (const key in shownAt) delete shownAt[key];
+                      eventBuffer.splice(0);
+                      if (props.onRestart) {
+                        props.onRestart();
+                        return;
+                      }
                       const firstNonWelcome = allFields().findIndex((f) => f.type !== "welcome_screen");
                       transition("down", () => {
                         setCurrentIdx(firstNonWelcome > 0 ? firstNonWelcome : 0);
@@ -546,6 +696,8 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
                 setCurrentIdx(startIdx);
                 setPhase("form");
                 saveDraft("form", startIdx, answers(), startedAt());
+                const firstField = allFields()[startIdx];
+                if (firstField) trackShown(firstField);
               });
             }}
             style={{
@@ -570,6 +722,9 @@ export function FormRenderer(props: { form: Form; fields: Field[] }) {
                   localStorage.removeItem(storageKey);
                   setAnswers({});
                   setCurrentIdx(0);
+                  for (const key in shownAt) delete shownAt[key];
+                  eventBuffer.splice(0);
+                  if (props.onRestart) { props.onRestart(); return; }
                 }}
                 style={{
                   background: "transparent", border: "none",
