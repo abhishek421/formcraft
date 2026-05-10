@@ -224,12 +224,35 @@ export function BuilderShell({ form, initialFields }: { form: Form; initialField
               saveTitle(e.target.value);
             }}
             style={{
-              flex: 1, background: "transparent", border: "none",
+              background: "transparent", border: "none",
               fontFamily: "'Syne', sans-serif", fontSize: "15px",
               fontWeight: 700, color: "#F0EDE8", letterSpacing: "-0.3px",
+              width: "200px",
             }}
             placeholder="Untitled Form"
           />
+
+          {/* Tab switcher */}
+          <div style={{ display: "flex", gap: "4px", marginLeft: "8px" }}>
+            {["Builder", "Responses"].map((tab) => {
+              const active = tab === "Builder";
+              const href = tab === "Responses"
+                ? `/builder/${form.id}/responses`
+                : `/builder/${form.id}`;
+              return (
+                <Link key={tab} href={href} style={{
+                  padding: "5px 14px", textDecoration: "none",
+                  fontSize: "12px", letterSpacing: "0.5px",
+                  background: active ? "rgba(240,237,232,0.07)" : "transparent",
+                  border: `1px solid ${active ? "rgba(240,237,232,0.12)" : "transparent"}`,
+                  color: active ? "#F0EDE8" : "rgba(240,237,232,0.35)",
+                  transition: "all 0.12s",
+                }}>
+                  {tab}
+                </Link>
+              );
+            })}
+          </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginLeft: "auto" }}>
             <div style={{
