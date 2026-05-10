@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { Sidebar } from "./_components/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
 
 export default async function DashboardLayout({
   children,
@@ -19,7 +19,7 @@ export default async function DashboardLayout({
       background: "#080808",
       color: "#F0EDE8",
     }}>
-      <Sidebar email={user.email!} />
+      <AppSidebar email={user.email!} />
       <main style={{ flex: 1, display: "flex", flexDirection: "column" }}>
         {children}
       </main>

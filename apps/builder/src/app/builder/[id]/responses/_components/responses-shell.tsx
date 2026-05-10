@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { AppSidebar } from "@/components/app-sidebar";
 
 type Field = { id: string; type: string; title: string; variable?: string; position: number };
 type Answer = { field_id: string; value: unknown };
@@ -15,10 +16,12 @@ export function ResponsesShell({
   form,
   fields,
   responses: rawResponses,
+  email,
 }: {
   form: Form;
   fields: Field[];
   responses: Response[];
+  email: string;
 }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>("submitted");
@@ -178,10 +181,13 @@ export function ResponsesShell({
       `}</style>
 
       <div style={{
-        display: "flex", flexDirection: "column", height: "100vh",
+        display: "flex", height: "100vh",
         background: "#080808", color: "#F0EDE8",
         fontFamily: "'DM Mono', monospace", overflow: "hidden",
       }}>
+        <AppSidebar email={email} />
+
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
 
         {/* Top bar */}
         <div style={{
@@ -190,10 +196,6 @@ export function ResponsesShell({
           padding: "0 20px", gap: "16px", flexShrink: 0,
           background: "#0A0A0A",
         }}>
-          <Link href="/dashboard" style={{
-            color: "rgba(240,237,232,0.3)", textDecoration: "none", fontSize: "12px",
-          }}>← Back</Link>
-          <div style={{ width: "1px", height: "20px", background: "rgba(240,237,232,0.08)" }} />
           <span style={{ fontFamily: "'Syne', sans-serif", fontSize: "15px", fontWeight: 700, letterSpacing: "-0.3px" }}>
             {form.title}
           </span>
@@ -400,6 +402,7 @@ export function ResponsesShell({
             )}
           </div>
         </div>
+        </div>{/* end inner flex column */}
       </div>
     </>
   );

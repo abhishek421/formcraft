@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useTransition, useRef, useEffect } from "react";
 import Link from "next/link";
+import { AppSidebar } from "@/components/app-sidebar";
 import {
   DndContext,
   closestCenter,
@@ -107,7 +108,7 @@ function useDebounce<T extends unknown[]>(fn: (...args: T) => void, delay: numbe
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export function BuilderShell({ form, initialFields }: { form: Form; initialFields: Field[] }) {
+export function BuilderShell({ form, initialFields, email }: { form: Form; initialFields: Field[]; email: string }) {
   const [fields, setFields] = useState<Field[]>(initialFields);
   const [selectedId, setSelectedId] = useState<string | null>(initialFields[0]?.id ?? null);
   const [formTitle, setFormTitle] = useState(form.title);
@@ -208,7 +209,10 @@ export function BuilderShell({ form, initialFields }: { form: Form; initialField
         .field-row:hover .field-delete { opacity: 1 !important; }
       `}</style>
 
-      <div style={{ display: "flex", flexDirection: "column", height: "100vh", background: "#080808", color: "#F0EDE8", fontFamily: "'DM Mono', monospace" }}>
+      <div style={{ display: "flex", height: "100vh", background: "#080808", color: "#F0EDE8", fontFamily: "'DM Mono', monospace" }}>
+        <AppSidebar email={email} />
+
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
 
         {/* ── Top bar ── */}
         <div style={{
@@ -217,15 +221,6 @@ export function BuilderShell({ form, initialFields }: { form: Form; initialField
           padding: "0 20px", gap: "16px", flexShrink: 0,
           background: "#0A0A0A",
         }}>
-          <Link href="/dashboard" style={{
-            display: "flex", alignItems: "center", gap: "6px",
-            color: "rgba(240,237,232,0.3)", textDecoration: "none",
-            fontSize: "12px", fontFamily: "'DM Mono', monospace",
-            transition: "color 0.12s",
-          }}>
-            ← Back
-          </Link>
-
           <div style={{ width: "1px", height: "20px", background: "rgba(240,237,232,0.08)" }} />
 
           <input
@@ -437,6 +432,7 @@ export function BuilderShell({ form, initialFields }: { form: Form; initialField
             </div>
           )}
         </div>
+        </div>{/* end inner flex column */}
       </div>
 
       {/* ── Widget picker modal ── */}
