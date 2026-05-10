@@ -31,6 +31,16 @@ const NAV = [
       </svg>
     ),
   },
+  {
+    label: "API Keys",
+    href: "/api-keys",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="6" cy="8" r="3" stroke="currentColor" strokeWidth="1.2" />
+        <path d="M9 8h5M12 6.5V8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+      </svg>
+    ),
+  },
 ];
 
 const COLLAPSED_WIDTH = 56;
