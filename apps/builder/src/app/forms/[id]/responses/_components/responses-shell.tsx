@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useTransition } from "react";
 import Link from "next/link";
 import { AppSidebar } from "@/components/app-sidebar";
+import { deleteResponse } from "../actions";
 
 type Field = { id: string; type: string; title: string; variable?: string; position: number };
 type Answer = { field_id: string; value: unknown };
@@ -28,6 +29,8 @@ export function ResponsesShell({
   const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [hiddenCols, setHiddenCols] = useState<Set<string>>(new Set());
   const [menuCol, setMenuCol] = useState<string | null>(null);
+  const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
+  const [isPending, startTransition] = useTransition();
   const menuRef = useRef<HTMLDivElement>(null);
 
   const questionFields = fields.filter(
@@ -65,8 +68,14 @@ export function ResponsesShell({
     return `${Math.floor(s / 60)}m ${s % 60}s`;
   }
 
+  function handleDelete(responseId: string) {
+    setDeletedIds((prev) => new Set([...prev, responseId]));
+    setSelectedId(null);
+    startTransition(() => deleteResponse(form.id, responseId));
+  }
+
   // Sort
-  const responses = [...rawResponses].sort((a, b) => {
+  const responses = [...rawResponses].filter((r) => !deletedIds.has(r.id)).sort((a, b) => {
     let cmp = 0;
     if (sortKey === "submitted") {
       cmp = new Date(a.submitted_at ?? a.started_at).getTime() - new Date(b.submitted_at ?? b.started_at).getTime();
@@ -265,7 +274,7 @@ export function ResponsesShell({
         {/* Stats row */}
         <div style={{ display: "flex", borderBottom: "1px solid var(--border)", background: "var(--surface)", flexShrink: 0 }}>
           {[
-            { label: "Total Responses", value: rawResponses.length },
+            { label: "Total Responses", value: rawResponses.length - deletedIds.size },
             { label: "Questions", value: questionFields.length },
             { label: "Avg. Completion", value: avgCompletion },
           ].map((stat, i) => (
@@ -376,14 +385,32 @@ export function ResponsesShell({
                       {completionMs(selectedResponse) !== null && ` · ${formatTime(completionMs(selectedResponse))}`}
                     </div>
                   </div>
-                  <button
-                    onClick={() => setSelectedId(null)}
-                    style={{
-                      background: "transparent", border: "none",
-                      color: "var(--text-dim)", fontSize: "18px",
-                      cursor: "pointer", padding: "4px 8px",
-                    }}
-                  >✕</button>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <button
+                      onClick={() => handleDelete(selectedResponse.id)}
+                      disabled={isPending}
+                      style={{
+                        background: "transparent", border: "1px solid var(--error)",
+                        borderRadius: "var(--radius-sm)",
+                        color: "var(--error)", fontSize: "11px", letterSpacing: "0.5px",
+                        cursor: "pointer", padding: "5px 12px",
+                        fontFamily: "var(--font-body)", opacity: isPending ? 0.5 : 1,
+                        transition: "all var(--duration) var(--ease)",
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = "var(--error)"; e.currentTarget.style.color = "var(--bg)"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--error)"; }}
+                    >
+                      Delete
+                    </button>
+                    <button
+                      onClick={() => setSelectedId(null)}
+                      style={{
+                        background: "transparent", border: "none",
+                        color: "var(--text-dim)", fontSize: "18px",
+                        cursor: "pointer", padding: "4px 8px",
+                      }}
+                    >✕</button>
+                  </div>
                 </div>
 
                 {/* Answers */}
