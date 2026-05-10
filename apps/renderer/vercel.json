@@ -1,6 +1,6 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
+  "buildCommand": "cd ../.. && npx turbo build --filter=@formcraft/renderer",
+  "outputDirectory": "apps/renderer/dist",
   "framework": null,
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
