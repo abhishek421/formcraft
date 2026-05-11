@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useTransition } from "react";
+import { deleteForm } from "../forms/actions";
 
 type Form = {
   id: string;
@@ -13,6 +15,14 @@ type Form = {
 export function FormCard({ form }: { form: Form }) {
   const updatedAt = new Date(form.updated_at);
   const timeAgo = getTimeAgo(updatedAt);
+  const [pending, startTransition] = useTransition();
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!confirm(`Delete "${form.title}"? This cannot be undone.`)) return;
+    startTransition(() => { deleteForm(form.id); });
+  };
 
   return (
     <Link href={`/forms/${form.id}/builder`} style={{ textDecoration: "none" }}>
@@ -30,17 +40,22 @@ export function FormCard({ form }: { form: Form }) {
           height: "160px",
           position: "relative",
           overflow: "hidden",
+          opacity: pending ? 0.4 : 1,
         }}
         onMouseEnter={(e) => {
           (e.currentTarget as HTMLDivElement).style.borderColor = "var(--accent-border)";
           (e.currentTarget as HTMLDivElement).style.background = "var(--surface-4)";
+          const btn = (e.currentTarget as HTMLDivElement).querySelector(".card-delete") as HTMLElement | null;
+          if (btn) btn.style.opacity = "1";
         }}
         onMouseLeave={(e) => {
           (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border)";
           (e.currentTarget as HTMLDivElement).style.background = "var(--surface-3)";
+          const btn = (e.currentTarget as HTMLDivElement).querySelector(".card-delete") as HTMLElement | null;
+          if (btn) btn.style.opacity = "0";
         }}
       >
-        {/* Status pill */}
+        {/* Status pill + delete button */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div style={{
             display: "inline-flex",
@@ -101,6 +116,40 @@ export function FormCard({ form }: { form: Form }) {
         }}>
           Edited {timeAgo}
         </div>
+
+        {/* Delete button — visible on hover */}
+        <button
+          className="card-delete"
+          onClick={handleDelete}
+          title="Delete form"
+          style={{
+            position: "absolute",
+            bottom: "var(--space-4)",
+            right: "var(--space-4)",
+            background: "transparent",
+            border: "1px solid var(--text-faint)",
+            borderRadius: "var(--radius-sm)",
+            padding: "4px 8px",
+            fontSize: "10px",
+            letterSpacing: "1px",
+            textTransform: "uppercase",
+            color: "var(--text-dim)",
+            fontFamily: "var(--font-body)",
+            cursor: "pointer",
+            opacity: 0,
+            transition: `opacity var(--duration) var(--ease), color var(--duration) var(--ease), border-color var(--duration) var(--ease)`,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = "#ff6b6b";
+            e.currentTarget.style.borderColor = "#ff6b6b";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = "var(--text-dim)";
+            e.currentTarget.style.borderColor = "var(--text-faint)";
+          }}
+        >
+          Delete
+        </button>
 
         {/* Hover accent line */}
         <div style={{

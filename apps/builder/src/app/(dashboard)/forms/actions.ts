@@ -19,6 +19,15 @@ export async function createForm() {
   redirect(`/forms/${data.id}/builder`);
 }
 
+export async function deleteForm(formId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  await supabase.from("forms").delete().eq("id", formId).eq("user_id", user.id);
+  redirect("/forms");
+}
+
 export async function getForms() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

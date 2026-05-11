@@ -28,6 +28,7 @@ import {
   updateFormTitle,
   togglePublish,
 } from "../actions";
+import { deleteForm } from "@/app/(dashboard)/forms/actions";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -193,6 +194,12 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
     startTransition(() => { togglePublish(form.id, next); });
   };
 
+  // Delete form
+  const handleDeleteForm = () => {
+    if (!confirm(`Delete "${formTitle}"? This cannot be undone.`)) return;
+    startTransition(() => { deleteForm(form.id); });
+  };
+
   return (
     <>
       <style>{`
@@ -317,6 +324,31 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
               }}
             >
               {published ? "● Live" : "Publish"}
+            </button>
+
+            <button
+              onClick={handleDeleteForm}
+              title="Delete form"
+              style={{
+                padding: "7px 12px",
+                background: "transparent",
+                border: "1px solid rgba(240,237,232,0.08)",
+                color: "rgba(240,237,232,0.25)",
+                fontFamily: "'DM Mono', monospace",
+                fontSize: "11px", cursor: "pointer",
+                letterSpacing: "1px", textTransform: "uppercase",
+                transition: "all 0.15s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = "#ff6b6b";
+                e.currentTarget.style.borderColor = "rgba(255,107,107,0.4)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = "rgba(240,237,232,0.25)";
+                e.currentTarget.style.borderColor = "rgba(240,237,232,0.08)";
+              }}
+            >
+              Delete
             </button>
           </div>
         </div>
