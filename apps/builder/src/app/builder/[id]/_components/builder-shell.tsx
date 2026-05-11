@@ -29,6 +29,7 @@ import {
   togglePublish,
 } from "../actions";
 import { deleteForm } from "@/app/(dashboard)/forms/actions";
+import { DeleteFormModal } from "@/app/(dashboard)/_components/delete-form-modal";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -115,6 +116,7 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
   const [formTitle, setFormTitle] = useState(form.title);
   const [published, setPublished] = useState(form.published);
   const [showWidgetPicker, setShowWidgetPicker] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [copied, setCopied] = useState(false);
   const [, startTransition] = useTransition();
 
@@ -195,13 +197,17 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
   };
 
   // Delete form
-  const handleDeleteForm = () => {
-    if (!confirm(`Delete "${formTitle}"? This cannot be undone.`)) return;
-    startTransition(() => { deleteForm(form.id); });
-  };
+  const handleDeleteForm = () => setShowDeleteModal(true);
 
   return (
     <>
+      {showDeleteModal && (
+        <DeleteFormModal
+          formTitle={formTitle}
+          onConfirm={() => { setShowDeleteModal(false); startTransition(() => { deleteForm(form.id); }); }}
+          onCancel={() => setShowDeleteModal(false)}
+        />
+      )}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
         * { box-sizing: border-box; }
