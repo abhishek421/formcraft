@@ -15,6 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <meta name="google-site-verification" content="GxG2RlbW8nKjmaSW60eNRM6OYOL_3coqLy-sL7NNswY" />
         <link
           href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap"
           rel="stylesheet"

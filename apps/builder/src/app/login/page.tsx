@@ -90,136 +90,9 @@ export default async function LoginPage({
           position: relative;
           z-index: 10;
           min-height: 100vh;
-          display: grid;
-          grid-template-columns: 1.1fr 0.9fr;
-        }
-
-        /* ── Left panel ─────────────────────────────────────── */
-        .left {
-          display: flex;
-          flex-direction: column;
-          padding: 48px 56px;
-          border-right: 1px solid var(--border);
-          position: relative;
-          overflow: hidden;
-        }
-
-
-        .logo {
-          font-family: var(--font-display);
-          font-size: 18px;
-          font-weight: 800;
-          letter-spacing: -0.3px;
-          color: var(--text);
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          animation: fadeUp 0.6s ease both;
-        }
-
-        .logo-mark {
-          width: 28px;
-          height: 28px;
-          background: var(--accent);
           display: flex;
           align-items: center;
           justify-content: center;
-          flex-shrink: 0;
-        }
-
-        .logo-mark svg { display: block; }
-
-        .hero-block {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          gap: 32px;
-          animation: fadeUp 0.6s 0.1s ease both;
-        }
-
-        .eyebrow {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          font-size: 10px;
-          letter-spacing: 3px;
-          text-transform: uppercase;
-          color: var(--text-dim);
-          font-family: var(--font-body);
-          font-weight: 400;
-        }
-
-        .eyebrow-line {
-          width: 32px;
-          height: 1px;
-          background: var(--accent);
-          opacity: 0.7;
-        }
-
-        .hero-heading {
-          font-family: var(--font-display);
-          font-size: clamp(44px, 5.5vw, 72px);
-          font-weight: 800;
-          line-height: 0.92;
-          letter-spacing: -2.5px;
-          color: var(--text);
-        }
-
-        .hero-heading .accent-word {
-          color: var(--accent);
-          display: block;
-        }
-
-        .hero-sub {
-          font-size: 13px;
-          line-height: 1.75;
-          color: var(--text-muted);
-          max-width: 360px;
-          font-weight: 300;
-        }
-
-        /* Feature pills */
-        .features {
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-        }
-
-        .feature {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          animation: fadeUp 0.5s ease both;
-        }
-
-        .feature:nth-child(1) { animation-delay: 0.25s; }
-        .feature:nth-child(2) { animation-delay: 0.35s; }
-        .feature:nth-child(3) { animation-delay: 0.45s; }
-        .feature:nth-child(4) { animation-delay: 0.55s; }
-
-        .feature-dot {
-          width: 5px;
-          height: 5px;
-          background: var(--accent);
-          border-radius: 50%;
-          flex-shrink: 0;
-          opacity: 0.7;
-        }
-
-        .feature-text {
-          font-size: 12px;
-          color: var(--text-muted);
-          font-weight: 300;
-          letter-spacing: 0.1px;
-        }
-
-        .left-footer {
-          font-size: 10px;
-          color: var(--text-faint);
-          letter-spacing: 1px;
-          font-family: var(--font-body);
-          animation: fadeUp 0.6s 0.6s ease both;
         }
 
         /* ── Right panel ─────────────────────────────────────── */
@@ -252,19 +125,6 @@ export default async function LoginPage({
           font-weight: 800;
           letter-spacing: -0.8px;
           color: var(--text);
-        }
-
-        .form-sub {
-          font-size: 12px;
-          color: var(--text-dim);
-          font-weight: 300;
-          line-height: 1.6;
-        }
-
-        .form-sub em {
-          font-style: normal;
-          color: var(--accent);
-          opacity: 0.9;
         }
 
         form {
@@ -345,68 +205,6 @@ export default async function LoginPage({
           opacity: 1;
         }
 
-        /* Divider */
-        .sep {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-
-        .sep-line {
-          flex: 1;
-          height: 1px;
-          background: var(--border);
-        }
-
-        .sep-label {
-          font-size: 9px;
-          letter-spacing: 3px;
-          text-transform: uppercase;
-          color: var(--text-faint);
-        }
-
-        /* Test creds */
-        .test-creds {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-        }
-
-        .test-label {
-          font-size: 9px;
-          letter-spacing: 2.5px;
-          text-transform: uppercase;
-          color: var(--accent);
-          opacity: 0.5;
-          margin-bottom: 4px;
-        }
-
-        .test-row {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 8px 0;
-          border-bottom: 1px solid var(--border);
-        }
-
-        .test-row:last-child {
-          border-bottom: none;
-        }
-
-        .test-key {
-          font-size: 10px;
-          letter-spacing: 1px;
-          text-transform: uppercase;
-          color: var(--text-faint);
-        }
-
-        .test-val {
-          font-size: 12px;
-          color: var(--text-muted);
-          font-family: var(--font-body);
-          font-weight: 400;
-        }
-
         /* Animations */
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(16px); }
@@ -415,8 +213,6 @@ export default async function LoginPage({
 
         /* Mobile */
         @media (max-width: 768px) {
-          .container { grid-template-columns: 1fr; }
-          .left { display: none; }
           .right { padding: 32px 24px; }
         }
       `}</style>
@@ -430,68 +226,10 @@ export default async function LoginPage({
       <SettingsPanel />
 
       <div className="container">
-        {/* Left panel */}
-        <div className="left">
-          <div className="logo">
-            <div className="logo-mark">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <rect x="1" y="1" width="5" height="5" fill="#080808" />
-                <rect x="8" y="1" width="5" height="5" fill="#080808" />
-                <rect x="1" y="8" width="5" height="5" fill="#080808" />
-                <rect x="8" y="8" width="2.5" height="2.5" fill="#080808" />
-              </svg>
-            </div>
-            FormCraft
-          </div>
-
-          <div className="hero-block">
-            <div className="eyebrow">
-              <div className="eyebrow-line" />
-              Form Builder
-            </div>
-
-            <div className="hero-heading">
-              Stop asking<br />
-              people to fill
-              <span className="accent-word">out forms.</span>
-            </div>
-
-            <p className="hero-sub">
-              One question at a time, only when it matters.
-              FormCraft makes data collection feel effortless — for you and whoever's answering.
-            </p>
-
-            <div className="features">
-              <div className="feature">
-                <div className="feature-dot" />
-                <span className="feature-text">Qualify leads before they reach your inbox</span>
-              </div>
-              <div className="feature">
-                <div className="feature-dot" />
-                <span className="feature-text">Skip irrelevant questions — ask what matters</span>
-              </div>
-              <div className="feature">
-                <div className="feature-dot" />
-                <span className="feature-text">Looks like your brand, not ours</span>
-              </div>
-              <div className="feature">
-                <div className="feature-dot" />
-                <span className="feature-text">Plug into any stack via REST API</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="left-footer">© 2026 FormCraft</div>
-        </div>
-
-        {/* Right panel */}
         <div className="right">
           <div className="form-card">
             <div className="form-header">
               <div className="form-title">Welcome back.</div>
-              <div className="form-sub">
-                No account? <em>Early access only.</em>
-              </div>
             </div>
 
             <form action={login}>
@@ -525,24 +263,6 @@ export default async function LoginPage({
                 Continue →
               </button>
             </form>
-
-            <div className="sep">
-              <div className="sep-line" />
-              <span className="sep-label">dev</span>
-              <div className="sep-line" />
-            </div>
-
-            <div className="test-creds">
-              <div className="test-label">Test credentials</div>
-              <div className="test-row">
-                <span className="test-key">Email</span>
-                <span className="test-val">test@formcraft.dev</span>
-              </div>
-              <div className="test-row">
-                <span className="test-key">Password</span>
-                <span className="test-val">test1234</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
