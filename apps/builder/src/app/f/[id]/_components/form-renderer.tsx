@@ -416,11 +416,11 @@ export function FormRenderer({ form, fields }: { form: Form; fields: Field[] }) 
       {/* Branding */}
       <div style={{
         position: "absolute", top: "20px", left: "24px",
-        fontSize: "13px", fontFamily: "'Syne', sans-serif",
+        fontSize: "13px", fontFamily: "'Arvo', serif",
         fontWeight: 700, color: "rgba(240,237,232,0.2)",
-        letterSpacing: "-0.3px", zIndex: 10,
+        letterSpacing: "0px", zIndex: 10,
       }}>
-        FormCraft
+CleverForms
       </div>
 
       {/* Content */}

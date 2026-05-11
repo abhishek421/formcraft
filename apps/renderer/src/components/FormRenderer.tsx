@@ -476,12 +476,12 @@ export function FormRenderer(props: {
                   </button>
                 </div>
 
-                {/* FormCraft badge bottom-right */}
+                {/* CleverForms badge bottom-right */}
                 <div style={{
                   position: "absolute", bottom: "20px", right: "24px", "z-index": "10",
                 }}>
                   <a
-                    href="https://formcraft.so"
+                    href="https://forms.stayclever.in"
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
@@ -494,7 +494,7 @@ export function FormRenderer(props: {
                     onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = `rgba(${textRgb()},0.5)`; }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = `rgba(${textRgb()},0.25)`; }}
                   >
-                    Made with <strong style={{ "font-weight": 600 }}>FormCraft</strong> ✦
+                    Made with <strong style={{ "font-weight": 700, "font-family": "'Arvo', serif" }}>CleverForms</strong> ✦
                   </a>
                 </div>
 
@@ -626,7 +626,7 @@ export function FormRenderer(props: {
         <div style={wrapStyle()}>
           <style>{`@import url('https://fonts.googleapis.com/css2?family=${encodeURIComponent(displayFont())}:wght@400;700;800&family=${encodeURIComponent(bodyFont())}:wght@300;400;500&display=swap'); * { box-sizing: border-box; margin: 0; padding: 0; }`}</style>
           <BrandHeader brandName={brandName()} brandLogo={brandLogo()} displayFont={displayFont()} textColor={textColor()} />
-          <FormCraftBadge bodyFont={bodyFont()} textRgb={textRgb()} />
+          <CleverFormsBadge bodyFont={bodyFont()} textRgb={textRgb()} />
           <div style={{
             flex: "1", display: "flex", "align-items": "center", "justify-content": "center",
             padding: "80px 24px", "flex-direction": "column", gap: "24px", "text-align": "center",
@@ -657,7 +657,7 @@ export function FormRenderer(props: {
       <div style={wrapStyle()}>
         <style>{`@import url('https://fonts.googleapis.com/css2?family=${encodeURIComponent(displayFont())}:wght@400;700;800&family=${encodeURIComponent(bodyFont())}:wght@300;400;500&display=swap'); * { box-sizing: border-box; margin: 0; padding: 0; }`}</style>
         <BrandHeader brandName={brandName()} brandLogo={brandLogo()} displayFont={displayFont()} textColor={textColor()} />
-        <FormCraftBadge bodyFont={bodyFont()} textRgb={textRgb()} />
+        <CleverFormsBadge bodyFont={bodyFont()} textRgb={textRgb()} />
         <div style={{
           flex: "1", display: "flex", "align-items": "center", "justify-content": "center",
           padding: "80px 24px", "flex-direction": "column", gap: "40px",
@@ -1041,11 +1041,11 @@ function BrandHeader(props: { brandName: string; brandLogo: string; displayFont:
   );
 }
 
-function FormCraftBadge(props: { bodyFont: string; textRgb: string }) {
+function CleverFormsBadge(props: { bodyFont: string; textRgb: string }) {
   return (
     <div style={{ position: "absolute", bottom: "20px", right: "24px", "z-index": "10" }}>
       <a
-        href="https://formcraft.so"
+        href="https://forms.stayclever.in"
         target="_blank"
         rel="noopener noreferrer"
         style={{
@@ -1057,7 +1057,7 @@ function FormCraftBadge(props: { bodyFont: string; textRgb: string }) {
         onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = `rgba(${props.textRgb},0.5)`; }}
         onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = `rgba(${props.textRgb},0.25)`; }}
       >
-        Made with <strong style={{ "font-weight": 600 }}>FormCraft</strong> ✦
+        Made with <strong style={{ "font-weight": 700, "font-family": "'Arvo', serif" }}>CleverForms</strong> ✦
       </a>
     </div>
   );

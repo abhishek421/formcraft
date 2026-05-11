@@ -1,5 +1,5 @@
 {
-  "name": "formcraft",
+  "name": "stayclever-forms",
   "private": true,
   "workspaces": [
     "apps/*",

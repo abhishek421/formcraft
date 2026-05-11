@@ -1,10 +1,10 @@
 const spec = {
   openapi: "3.1.0",
   info: {
-    title: "FormCraft API",
+    title: "CleverForms API",
     version: "1.0.0",
     description:
-      "REST API for FormCraft — create and manage forms, fields, responses, and self-optimizing A/B experiments.",
+      "REST API for CleverForms — create and manage forms, fields, responses, and self-optimizing A/B experiments.",
   },
   servers: [{ url: "/api/v1" }],
   security: [{ bearerAuth: [] }],
@@ -13,7 +13,7 @@ const spec = {
       bearerAuth: {
         type: "http",
         scheme: "bearer",
-        description: "API key from the FormCraft dashboard.",
+        description: "API key from the CleverForms dashboard.",
       },
     },
     schemas: {

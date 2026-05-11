@@ -276,7 +276,7 @@ export default function Page() {
   return (
     <div style={{ minHeight:"100vh", background:BG, color:TEXT, fontFamily:"'DM Mono',monospace", overflowX:"hidden" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Arvo:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap');
         *{box-sizing:border-box;margin:0;padding:0}
         ::selection{background:${ACCENT};color:#fff}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.2}}
@@ -341,13 +341,14 @@ export default function Page() {
         <div className="nav-inner" style={{ maxWidth:1280, margin:"0 auto", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <div style={{ display:"flex", alignItems:"center", gap:9 }}>
             <div style={{ width:7, height:7, background:ACCENT, borderRadius:2 }} />
-            <span style={{ fontFamily:"'Bricolage Grotesque',sans-serif", fontWeight:800, fontSize:15, letterSpacing:"-0.01em" }}>FormCraft</span>
+            <span style={{ fontFamily:"'Arvo',serif", fontWeight:700, fontSize:15, letterSpacing:"-0.01em" }}>CleverForms</span>
           </div>
           <div className="nav-links">
             <a href="#how" className="nl">How it works</a>
             <a href="#proof" className="nl">Why it works</a>
+            <a href="#pricing" className="nl">Pricing</a>
           </div>
-          <Link href="/login" className="btn" style={{ padding:"9px 22px", fontSize:11 }}>Get started free</Link>
+          <Link href="/login" className="btn" style={{ padding:"9px 22px", fontSize:11 }}>Start free</Link>
         </div>
       </nav>
 
@@ -360,8 +361,8 @@ export default function Page() {
         <div style={{ opacity:m?1:0, animation:m?"up 0.6s ease both":"none" }}>
 
           <div style={{ fontSize:12, color:MUTED, letterSpacing:"0.04em", marginBottom:28, lineHeight:1.8 }}>
-            Your form has a question that kills conversions.<br />
-            <span style={{ color:ACCENT }}>You just don't know which one yet.</span>
+            Self-optimizing forms for modern teams.<br />
+            <span style={{ color:ACCENT }}>Every submission makes your form smarter.</span>
           </div>
 
           <h1 style={{
@@ -370,16 +371,23 @@ export default function Page() {
             fontWeight:800, lineHeight:1.04,
             letterSpacing:"-0.03em", marginBottom:24, color:TEXT,
           }}>
-            Forms that<br />fix themselves.
+            Forms that<br />improve themselves.
           </h1>
 
-          <p style={{ fontSize:14, color:MUTED, lineHeight:2, maxWidth:400, marginBottom:40, fontWeight:300 }}>
-            A/B test every question. Track real behavior.
-            Automatically shift traffic to the wording that converts.
-            No analyst. No guesswork.
+          <p style={{ fontSize:14, color:MUTED, lineHeight:2, maxWidth:420, marginBottom:40, fontWeight:300 }}>
+            Automatically test question variants, detect friction, and optimize
+            completion rates in real time — no analyst, no guesswork, no duplicate forms.
           </p>
 
-          <Link href="/login" className="btn">Run your first experiment free</Link>
+          <div style={{ display:"flex", alignItems:"center", gap:16, flexWrap:"wrap", marginBottom:20 }}>
+            <Link href="/login" className="btn">Start free</Link>
+            <a href="#how" style={{ fontSize:12, color:MUTED, letterSpacing:"0.04em", textDecoration:"none", transition:"color 0.18s" }}
+               onMouseOver={e=>(e.currentTarget.style.color=ACCENT)}
+               onMouseOut={e=>(e.currentTarget.style.color=MUTED)}>See how it works →</a>
+          </div>
+          <div style={{ fontSize:11, color:DIM, letterSpacing:"0.04em" }}>
+            No-code setup · Real-time optimization · Behavioral analytics
+          </div>
         </div>
 
         <div style={{ opacity:m?1:0, animation:m?"up 0.6s 0.1s ease both":"none" }}>
@@ -391,7 +399,7 @@ export default function Page() {
       {/* ── Pain ── */}
       <section style={{ borderTop:`1px solid ${BORDER}`, borderBottom:`1px solid ${BORDER}`, background:SURFACE }}>
         <div className="sec-pad" style={{ maxWidth:1280, margin:"0 auto" }}>
-          <div style={{ maxWidth:640 }}>
+          <div style={{ maxWidth:680 }}>
             <div style={{ fontSize:10, letterSpacing:"0.18em", color:ACCENT, marginBottom:20, opacity:0.75 }}>THE PROBLEM</div>
             <h2 style={{
               fontFamily:"'Bricolage Grotesque',sans-serif",
@@ -399,20 +407,22 @@ export default function Page() {
               fontWeight:800, lineHeight:1.12,
               letterSpacing:"-0.025em", marginBottom:24,
             }}>
-              You published your form.<br />
-              You're bleeding conversions<br />
-              and you don't know where.
+              Most forms quietly<br />lose conversions.
             </h2>
             <p style={{ fontSize:13, color:MUTED, lineHeight:2, marginBottom:20 }}>
-              The average form loses 68% of visitors before completion.
-              Most drop-off happens at a single question —
-              the one that's worded wrong, positioned wrong, or asks too much.
+              Users abandon forms because of confusing wording, bad sequencing, too much friction,
+              weak mobile flows, or unnecessary inputs. The average form loses 68% of visitors before completion —
+              and most drop-off happens at a single question.
+            </p>
+            <p style={{ fontSize:13, color:MUTED, lineHeight:2, marginBottom:20 }}>
+              Traditional form builders give you dashboards.
+              They show you <em>where</em> people left.
+              They never tell you <em>why</em> — or fix it.
             </p>
             <p style={{ fontSize:13, color:MUTED, lineHeight:2 }}>
-              Traditional analytics tell you <em>where</em> people left.
-              FormCraft tells you <em>which variant fixes it</em>
-              and routes traffic there automatically —
-              every 15 minutes, around the clock.
+              CleverForms fixes the problem automatically.
+              It tests every question, measures real behavior, and routes traffic
+              to the variant that converts — every 15 minutes, around the clock.
             </p>
           </div>
         </div>
@@ -426,27 +436,31 @@ export default function Page() {
             fontFamily:"'Bricolage Grotesque',sans-serif",
             fontSize:"clamp(32px,3.5vw,52px)",
             fontWeight:800, lineHeight:1.08,
-            letterSpacing:"-0.025em",
+            letterSpacing:"-0.025em", marginBottom:16,
           }}>
-            Set it once.<br />It improves itself.
+            Built-in experimentation.<br />Zero manual work.
           </h2>
+          <p style={{ fontSize:13, color:MUTED, lineHeight:2, maxWidth:520 }}>
+            No duplicate forms. No separate A/B testing tool. No analyst required.
+            CleverForms runs adaptive experimentation directly inside your form.
+          </p>
         </div>
 
         <div className="steps-grid">
           {[
             {
-              n:"01", title:"Write your variants",
-              body:"Add 2–3 phrasings of any question. Different wording, tone, or input type. Two minutes.",
-              note:"Your existing form keeps working. Variants are layered on top.",
+              n:"01", title:"Create question variants",
+              body:"Write 2–3 phrasings of any question — different wording, tone, or input type. Your existing form keeps working unchanged.",
+              note:"Variants layer on top. No rebuilding. No duplicate forms.",
             },
             {
-              n:"02", title:"Traffic splits automatically",
-              body:"Every visitor gets a variant for their entire session. Deterministic. No flicker.",
-              note:"Weighted random assignment server-side. Same variant every time they return.",
+              n:"02", title:"Traffic distributes automatically",
+              body:"Each visitor is assigned a variant for their entire session — deterministic, consistent, no flicker.",
+              note:"Server-side weighted assignment. Same variant on every return visit.",
             },
             {
-              n:"03", title:"Engine finds the winner",
-              body:"Every 15 minutes the optimizer scores variants and shifts traffic toward what converts.",
+              n:"03", title:"Engine detects the winner",
+              body:"Every 15 minutes the adaptive optimizer scores behavioral signals and shifts traffic toward higher-converting variants.",
               note:"Minimum 100 impressions before rebalancing. No premature conclusions.",
             },
           ].map(({ n, title, body, note }) => (
@@ -462,7 +476,7 @@ export default function Page() {
         {/* Variant example */}
         <div style={{ background:SURFACE, borderRadius:8, border:`1px solid ${BORDER}`, padding:"32px" }}>
           <div style={{ fontSize:10, color:DIM, letterSpacing:"0.12em", marginBottom:24 }}>
-            EXAMPLE — three phrasings of "annual revenue" · system found variant A converts 2.4× better
+            EXAMPLE — three phrasings of "annual revenue" · CleverForms found variant A converts 2.4× better and shifted traffic automatically
           </div>
           <div className="variants-grid">
             {[
@@ -506,27 +520,26 @@ export default function Page() {
         <div className="sec-pad" style={{ maxWidth:1280, margin:"0 auto" }}>
           <div className="proof-grid">
             <div>
-              <div style={{ fontSize:10, letterSpacing:"0.18em", color:ACCENT, marginBottom:18, opacity:0.75 }}>WHY IT WORKS</div>
+              <div style={{ fontSize:10, letterSpacing:"0.18em", color:ACCENT, marginBottom:18, opacity:0.75 }}>BEHAVIORAL ANALYTICS</div>
               <h2 style={{
                 fontFamily:"'Bricolage Grotesque',sans-serif",
                 fontSize:"clamp(28px,3vw,42px)",
                 fontWeight:800, lineHeight:1.12,
                 letterSpacing:"-0.02em", marginBottom:24,
               }}>
-                Tracks more than just completion rate.
+                Understand behavior,<br />not just submissions.
               </h2>
               <p style={{ fontSize:13, color:MUTED, lineHeight:2, marginBottom:32 }}>
-                Most analytics tell you what happened.
-                FormCraft tracks the full behavioral signal —
-                hesitation, backtracking, skips, errors —
-                then decides which variant caused it.
+                Most analytics tell you what happened. CleverForms tracks the full behavioral signal —
+                hesitation, abandonment, backtracking, skips, validation friction, answer speed —
+                then identifies which variant caused the drop-off and fixes it.
               </p>
               <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                 {[
-                  "Session-level consistency — same variant for the whole journey",
+                  "Session-level consistency — same variant for the entire user journey",
                   "Exploration floor — worst variant always gets ≥5% traffic",
                   "Statistical guard — no rebalancing until 100+ impressions",
-                  "Epsilon-greedy scoring — deterministic and fully auditable",
+                  "Epsilon-greedy scoring — deterministic, transparent, fully auditable",
                 ].map(t => (
                   <div key={t} style={{ display:"flex", gap:12, fontSize:12, color:MUTED, lineHeight:1.7 }}>
                     <span style={{ color:ACCENT, flexShrink:0, marginTop:2 }}>✓</span>
@@ -568,7 +581,7 @@ export default function Page() {
       </section>
 
       {/* ── Pricing ── */}
-      <section className="how-pad" style={{ maxWidth:1280, margin:"0 auto" }}>
+      <section id="pricing" className="how-pad" style={{ maxWidth:1280, margin:"0 auto" }}>
         <div style={{ marginBottom:64 }}>
           <div style={{ fontSize:10, letterSpacing:"0.18em", color:ACCENT, marginBottom:16, opacity:0.75 }}>PRICING</div>
           <h2 style={{
@@ -580,8 +593,8 @@ export default function Page() {
             Free while it's early.
           </h2>
           <p style={{ fontSize:13, color:MUTED, lineHeight:2, maxWidth:480 }}>
-            We're in early access. Run real experiments at no cost.
-            Pricing kicks in when we're confident you're getting value.
+            CleverForms is in early access. Run real self-optimizing experiments at no cost.
+            Paid plans launch when we're confident you're getting measurable value.
           </p>
         </div>
 
@@ -695,7 +708,7 @@ export default function Page() {
       <section style={{ background:DARK_BG, color:DARK_TEXT }}>
         <div className="cta-pad" style={{ maxWidth:1280, margin:"0 auto", textAlign:"center" }}>
           <div style={{ fontSize:10, letterSpacing:"0.18em", color:"rgba(232,93,58,0.7)", marginBottom:24 }}>
-            EVERY DAY WITHOUT OPTIMIZATION IS WASTED CONVERSIONS
+            TRADITIONAL FORMS COLLECT RESPONSES. CLEVERFORMS LEARNS FROM THEM.
           </div>
           <h2 style={{
             fontFamily:"'Bricolage Grotesque',sans-serif",
@@ -703,19 +716,19 @@ export default function Page() {
             fontWeight:800, lineHeight:1.04,
             letterSpacing:"-0.03em", marginBottom:24, color:DARK_TEXT,
           }}>
-            Your competitors are optimizing.<br />
-            <span style={{ color:ACCENT }}>Is your form?</span>
+            Your forms should<br />
+            <span style={{ color:ACCENT }}>stay clever.</span>
           </h2>
-          <p style={{ fontSize:13, color:DARK_MUT, maxWidth:380, margin:"0 auto 44px", lineHeight:2, fontWeight:300 }}>
-            Stop publishing static forms.
-            FormCraft finds what converts and routes traffic there —
-            automatically, every 15 minutes.
+          <p style={{ fontSize:13, color:DARK_MUT, maxWidth:420, margin:"0 auto 44px", lineHeight:2, fontWeight:300 }}>
+            Stop publishing static forms that stop evolving after launch.
+            CleverForms continuously improves question wording, structure, and conversion
+            performance — automatically, with every submission.
           </p>
           <Link href="/login" className="btn" style={{ fontSize:13, padding:"16px 48px" }}>
-            Run your first experiment free
+            Build your first self-optimizing form
           </Link>
           <div style={{ fontSize:11, color:DARK_DIM, marginTop:16, letterSpacing:"0.04em" }}>
-            No credit card required · Works on any form you already have
+            No credit card required · No-code setup · Works on any existing form
           </div>
         </div>
       </section>
@@ -723,11 +736,14 @@ export default function Page() {
       {/* ── Footer ── */}
       <footer style={{ borderTop:`1px solid rgba(240,237,232,0.08)`, background:DARK_BG, padding:"24px 24px" }}>
         <div className="footer-inner" style={{ maxWidth:1280, margin:"0 auto" }}>
-          <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-            <div style={{ width:6, height:6, background:ACCENT, borderRadius:2 }} />
-            <span style={{ fontFamily:"'Bricolage Grotesque',sans-serif", fontWeight:800, fontSize:13, color:DARK_TEXT, letterSpacing:"-0.01em" }}>FormCraft</span>
+          <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+              <div style={{ width:6, height:6, background:ACCENT, borderRadius:2 }} />
+              <span style={{ fontFamily:"'Arvo',serif", fontWeight:700, fontSize:13, color:DARK_TEXT, letterSpacing:"-0.01em" }}>CleverForms</span>
+            </div>
+            <div style={{ fontSize:10, color:DARK_DIM, letterSpacing:"0.04em" }}>by StayClever · forms.stayclever.in</div>
           </div>
-          <div style={{ fontSize:11, color:DARK_DIM }}>Forms that fix themselves. © 2026</div>
+          <div style={{ fontSize:11, color:DARK_DIM }}>Self-optimizing forms for modern teams. © 2026</div>
           <div style={{ display:"flex", gap:24 }}>
             <a href="/api/v1/docs" style={{ color:DARK_DIM, fontSize:11, letterSpacing:"0.04em", transition:"color 0.18s", textDecoration:"none" }}
                onMouseOver={e=>(e.currentTarget.style.color=ACCENT)}

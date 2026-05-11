@@ -91,11 +91,11 @@ export function AppSidebar({ email, defaultCollapsed = false }: { email: string;
           <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
             <div style={{ width: "8px", height: "8px", background: "var(--accent)", borderRadius: "50%", flexShrink: 0 }} />
             <span style={{
-              fontFamily: "var(--font-display)", fontSize: "17px",
-              fontWeight: 800, color: "var(--text)", letterSpacing: "-0.3px",
+              fontFamily: "'Arvo', serif", fontSize: "16px",
+              fontWeight: 700, color: "var(--text)", letterSpacing: "0px",
               whiteSpace: "nowrap",
             }}>
-              FormCraft
+              CleverForms
             </span>
           </div>
         )}

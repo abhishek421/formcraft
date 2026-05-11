@@ -3,8 +3,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
-  title: "FormCraft",
-  description: "AI-native form builder for modern teams",
+  title: "CleverForms — Self-Optimizing Forms That Improve Completion Rates",
+  description: "CleverForms automatically tests question variants, detects drop-offs, and optimizes forms in real time to improve completion rates and reduce friction.",
 };
 
 export default function RootLayout({
@@ -17,7 +17,7 @@ export default function RootLayout({
       <head>
         <meta name="google-site-verification" content="GxG2RlbW8nKjmaSW60eNRM6OYOL_3coqLy-sL7NNswY" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Arvo:wght@400;700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap"
           rel="stylesheet"
         />
         {/* Prevent flash: set theme before paint */}

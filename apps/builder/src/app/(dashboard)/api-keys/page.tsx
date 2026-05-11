@@ -15,7 +15,7 @@ export default async function ApiKeysPage() {
           API Keys
         </h1>
         <p style={{ fontSize: "13px", color: "var(--text-muted)", fontFamily: "var(--font-body)", fontWeight: 300 }}>
-          Use these keys to access the FormCraft REST API and MCP server.
+          Use these keys to access the CleverForms REST API and MCP server.
         </p>
       </div>
       <ApiKeysShell keys={keys} />

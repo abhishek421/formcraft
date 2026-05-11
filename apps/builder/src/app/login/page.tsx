@@ -1,12 +1,13 @@
-import { login } from "./actions";
 import { SettingsPanel } from "@/components/settings-panel";
+import { AuthCard } from "./AuthCard";
 
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; tab?: string; success?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, tab, success } = await searchParams;
+  const defaultTab = tab === "signup" ? "signup" : "login";
 
   return (
     <>
@@ -75,7 +76,6 @@ export default async function LoginPage({
           50%  { transform: translate(-50%, -50%) scale(1.3); opacity: 0.6; }
         }
 
-        /* Noise overlay for texture */
         .noise {
           position: fixed;
           inset: 0;
@@ -86,51 +86,98 @@ export default async function LoginPage({
         }
 
         /* ── Layout ─────────────────────────────────────────── */
-        .container {
+        .page {
           position: relative;
           z-index: 10;
           min-height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          align-items: stretch;
         }
 
-        /* ── Right panel ─────────────────────────────────────── */
+        /* ── Left: marketing ────────────────────────────────── */
+        .left {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          padding: 64px 72px;
+          border-right: 1px solid var(--border);
+          gap: 40px;
+          animation: fadeUp 0.6s ease both;
+        }
+
+        .wordmark {
+          font-family: 'Arvo', serif;
+          font-size: 14px;
+          font-weight: 700;
+          letter-spacing: 0.5px;
+          color: var(--accent);
+          opacity: 0.9;
+        }
+
+        .marketing-body {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
+
+        .marketing-headline {
+          font-family: var(--font-display);
+          font-size: clamp(36px, 4vw, 52px);
+          font-weight: 900;
+          letter-spacing: -1.5px;
+          line-height: 1.05;
+          color: var(--text);
+        }
+
+        .marketing-headline em {
+          font-style: normal;
+          color: var(--accent);
+        }
+
+        .marketing-copy {
+          font-size: 14px;
+          color: var(--text-dim);
+          line-height: 1.65;
+          max-width: 380px;
+        }
+
+        .feature-list {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          margin-top: 8px;
+        }
+
+        .feature-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 13px;
+          color: var(--text-dim);
+        }
+
+        .feature-dot {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background: var(--accent);
+          flex-shrink: 0;
+          opacity: 0.7;
+        }
+
+        /* ── Right: auth ─────────────────────────────────────── */
         .right {
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 48px 56px;
-          background: linear-gradient(135deg, rgba(255,255,255,0.015) 0%, transparent 60%);
+          padding: 64px 72px;
         }
 
-        .form-card {
-          width: 100%;
-          max-width: 340px;
-          display: flex;
-          flex-direction: column;
-          gap: 32px;
-          animation: fadeUp 0.7s 0.15s ease both;
-        }
-
-        .form-header {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-
-        .form-title {
-          font-family: var(--font-display);
-          font-size: 30px;
-          font-weight: 800;
-          letter-spacing: -0.8px;
-          color: var(--text);
-        }
-
+        /* Shared form styles (used in AuthCard) */
         form {
           display: flex;
           flex-direction: column;
-          gap: 16px;
         }
 
         .field {
@@ -163,13 +210,8 @@ export default async function LoginPage({
           width: 100%;
         }
 
-        input::placeholder {
-          color: var(--text-faint);
-        }
-
-        input:focus {
-          border-bottom-color: var(--accent);
-        }
+        input::placeholder { color: var(--text-faint); }
+        input:focus { border-bottom-color: var(--accent); }
 
         .error-msg {
           font-size: 11px;
@@ -191,21 +233,12 @@ export default async function LoginPage({
           padding: 14px;
           cursor: pointer;
           transition: opacity 0.15s ease, transform 0.15s ease;
-          margin-top: 8px;
           width: 100%;
         }
 
-        .submit-btn:hover {
-          opacity: 0.88;
-          transform: translateY(-1px);
-        }
+        .submit-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+        .submit-btn:active { transform: translateY(0); opacity: 1; }
 
-        .submit-btn:active {
-          transform: translateY(0);
-          opacity: 1;
-        }
-
-        /* Animations */
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(16px); }
           to   { opacity: 1; transform: translateY(0); }
@@ -213,11 +246,12 @@ export default async function LoginPage({
 
         /* Mobile */
         @media (max-width: 768px) {
-          .right { padding: 32px 24px; }
+          .page { grid-template-columns: 1fr; }
+          .left { display: none; }
+          .right { padding: 40px 28px; }
         }
       `}</style>
 
-      {/* Orbs */}
       <div className="orb orb-1" />
       <div className="orb orb-2" />
       <div className="orb orb-3" />
@@ -225,45 +259,40 @@ export default async function LoginPage({
 
       <SettingsPanel />
 
-      <div className="container">
-        <div className="right">
-          <div className="form-card">
-            <div className="form-header">
-              <div className="form-title">Welcome back.</div>
+      <div className="page">
+        {/* Left — marketing */}
+        <div className="left">
+          <div className="wordmark">CleverForms</div>
+          <div className="marketing-body">
+            <h1 className="marketing-headline">
+              Forms that<br />actually <em>convert.</em>
+            </h1>
+            <p className="marketing-copy">
+              Forms that stay clever. Build, publish, and let your forms improve themselves — one response at a time.
+            </p>
+            <div className="feature-list">
+              {[
+                "Drag-and-drop builder with 20+ field types",
+                "Conditional logic and branching flows",
+                "Real-time analytics and completion insights",
+                "Embed anywhere in one line of code",
+              ].map((f) => (
+                <div className="feature-item" key={f}>
+                  <span className="feature-dot" />
+                  {f}
+                </div>
+              ))}
             </div>
-
-            <form action={login}>
-              <div className="field">
-                <label htmlFor="email">Email</label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  required
-                  autoComplete="email"
-                />
-              </div>
-
-              <div className="field">
-                <label htmlFor="password">Password</label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  placeholder="••••••••"
-                  required
-                  autoComplete="current-password"
-                />
-              </div>
-
-              {error && <div className="error-msg">{decodeURIComponent(error)}</div>}
-
-              <button type="submit" className="submit-btn">
-                Continue →
-              </button>
-            </form>
           </div>
+        </div>
+
+        {/* Right — auth card */}
+        <div className="right">
+          <AuthCard
+            defaultTab={defaultTab}
+            error={error}
+            success={success === "1"}
+          />
         </div>
       </div>
     </>
