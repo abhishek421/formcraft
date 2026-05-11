@@ -2,9 +2,42 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 
+const BASE_URL = "https://forms.stayclever.in";
+
 export const metadata: Metadata = {
-  title: "CleverForms — Self-Optimizing Forms That Improve Completion Rates",
-  description: "CleverForms automatically tests question variants, detects drop-offs, and optimizes forms in real time to improve completion rates and reduce friction.",
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: "CleverForms — Self-Optimizing Forms That Improve Completion Rates",
+    template: "%s | CleverForms",
+  },
+  description:
+    "CleverForms automatically tests question variants, detects drop-offs, and optimizes forms in real time to improve completion rates and reduce friction.",
+  alternates: {
+    canonical: BASE_URL,
+  },
+  openGraph: {
+    type: "website",
+    url: BASE_URL,
+    siteName: "CleverForms",
+    title: "CleverForms — Self-Optimizing Forms That Improve Completion Rates",
+    description:
+      "CleverForms automatically tests question variants, detects drop-offs, and optimizes forms in real time to improve completion rates and reduce friction.",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "CleverForms — Self-Optimizing Forms",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CleverForms — Self-Optimizing Forms That Improve Completion Rates",
+    description:
+      "CleverForms automatically tests question variants, detects drop-offs, and optimizes forms in real time to improve completion rates and reduce friction.",
+    images: ["/opengraph-image"],
+  },
 };
 
 export default function RootLayout({
@@ -16,8 +49,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="google-site-verification" content="GxG2RlbW8nKjmaSW60eNRM6OYOL_3coqLy-sL7NNswY" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Arvo:wght@400;700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Arvo:wght@400;700&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap&font-display=swap"
           rel="stylesheet"
         />
         {/* Prevent flash: set theme before paint */}

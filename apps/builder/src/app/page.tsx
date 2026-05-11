@@ -332,6 +332,40 @@ export default function Page() {
         }
       `}</style>
 
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            name: "CleverForms",
+            applicationCategory: "BusinessApplication",
+            operatingSystem: "Web",
+            url: "https://forms.stayclever.in",
+            description:
+              "CleverForms automatically tests question variants, detects drop-offs, and optimizes forms in real time to improve completion rates and reduce friction.",
+            offers: {
+              "@type": "Offer",
+              price: "0",
+              priceCurrency: "USD",
+              description: "Free during early access",
+            },
+            publisher: {
+              "@type": "Organization",
+              name: "StayClever",
+              url: "https://forms.stayclever.in",
+            },
+            featureList: [
+              "Self-optimizing question variants",
+              "Behavioral analytics",
+              "Adaptive traffic allocation",
+              "Real-time form experimentation",
+              "No-code setup",
+            ],
+          }),
+        }}
+      />
+
       {/* ── Nav ── */}
       <nav style={{
         position:"fixed",top:0,left:0,right:0,zIndex:100,
@@ -347,6 +381,7 @@ export default function Page() {
             <a href="#how" className="nl">How it works</a>
             <a href="#proof" className="nl">Why it works</a>
             <a href="#pricing" className="nl">Pricing</a>
+            <Link href="/blog" className="nl">Blog</Link>
           </div>
           <Link href="/login" className="btn" style={{ padding:"9px 22px", fontSize:11 }}>Start free</Link>
         </div>
@@ -745,6 +780,9 @@ export default function Page() {
           </div>
           <div style={{ fontSize:11, color:DARK_DIM }}>Self-optimizing forms for modern teams. © 2026</div>
           <div style={{ display:"flex", gap:24 }}>
+            <Link href="/blog" style={{ color:DARK_DIM, fontSize:11, letterSpacing:"0.04em", transition:"color 0.18s" }}
+                  onMouseOver={e=>(e.currentTarget.style.color=ACCENT)}
+                  onMouseOut={e=>(e.currentTarget.style.color=DARK_DIM)}>Blog</Link>
             <a href="/api/v1/docs" style={{ color:DARK_DIM, fontSize:11, letterSpacing:"0.04em", transition:"color 0.18s", textDecoration:"none" }}
                onMouseOver={e=>(e.currentTarget.style.color=ACCENT)}
                onMouseOut={e=>(e.currentTarget.style.color=DARK_DIM)}>API docs</a>
