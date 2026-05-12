@@ -1,4 +1,6 @@
 import { getForms, createForm } from "./actions";
+
+export const revalidate = 30;
 import { FormCard } from "../_components/form-card";
 
 export default async function DashboardPage() {

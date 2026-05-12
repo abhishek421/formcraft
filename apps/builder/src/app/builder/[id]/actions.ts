@@ -6,19 +6,13 @@ import { revalidatePath } from "next/cache";
 export async function getForm(id: string) {
   const supabase = await createClient();
 
-  const { data: form } = await supabase
-    .from("forms")
-    .select("*")
-    .eq("id", id)
-    .single();
+  const [{ data: form }, { data: fields }, { data: { user } }] = await Promise.all([
+    supabase.from("forms").select("*").eq("id", id).single(),
+    supabase.from("fields").select("*").eq("form_id", id).order("position", { ascending: true }),
+    supabase.auth.getUser(),
+  ]);
 
-  const { data: fields } = await supabase
-    .from("fields")
-    .select("*")
-    .eq("form_id", id)
-    .order("position", { ascending: true });
-
-  return { form, fields: fields ?? [] };
+  return { form, fields: fields ?? [], email: user?.email ?? "" };
 }
 
 export async function updateFormTitle(formId: string, title: string) {

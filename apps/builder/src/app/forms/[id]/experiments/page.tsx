@@ -32,6 +32,7 @@ type GroupWithStats = Group & {
 async function getExperimentsData(formId: string) {
   const supabase = await createClient();
 
+  // Tier 1: form + user in parallel
   const [{ data: form }, { data: { user } }] = await Promise.all([
     supabase.from("forms").select("id, title, published").eq("id", formId).single(),
     supabase.auth.getUser(),
@@ -39,66 +40,76 @@ async function getExperimentsData(formId: string) {
 
   if (!form) return null;
 
+  // Tier 2: groups
   const { data: groups } = await supabase
     .from("question_groups")
     .select("id, form_id, label, created_at")
     .eq("form_id", formId)
     .order("created_at", { ascending: true });
 
-  const groupList: GroupWithStats[] = await Promise.all(
-    (groups ?? []).map(async (group: Group) => {
-      const { data: variants } = await supabase
-        .from("question_variants")
-        .select("id, variant_label, title, traffic_weight, is_active")
-        .eq("group_id", group.id)
-        .order("created_at", { ascending: true });
+  const groupIds = (groups ?? []).map((g: Group) => g.id);
+  if (groupIds.length === 0) return { form, groups: [], email: user?.email ?? "" };
 
-      const variantStats: VariantStat[] = await Promise.all(
-        (variants ?? []).map(async (v: Variant) => {
-          const [{ count: impressions }, { count: answers }, { data: answered }] = await Promise.all([
-            supabase
-              .from("question_events")
-              .select("id", { count: "exact", head: true })
-              .eq("variant_id", v.id)
-              .eq("event_type", "shown"),
-            supabase
-              .from("question_events")
-              .select("id", { count: "exact", head: true })
-              .eq("variant_id", v.id)
-              .eq("event_type", "answered"),
-            supabase
-              .from("question_events")
-              .select("duration_ms")
-              .eq("variant_id", v.id)
-              .eq("event_type", "answered")
-              .not("duration_ms", "is", null),
-          ]);
+  // Tier 3: all variants + all optimization runs in parallel (one query each)
+  const [{ data: allVariants }, { data: allRuns }] = await Promise.all([
+    supabase
+      .from("question_variants")
+      .select("id, group_id, variant_label, title, traffic_weight, is_active")
+      .in("group_id", groupIds)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("optimization_runs")
+      .select("group_id, ran_at")
+      .in("group_id", groupIds)
+      .order("ran_at", { ascending: false }),
+  ]);
 
-          let avg_ms: number | null = null;
-          if (answered && answered.length > 0) {
-            const total = answered.reduce((sum: number, r: { duration_ms: number }) => sum + r.duration_ms, 0);
-            avg_ms = Math.round(total / answered.length);
-          }
+  const variantIds = (allVariants ?? []).map((v: Variant & { group_id: string }) => v.id);
 
-          return { ...v, impressions: impressions ?? 0, answers: answers ?? 0, avg_ms };
-        })
-      );
+  // Tier 4: all events in 2 queries (shown counts + answered with duration) in parallel
+  const [{ data: shownEvents }, { data: answeredEvents }] = await Promise.all([
+    variantIds.length > 0
+      ? supabase.from("question_events").select("variant_id").in("variant_id", variantIds).eq("event_type", "shown")
+      : Promise.resolve({ data: [] }),
+    variantIds.length > 0
+      ? supabase.from("question_events").select("variant_id, duration_ms").in("variant_id", variantIds).eq("event_type", "answered")
+      : Promise.resolve({ data: [] }),
+  ]);
 
-      const { data: lastRun } = await supabase
-        .from("optimization_runs")
-        .select("ran_at")
-        .eq("group_id", group.id)
-        .order("ran_at", { ascending: false })
-        .limit(1)
-        .single();
+  // Aggregate in JS
+  const shownByVariant: Record<string, number> = {};
+  for (const e of shownEvents ?? []) {
+    shownByVariant[e.variant_id] = (shownByVariant[e.variant_id] ?? 0) + 1;
+  }
 
-      return {
-        ...group,
-        variants: variantStats,
-        last_optimized_at: lastRun?.ran_at ?? null,
-      };
-    })
-  );
+  const answeredByVariant: Record<string, { count: number; totalMs: number }> = {};
+  for (const e of answeredEvents ?? []) {
+    if (!answeredByVariant[e.variant_id]) answeredByVariant[e.variant_id] = { count: 0, totalMs: 0 };
+    answeredByVariant[e.variant_id].count += 1;
+    if (e.duration_ms != null) answeredByVariant[e.variant_id].totalMs += e.duration_ms;
+  }
+
+  const lastRunByGroup: Record<string, string> = {};
+  for (const r of allRuns ?? []) {
+    if (!lastRunByGroup[r.group_id]) lastRunByGroup[r.group_id] = r.ran_at;
+  }
+
+  // Assemble
+  const variantsByGroup: Record<string, VariantStat[]> = {};
+  for (const v of (allVariants ?? []) as (Variant & { group_id: string })[]) {
+    const impressions = shownByVariant[v.id] ?? 0;
+    const answered = answeredByVariant[v.id];
+    const answers = answered?.count ?? 0;
+    const avg_ms = answered && answered.count > 0 ? Math.round(answered.totalMs / answered.count) : null;
+    if (!variantsByGroup[v.group_id]) variantsByGroup[v.group_id] = [];
+    variantsByGroup[v.group_id].push({ ...v, impressions, answers, avg_ms });
+  }
+
+  const groupList: GroupWithStats[] = (groups ?? []).map((g: Group) => ({
+    ...g,
+    variants: variantsByGroup[g.id] ?? [],
+    last_optimized_at: lastRunByGroup[g.id] ?? null,
+  }));
 
   return { form, groups: groupList, email: user?.email ?? "" };
 }
