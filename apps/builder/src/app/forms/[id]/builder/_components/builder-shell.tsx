@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useTransition, useRef, useEffect } from "react";
 import Link from "next/link";
-import { VariantEditor } from "./variant-editor";
+import { VariantPanel } from "./variant-editor";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   DndContext,
@@ -30,6 +30,7 @@ import {
   togglePublish,
   updateFormTheme,
 } from "../actions";
+import { listVariants, createVariant, patchVariant } from "../variant-actions";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -53,6 +54,19 @@ type Form = {
   published: boolean;
   settings: Record<string, unknown>;
   theme: Record<string, unknown>;
+};
+
+type Variant = {
+  id: string;
+  variant_label: string;
+  title: string;
+  description?: string;
+  type: string;
+  config: Record<string, unknown>;
+  logic: unknown[];
+  traffic_weight: number;
+  is_active: boolean;
+  created_at: string;
 };
 
 function isLightColor(hex: string): boolean {
@@ -136,6 +150,11 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
   const [formTheme, setFormTheme] = useState<Record<string, unknown>>(form.theme ?? {});
   const [, startTransition] = useTransition();
 
+  // Variant state
+  const [variants, setVariants] = useState<Variant[]>([]);
+  const [activeVariantId, setActiveVariantId] = useState<string | null>(null);
+  const [loadingVariants, setLoadingVariants] = useState(false);
+
   const rendererBase = process.env.NEXT_PUBLIC_RENDERER_URL ?? "http://localhost:3001";
   const shareUrl = `${rendererBase}/f/${form.id}`;
 
@@ -198,6 +217,53 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
       return next;
     });
   }, [saveTheme]);
+
+  // Load variants when selected field changes
+  useEffect(() => {
+    setActiveVariantId(null);
+    setVariants([]);
+    const field = fields.find((f) => f.id === selectedId);
+    if (!field?.question_group_id) return;
+    setLoadingVariants(true);
+    listVariants(form.id, field.question_group_id).then((data) => {
+      setVariants(data);
+      if (data.length > 0) setActiveVariantId(data[0].id);
+      setLoadingVariants(false);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedId]);
+
+  const saveVariant = useDebounce((variantId: string, groupId: string, updates: Partial<Variant>) => {
+    patchVariant(form.id, groupId, variantId, updates);
+  }, 500);
+
+  const patchActiveVariant = useCallback((updates: Partial<Field>) => {
+    if (!activeVariantId) return;
+    const field = fields.find((f) => f.id === selectedId);
+    if (!field?.question_group_id) return;
+    setVariants((prev) => prev.map((v) => v.id === activeVariantId ? { ...v, ...updates } : v));
+    saveVariant(activeVariantId, field.question_group_id, updates as Partial<Variant>);
+  }, [activeVariantId, fields, selectedId, saveVariant]);
+
+  const handleAddVariantTab = async () => {
+    const field = fields.find((f) => f.id === selectedId);
+    if (!field?.question_group_id) return;
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const used = new Set(variants.map((v) => v.variant_label));
+    const nextLabel = letters.split("").find((l) => !used.has(l)) ?? "Z";
+    const created = await createVariant(form.id, field.question_group_id, {
+      variant_label: nextLabel,
+      title: "",
+      type: field.type,
+      config: {},
+      logic: [],
+    });
+    if (created) {
+      const fresh = await listVariants(form.id, field.question_group_id);
+      setVariants(fresh);
+      setActiveVariantId(created.id);
+    }
+  };
 
   // Add field
   const handleAddField = async (type: string) => {
@@ -504,24 +570,96 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
             const isLight = isLightColor(bg);
             const textColor = isLight ? "#1A1A1A" : "#F0EDE8";
             const textMuted = isLight ? "rgba(0,0,0,0.4)" : "rgba(240,237,232,0.45)";
+
+            const activeVariant = variants.find((v) => v.id === activeVariantId) ?? null;
+            const displayField: Field | null = selectedField
+              ? activeVariant
+                ? { ...selectedField, title: activeVariant.title, description: activeVariant.description, type: activeVariant.type, config: activeVariant.config }
+                : selectedField
+              : null;
+            const handleChange = activeVariant
+              ? patchActiveVariant
+              : selectedField ? (updates: Partial<Field>) => patchField(selectedField.id, updates) : () => {};
+
+            const hasVariants = selectedField?.question_group_id && variants.length > 0;
+
             return (
-              <div style={{ flex: 1, overflowY: "auto", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "48px 32px", background: bg }}>
-                {selectedField ? (
-                  <FieldEditor
-                    field={selectedField}
-                    onChange={(updates) => patchField(selectedField.id, updates)}
-                    theme={{ bg, primary, dFont, bFont, bRadius, textColor, textMuted }}
-                  />
-                ) : (
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", background: bg }}>
+                {/* Variant tabs */}
+                {hasVariants && (
                   <div style={{
-                    display: "flex", flexDirection: "column", alignItems: "center",
-                    justifyContent: "center", gap: "16px", height: "100%",
-                    color: textMuted, fontSize: "13px", fontFamily: `'${bFont}', monospace`,
+                    display: "flex", alignItems: "center", gap: "2px",
+                    padding: "10px 32px 0",
+                    borderBottom: `1px solid rgba(${isLight ? "0,0,0" : "240,237,232"},0.08)`,
+                    background: bg, flexShrink: 0,
                   }}>
-                    <div style={{ fontSize: "32px", opacity: 0.3 }}>⊞</div>
-                    Select a question or add a new one
+                    {variants.map((v) => {
+                      const active = v.id === activeVariantId;
+                      return (
+                        <button
+                          key={v.id}
+                          onClick={() => setActiveVariantId(v.id)}
+                          style={{
+                            padding: "7px 18px",
+                            background: active ? `rgba(${isLight ? "0,0,0" : "240,237,232"},0.07)` : "transparent",
+                            border: `1px solid ${active ? `rgba(${isLight ? "0,0,0" : "240,237,232"},0.15)` : "transparent"}`,
+                            borderBottom: active ? `2px solid ${primary}` : "2px solid transparent",
+                            borderRadius: "4px 4px 0 0",
+                            color: active ? textColor : textMuted,
+                            fontFamily: `'${bFont}', monospace`,
+                            fontSize: "11px", letterSpacing: "1px",
+                            cursor: "pointer",
+                            transition: "all 0.12s",
+                            marginBottom: "-1px",
+                          }}
+                        >
+                          {v.variant_label}
+                          {!v.is_active && (
+                            <span style={{ marginLeft: "6px", fontSize: "9px", opacity: 0.4 }}>off</span>
+                          )}
+                        </button>
+                      );
+                    })}
+                    {!loadingVariants && (
+                      <button
+                        onClick={handleAddVariantTab}
+                        title="Add variant"
+                        style={{
+                          padding: "7px 12px", marginBottom: "-1px",
+                          background: "transparent",
+                          border: `1px dashed rgba(${isLight ? "0,0,0" : "240,237,232"},0.15)`,
+                          borderRadius: "4px 4px 0 0",
+                          color: textMuted, fontFamily: `'${bFont}', monospace`,
+                          fontSize: "14px", cursor: "pointer",
+                          transition: "all 0.12s",
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.borderColor = primary; e.currentTarget.style.color = primary; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.borderColor = `rgba(${isLight ? "0,0,0" : "240,237,232"},0.15)`; e.currentTarget.style.color = textMuted; }}
+                      >
+                        +
+                      </button>
+                    )}
                   </div>
                 )}
+
+                <div style={{ flex: 1, overflowY: "auto", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "48px 32px" }}>
+                  {displayField ? (
+                    <FieldEditor
+                      field={displayField}
+                      onChange={handleChange}
+                      theme={{ bg, primary, dFont, bFont, bRadius, textColor, textMuted }}
+                    />
+                  ) : (
+                    <div style={{
+                      display: "flex", flexDirection: "column", alignItems: "center",
+                      justifyContent: "center", gap: "16px", height: "100%",
+                      color: textMuted, fontSize: "13px", fontFamily: `'${bFont}', monospace`,
+                    }}>
+                      <div style={{ fontSize: "32px", opacity: 0.3 }}>⊞</div>
+                      Select a question or add a new one
+                    </div>
+                  )}
+                </div>
               </div>
             );
           })()}
@@ -540,7 +678,15 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
                 allFields={fields}
                 formId={form.id}
                 onChange={(updates) => patchField(selectedField.id, updates)}
-                onFieldUpdated={(groupId) => patchField(selectedField.id, { question_group_id: groupId ?? null })}
+                onFieldUpdated={(groupId, newVariants) => {
+                  patchField(selectedField.id, { question_group_id: groupId ?? null });
+                  if (newVariants) {
+                    setVariants(newVariants);
+                    if (newVariants.length > 0) setActiveVariantId(newVariants[0].id);
+                  }
+                }}
+                variants={variants}
+                setVariants={setVariants}
               />
             </div>
           )}
@@ -940,7 +1086,7 @@ function FieldTypePreview({ field, onChange, theme: t }: { field: Field; onChang
 
 // ─── Field settings (right panel) ────────────────────────────────────────────
 
-function FieldSettings({ field, allFields, formId, onChange, onFieldUpdated }: { field: Field; allFields: Field[]; formId: string; onChange: (u: Partial<Field>) => void; onFieldUpdated: (groupId: string | null) => void }) {
+function FieldSettings({ field, allFields, formId, onChange, onFieldUpdated, variants, setVariants }: { field: Field; allFields: Field[]; formId: string; onChange: (u: Partial<Field>) => void; onFieldUpdated: (groupId: string | null, variants?: Variant[]) => void; variants: Variant[]; setVariants: (v: Variant[]) => void }) {
   return (
     <>
       <div>
@@ -1048,7 +1194,7 @@ function FieldSettings({ field, allFields, formId, onChange, onFieldUpdated }: {
       )}
 
       {/* Experiments */}
-      <VariantEditor field={field} formId={formId} onFieldUpdated={onFieldUpdated} />
+      <VariantPanel field={field} formId={formId} onFieldUpdated={onFieldUpdated} variants={variants} setVariants={setVariants} />
     </>
   );
 }

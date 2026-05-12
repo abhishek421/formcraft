@@ -91,7 +91,7 @@ export async function patchVariant(
   formId: string,
   groupId: string,
   variantId: string,
-  updates: Partial<{ title: string; description: string; is_active: boolean; traffic_weight: number }>
+  updates: Partial<{ title: string; description: string; is_active: boolean; traffic_weight: number; config: Record<string, unknown> }>
 ): Promise<boolean> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
