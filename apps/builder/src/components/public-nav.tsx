@@ -90,10 +90,12 @@ function DropdownMenu({ columns }: { columns: { heading?: string; items: Dropdow
       paddingTop: 12,
       background: "transparent",
       minWidth: multiCol ? 520 : 240,
+      zIndex: 200,
+    }}>
+    <div style={{
       display: "grid",
       gridTemplateColumns: multiCol ? `repeat(${columns.length}, 1fr)` : "1fr",
       gap: multiCol ? 24 : 0,
-      zIndex: 200,
       background: BG,
       border: `1px solid ${BORDER}`,
       borderRadius: 10,
@@ -141,8 +143,8 @@ function DropdownMenu({ columns }: { columns: { heading?: string; items: Dropdow
                   textDecoration: "none",
                   transition: "background 0.15s",
                 }}
-                onMouseOver={e => (e.currentTarget.style.background = "rgba(28,25,23,0.05)")}
-                onMouseOut={e => (e.currentTarget.style.background = "transparent")}
+                onMouseOver={(e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.background = "rgba(28,25,23,0.05)")}
+                onMouseOut={(e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.background = "transparent")}
               >
                 <div style={{ fontSize: 12, fontWeight: 500, color: TEXT, marginBottom: 2 }}>
                   {item.label}
@@ -155,6 +157,7 @@ function DropdownMenu({ columns }: { columns: { heading?: string; items: Dropdow
           </div>
         </div>
       ))}
+    </div>
     </div>
   );
 }
@@ -330,8 +333,8 @@ export function PublicNav() {
                 borderRadius: 5,
                 transition: "color 0.15s",
               }}
-              onMouseOver={e => (e.currentTarget.style.color = TEXT)}
-              onMouseOut={e => (e.currentTarget.style.color = MUTED)}
+              onMouseOver={(e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.color = TEXT)}
+              onMouseOut={(e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.color = MUTED)}
             >
               Log in
             </Link>
@@ -349,8 +352,8 @@ export function PublicNav() {
               transition: "background 0.15s, transform 0.15s",
               display: "inline-block",
             }}
-              onMouseOver={e => { e.currentTarget.style.background = "#d14e2c"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-              onMouseOut={e => { e.currentTarget.style.background = ACCENT; e.currentTarget.style.transform = "translateY(0)"; }}
+              onMouseOver={(e: React.MouseEvent<HTMLElement>) => { e.currentTarget.style.background = "#d14e2c"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+              onMouseOut={(e: React.MouseEvent<HTMLElement>) => { e.currentTarget.style.background = ACCENT; e.currentTarget.style.transform = "translateY(0)"; }}
             >
               Start free
             </Link>

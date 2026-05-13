@@ -162,8 +162,8 @@ export function PublicFooter() {
                         transition: "color 0.15s",
                         display: "inline-block",
                       }}
-                      onMouseOver={e => (e.currentTarget.style.color = DARK_TEXT)}
-                      onMouseOut={e => (e.currentTarget.style.color = DARK_MUT)}
+                      onMouseOver={(e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.color = DARK_TEXT)}
+                      onMouseOut={(e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.color = DARK_MUT)}
                     >
                       {link.label}
                     </Link>
@@ -233,8 +233,8 @@ export function PublicFooter() {
                   letterSpacing: "0.04em",
                   transition: "color 0.15s",
                 }}
-                onMouseOver={e => (e.currentTarget.style.color = DARK_TEXT)}
-                onMouseOut={e => (e.currentTarget.style.color = DARK_DIM)}
+                onMouseOver={(e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.color = DARK_TEXT)}
+                onMouseOut={(e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.color = DARK_DIM)}
               >
                 {label}
               </Link>
