@@ -1,6 +1,6 @@
 import { ApiReference } from "@scalar/nextjs-api-reference";
 
 export const GET = ApiReference({
-  spec: { url: "/api/v1/docs" },
+  url: "/api/v1/docs",
   theme: "default",
 });
