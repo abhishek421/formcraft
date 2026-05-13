@@ -52,3 +52,5 @@ next-env.d.ts
 # agent tooling
 .agents/
 .claude/
+# Added by code-review-graph
+.code-review-graph/

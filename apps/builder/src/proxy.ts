@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PROTECTED = ["/forms"];
+const PROTECTED = ["/app"];
 const PUBLIC_ONLY = ["/login"];
 
 export async function proxy(request: NextRequest) {
@@ -34,7 +34,7 @@ export async function proxy(request: NextRequest) {
 
   // Already logged in → redirect away from login
   if (user && PUBLIC_ONLY.some((p) => path.startsWith(p))) {
-    return NextResponse.redirect(new URL("/forms", request.url));
+    return NextResponse.redirect(new URL("/app/forms", request.url));
   }
 
   return supabaseResponse;

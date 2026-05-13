@@ -9,7 +9,7 @@ import { SettingsPanel } from "./settings-panel";
 const NAV = [
   {
     label: "Forms",
-    href: "/forms",
+    href: "/app/forms",
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <rect x="2" y="2" width="12" height="3" stroke="currentColor" strokeWidth="1.2" />
@@ -20,7 +20,7 @@ const NAV = [
   },
   {
     label: "Integrations",
-    href: "/integrations",
+    href: "/app/integrations",
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <circle cx="4" cy="8" r="2" stroke="currentColor" strokeWidth="1.2" />
@@ -33,7 +33,7 @@ const NAV = [
   },
   {
     label: "API Keys",
-    href: "/api-keys",
+    href: "/app/api-keys",
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <circle cx="6" cy="8" r="3" stroke="currentColor" strokeWidth="1.2" />
@@ -42,8 +42,20 @@ const NAV = [
     ),
   },
   {
+    label: "Docs",
+    href: "/docs",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <rect x="3" y="2" width="10" height="12" rx="1" stroke="currentColor" strokeWidth="1.2" />
+        <line x1="5.5" y1="5.5" x2="10.5" y2="5.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+        <line x1="5.5" y1="8" x2="10.5" y2="8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+        <line x1="5.5" y1="10.5" x2="8.5" y2="10.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
     label: "Profile",
-    href: "/profile",
+    href: "/app/profile",
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <circle cx="8" cy="5.5" r="2.5" stroke="currentColor" strokeWidth="1.2" />

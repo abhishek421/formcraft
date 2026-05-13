@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { PublicNav } from "@/components/public-nav";
+import { PublicFooter } from "@/components/public-footer";
 
 export const metadata: Metadata = {
   title: "Blog — Form Optimization & Conversion Insights",
@@ -73,27 +75,7 @@ export default function BlogPage() {
         .post-card:hover { border-color: ${ACCENT} !important; transform: translateY(-2px); }
       `}</style>
 
-      {/* Nav */}
-      <nav style={{
-        position: "sticky", top: 0, zIndex: 100,
-        background: "rgba(244,239,230,0.92)", backdropFilter: "blur(16px)",
-        borderBottom: `1px solid ${BORDER}`, padding: "0 52px",
-      }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 9, color: TEXT }}>
-            <div style={{ width: 7, height: 7, background: ACCENT, borderRadius: 2 }} />
-            <span style={{ fontFamily: "'Arvo', serif", fontWeight: 700, fontSize: 15, letterSpacing: "-0.01em" }}>CleverForms</span>
-          </Link>
-          <Link href="/login" style={{
-            background: ACCENT, color: "#fff", padding: "9px 22px",
-            fontSize: 11, fontWeight: 500, letterSpacing: "0.08em",
-            fontFamily: "'DM Mono', monospace", borderRadius: 5,
-            textTransform: "uppercase",
-          }}>
-            Start free
-          </Link>
-        </div>
-      </nav>
+      <PublicNav />
 
       {/* Header */}
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "80px 52px 56px" }}>
@@ -110,6 +92,36 @@ export default function BlogPage() {
           Practical guides on reducing abandonment, adaptive experimentation,
           and building forms that improve over time.
         </p>
+      </div>
+
+      {/* Categories */}
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 52px 48px" }}>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          {[
+            { label: "All posts",    href: "/blog" },
+            { label: "Form Design",  href: "/blog/form-design" },
+            { label: "A/B Testing",  href: "/blog/ab-testing" },
+            { label: "Survey Tips",  href: "/blog/survey-tips" },
+          ].map(({ label, href }) => (
+            <Link
+              key={href}
+              href={href}
+              style={{
+                fontFamily: "'DM Mono', monospace",
+                fontSize: 11,
+                letterSpacing: "0.06em",
+                padding: "8px 16px",
+                borderRadius: 6,
+                border: `1px solid ${BORDER}`,
+                background: href === "/blog" ? TEXT : SURFACE,
+                color: href === "/blog" ? "#F0EDE8" : MUTED,
+                textDecoration: "none",
+              }}
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
       </div>
 
       {/* Posts */}
@@ -151,6 +163,7 @@ export default function BlogPage() {
           ))}
         </div>
       </div>
+      <PublicFooter />
     </div>
   );
 }

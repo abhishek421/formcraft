@@ -39,7 +39,7 @@ export function OnboardingShell({ email }: { email: string }) {
       return;
     }
 
-    router.push("/forms");
+    router.push("/app/forms");
   }
 
   return (

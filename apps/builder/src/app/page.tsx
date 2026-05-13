@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { PublicNav } from "@/components/public-nav";
+import { PublicFooter } from "@/components/public-footer";
 
 // ── Palette ───────────────────────────────────────────────────────────────────
 const BG      = "#F4EFE6";
@@ -282,8 +284,6 @@ export default function Page() {
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.2}}
         @keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
         a{text-decoration:none}
-        .nl{color:${MUTED};font-size:12px;letter-spacing:0.04em;transition:color 0.18s}
-        .nl:hover{color:${ACCENT}}
         .btn{
           display:inline-block;background:${ACCENT};color:#fff;
           padding:14px 36px;font-size:12px;font-weight:500;letter-spacing:0.08em;
@@ -298,8 +298,6 @@ export default function Page() {
         .step-card:hover{border-color:${ACCENT_B}}
 
         /* ── Responsive ── */
-        .nav-inner{padding:18px 52px}
-        .nav-links{display:flex;gap:32px;align-items:center}
         .hero-grid{padding:148px 52px 100px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
         .sec-pad{padding:96px 52px}
         .how-pad{padding:112px 52px}
@@ -308,15 +306,11 @@ export default function Page() {
         .proof-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
         .pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
         .cta-pad{padding:120px 52px}
-        .footer-inner{display:flex;justify-content:space-between;align-items:center}
-
         @media(max-width:1024px){
           .pricing-grid{grid-template-columns:1fr 1fr}
           .steps-grid{grid-template-columns:1fr 1fr}
         }
         @media(max-width:768px){
-          .nav-inner{padding:16px 24px}
-          .nav-links{display:none}
           .hero-grid{grid-template-columns:1fr;gap:48px;padding:112px 24px 72px}
           .sec-pad{padding:64px 24px}
           .how-pad{padding:72px 24px}
@@ -366,30 +360,11 @@ export default function Page() {
         }}
       />
 
-      {/* ── Nav ── */}
-      <nav style={{
-        position:"fixed",top:0,left:0,right:0,zIndex:100,
-        background:"rgba(244,239,230,0.88)",backdropFilter:"blur(16px)",
-        borderBottom:`1px solid ${BORDER}`,
-      }}>
-        <div className="nav-inner" style={{ maxWidth:1280, margin:"0 auto", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-          <div style={{ display:"flex", alignItems:"center", gap:9 }}>
-            <div style={{ width:7, height:7, background:ACCENT, borderRadius:2 }} />
-            <span style={{ fontFamily:"'Arvo',serif", fontWeight:700, fontSize:15, letterSpacing:"-0.01em" }}>CleverForms</span>
-          </div>
-          <div className="nav-links">
-            <a href="#how" className="nl">How it works</a>
-            <a href="#proof" className="nl">Why it works</a>
-            <a href="#pricing" className="nl">Pricing</a>
-            <Link href="/blog" className="nl">Blog</Link>
-          </div>
-          <Link href="/login" className="btn" style={{ padding:"9px 22px", fontSize:11 }}>Start free</Link>
-        </div>
-      </nav>
+      <PublicNav />
 
       {/* ── Hero ── */}
       <section style={{
-        minHeight:"100vh",
+        minHeight:"calc(100vh - 64px)",
         display:"flex", alignItems:"center",
       }}>
       <div className="hero-grid" style={{ maxWidth:1280, margin:"0 auto", width:"100%" }}>
@@ -768,30 +743,7 @@ export default function Page() {
         </div>
       </section>
 
-      {/* ── Footer ── */}
-      <footer style={{ borderTop:`1px solid rgba(240,237,232,0.08)`, background:DARK_BG, padding:"24px 24px" }}>
-        <div className="footer-inner" style={{ maxWidth:1280, margin:"0 auto" }}>
-          <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
-            <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-              <div style={{ width:6, height:6, background:ACCENT, borderRadius:2 }} />
-              <span style={{ fontFamily:"'Arvo',serif", fontWeight:700, fontSize:13, color:DARK_TEXT, letterSpacing:"-0.01em" }}>CleverForms</span>
-            </div>
-            <div style={{ fontSize:10, color:DARK_DIM, letterSpacing:"0.04em" }}>by StayClever · forms.stayclever.in</div>
-          </div>
-          <div style={{ fontSize:11, color:DARK_DIM }}>Self-optimizing forms for modern teams. © 2026</div>
-          <div style={{ display:"flex", gap:24 }}>
-            <Link href="/blog" style={{ color:DARK_DIM, fontSize:11, letterSpacing:"0.04em", transition:"color 0.18s" }}
-                  onMouseOver={e=>(e.currentTarget.style.color=ACCENT)}
-                  onMouseOut={e=>(e.currentTarget.style.color=DARK_DIM)}>Blog</Link>
-            <a href="/api/v1/docs" style={{ color:DARK_DIM, fontSize:11, letterSpacing:"0.04em", transition:"color 0.18s", textDecoration:"none" }}
-               onMouseOver={e=>(e.currentTarget.style.color=ACCENT)}
-               onMouseOut={e=>(e.currentTarget.style.color=DARK_DIM)}>API docs</a>
-            <Link href="/login" style={{ color:DARK_DIM, fontSize:11, letterSpacing:"0.04em", transition:"color 0.18s" }}
-                  onMouseOver={e=>(e.currentTarget.style.color=ACCENT)}
-                  onMouseOut={e=>(e.currentTarget.style.color=DARK_DIM)}>Login</Link>
-          </div>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   );
 }
