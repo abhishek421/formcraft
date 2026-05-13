@@ -54,3 +54,17 @@ next-env.d.ts
 .claude/
 # Added by code-review-graph
 .code-review-graph/
+
+# IDE / AI tooling configs
+.cursor/
+.cursorrules
+.gemini/
+.kiro/
+.mcp.json
+.opencode.json
+.qoder/
+.vscode/
+.windsurfrules
+.github/
+GEMINI.md
+QODER.md
