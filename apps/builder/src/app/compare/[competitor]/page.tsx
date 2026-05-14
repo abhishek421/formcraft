@@ -197,8 +197,8 @@ export async function generateMetadata({ params }: { params: Promise<{ competito
   const data = COMPETITORS[competitor];
   if (!data) return {};
   return {
-    title: `CleverForms vs ${data.name} — Comparison`,
-    description: `How CleverForms compares to ${data.name}: A/B testing, pricing, analytics, and integrations. See which is right for your team.`,
+    title: `CleverForms vs ${data.name} — Form Builder Comparison`,
+    description: `CleverForms vs ${data.name}: compare A/B testing, form analytics, pricing, and integrations. See which form builder is right for your team.`,
     alternates: { canonical: `https://forms.stayclever.in/compare/${competitor}` },
     openGraph: {
       url: `https://forms.stayclever.in/compare/${competitor}`,

@@ -4,14 +4,14 @@ import { PublicNav } from "@/components/public-nav";
 import { PublicFooter } from "@/components/public-footer";
 
 export const metadata: Metadata = {
-  title: "Pricing — CleverForms",
+  title: "Form Builder Pricing — Plans, Cost & Free Trial | CleverForms",
   description:
-    "Simple, transparent pricing for form builders who care about conversions. Start free, upgrade when you need more.",
+    "CleverForms pricing: free plan forever, Pro at $29/mo, Business at $99/mo. A/B testing form builder with transparent pricing, no per-response fees. Free 14-day trial.",
   alternates: { canonical: "https://forms.stayclever.in/pricing" },
   openGraph: {
     url: "https://forms.stayclever.in/pricing",
-    title: "Pricing — CleverForms",
-    description: "Simple, transparent pricing. Start free.",
+    title: "Form Builder Pricing — Plans, Cost & Free Trial | CleverForms",
+    description: "Free plan forever. Pro at $29/mo. No per-response fees, no surprise charges.",
   },
 };
 
@@ -102,9 +102,23 @@ const FAQ = [
   },
 ];
 
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQ.map(({ q, a }) => ({
+    "@type": "Question",
+    name: q,
+    acceptedAnswer: { "@type": "Answer", text: a },
+  })),
+};
+
 export default function PricingPage() {
   return (
     <div style={{ minHeight: "100vh", background: BG, color: TEXT, fontFamily: "'DM Mono', monospace" }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Arvo:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Mono:wght@300;400;500&display=swap&font-display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }

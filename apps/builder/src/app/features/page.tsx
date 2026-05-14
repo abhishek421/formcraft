@@ -4,14 +4,14 @@ import { PublicNav } from "@/components/public-nav";
 import { PublicFooter } from "@/components/public-footer";
 
 export const metadata: Metadata = {
-  title: "Features — CleverForms",
+  title: "Form Builder Features — A/B Testing, Analytics & Conditional Logic | CleverForms",
   description:
-    "A/B testing, conditional logic, file uploads, and behavioral analytics — everything you need to build forms that improve themselves.",
+    "A/B testing, conditional logic, file uploads, and behavioral analytics — everything you need in a form builder to improve completion rates automatically.",
   alternates: { canonical: "https://forms.stayclever.in/features" },
   openGraph: {
     url: "https://forms.stayclever.in/features",
-    title: "Features — CleverForms",
-    description: "Build forms that learn, adapt, and convert better over time.",
+    title: "Form Builder Features — A/B Testing, Analytics & Conditional Logic | CleverForms",
+    description: "Build forms that test variants, detect drop-off, and improve conversions automatically.",
   },
 };
 
@@ -71,7 +71,7 @@ export default function FeaturesPage() {
           fontWeight: 800, lineHeight: 1.08,
           letterSpacing: "-0.025em", marginBottom: 20,
         }}>
-          Forms that improve themselves.
+          A/B testing, analytics, and conditional logic — built in.
         </h1>
         <p style={{ fontSize: 14, color: MUTED, lineHeight: 1.8, maxWidth: 540 }}>
           Every feature in CleverForms is built around one idea: your form should get better with every submission, automatically.

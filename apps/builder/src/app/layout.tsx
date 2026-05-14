@@ -7,7 +7,7 @@ const BASE_URL = "https://forms.stayclever.in";
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "CleverForms — Self-Optimizing Forms That Improve Completion Rates",
+    default: "CleverForms — Self-Optimizing Form Builder That Improves Completion Rates",
     template: "%s | CleverForms",
   },
   description:
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     type: "website",
     url: BASE_URL,
     siteName: "CleverForms",
-    title: "CleverForms — Self-Optimizing Forms That Improve Completion Rates",
+    title: "CleverForms — Self-Optimizing Form Builder That Improves Completion Rates",
     description:
       "CleverForms automatically tests question variants, detects drop-offs, and optimizes forms in real time to improve completion rates and reduce friction.",
     images: [
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "CleverForms — Self-Optimizing Forms That Improve Completion Rates",
+    title: "CleverForms — Self-Optimizing Form Builder That Improves Completion Rates",
     description:
       "CleverForms automatically tests question variants, detects drop-offs, and optimizes forms in real time to improve completion rates and reduce friction.",
     images: ["/opengraph-image"],
