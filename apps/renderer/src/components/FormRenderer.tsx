@@ -2,6 +2,100 @@ import { createSignal, For, Show, onMount, onCleanup } from "solid-js";
 import { supabase } from "../lib/supabase";
 import type { Field, Form, Answers, LogicJump, VariantAssignment } from "../lib/types";
 
+// ── Welcome screen blocks ─────────────────────────────────────────────────────
+
+type WelcomeBlockRenderer =
+  | { id: string; type: "heading";    content: string }
+  | { id: string; type: "subheading"; content: string }
+  | { id: string; type: "paragraph";  content: string }
+  | { id: string; type: "quote";      content: string; attribution?: string }
+  | { id: string; type: "image";      url: string; caption?: string }
+  | { id: string; type: "embed";      url: string; caption?: string }
+  | { id: string; type: "divider" }
+  | { id: string; type: "spacer" };
+
+function WelcomeBlockView(props: {
+  block: WelcomeBlockRenderer;
+  displayFont: string; bodyFont: string;
+  primaryColor: string; textColor: string; textMuted: string;
+}) {
+  const b = props.block;
+
+  if (b.type === "heading") return (
+    <h1 style={{
+      "font-family": `'${props.displayFont}', sans-serif`,
+      "font-size": "clamp(28px, 4.5vw, 48px)", "font-weight": "800",
+      "letter-spacing": "-1px", color: props.textColor, "line-height": "1.1", margin: "0",
+    }}>{b.content}</h1>
+  );
+
+  if (b.type === "subheading") return (
+    <h2 style={{
+      "font-family": `'${props.displayFont}', sans-serif`,
+      "font-size": "clamp(18px, 2.5vw, 26px)", "font-weight": "600",
+      "letter-spacing": "-0.3px", color: props.textColor, "line-height": "1.2", margin: "0",
+    }}>{b.content}</h2>
+  );
+
+  if (b.type === "paragraph") return (
+    <p style={{
+      "font-family": `'${props.bodyFont}', monospace`,
+      "font-size": "15px", "font-weight": "300",
+      color: props.textMuted, "line-height": "1.8", margin: "0",
+    }}>{b.content}</p>
+  );
+
+  if (b.type === "quote") return (
+    <blockquote style={{
+      "border-left": `3px solid ${props.primaryColor}`,
+      "padding-left": "16px", margin: "0",
+      display: "flex", "flex-direction": "column", gap: "6px",
+    }}>
+      <p style={{ "font-family": `'${props.bodyFont}', monospace`, "font-size": "16px", "font-style": "italic", "font-weight": "300", color: props.textMuted, "line-height": "1.7", margin: "0" }}>{b.content}</p>
+      <Show when={!!b.attribution}>
+        <span style={{ "font-size": "11px", color: props.textMuted, opacity: "0.5", "font-family": `'${props.bodyFont}', monospace`, "letter-spacing": "0.5px" }}>{b.attribution}</span>
+      </Show>
+    </blockquote>
+  );
+
+  if (b.type === "image") return (
+    <div style={{ display: "flex", "flex-direction": "column", gap: "8px" }}>
+      <img src={b.url} alt={b.caption ?? ""} style={{ width: "100%", "border-radius": "8px", "object-fit": "cover", "max-height": "360px" }} />
+      <Show when={!!b.caption}>
+        <span style={{ "font-size": "11px", color: props.textMuted, opacity: "0.5", "font-family": `'${props.bodyFont}', monospace`, "text-align": "center" }}>{b.caption}</span>
+      </Show>
+    </div>
+  );
+
+  if (b.type === "embed") {
+    const embedUrl = (() => {
+      if (b.url.includes("youtube.com") || b.url.includes("youtu.be")) {
+        const id = b.url.split("v=")[1]?.split("&")[0] ?? b.url.split("/").pop();
+        return `https://www.youtube.com/embed/${id}`;
+      }
+      if (b.url.includes("loom.com")) {
+        return `https://www.loom.com/embed/${b.url.split("/").pop()}`;
+      }
+      return b.url;
+    })();
+    return (
+      <div style={{ position: "relative", "padding-bottom": "56.25%", height: "0", overflow: "hidden", "border-radius": "8px" }}>
+        <iframe src={embedUrl} style={{ position: "absolute", top: "0", left: "0", width: "100%", height: "100%", border: "none" }} allowfullscreen />
+      </div>
+    );
+  }
+
+  if (b.type === "divider") return (
+    <div style={{ "padding": "4px 0" }}>
+      <hr style={{ border: "none", "border-top": `1px solid rgba(255,255,255,0.1)`, margin: "0" }} />
+    </div>
+  );
+
+  if (b.type === "spacer") return <div style={{ height: "24px" }} />;
+
+  return null;
+}
+
 // ── Event tracking ────────────────────────────────────────────────────────────
 
 const API_BASE = `${import.meta.env.VITE_BUILDER_URL}/api/v1`;
@@ -665,27 +759,48 @@ export function FormRenderer(props: {
           <div style={{
             opacity: visible() ? "1" : "0",
             transform: visible() ? "translateY(0)" : "translateY(20px)",
-            transition: "all 0.4s ease", "text-align": "center",
+            transition: "all 0.4s ease",
+            width: "100%", "max-width": "600px",
           }}>
+            {/* Form title label */}
             <div style={{
               "font-size": "12px", "letter-spacing": "3px", "text-transform": "uppercase",
-              color: primaryColor(), "margin-bottom": "20px", "font-family": `'${bodyFont()}', monospace`,
+              color: primaryColor(), "margin-bottom": "24px", "font-family": `'${bodyFont()}', monospace`,
+              "text-align": "center",
             }}>
               {props.form.title}
             </div>
-            <h1 style={{
-              "font-family": `'${displayFont()}', sans-serif`,
-              "font-size": "clamp(32px, 5vw, 56px)",
-              "font-weight": "800", "letter-spacing": "-1.5px",
-              color: textColor(), "margin-bottom": "16px", "line-height": "1.1",
-            }}>
-              {welcomeField()?.title || props.form.title}
-            </h1>
-            <Show when={welcomeField()?.description}>
-              <p style={{ "font-size": "15px", color: textMuted(), "line-height": "1.7", "max-width": "480px", margin: "0 auto" }}>
-                {welcomeField()!.description}
-              </p>
-            </Show>
+
+            {/* Blocks or legacy title/description */}
+            {(() => {
+              const wf = welcomeField();
+              const blocks = wf?.config?.blocks as WelcomeBlockRenderer[] | undefined;
+              if (blocks?.length) {
+                return (
+                  <div style={{ display: "flex", "flex-direction": "column", gap: "16px" }}>
+                    {blocks.map((block) => <WelcomeBlockView block={block} displayFont={displayFont()} bodyFont={bodyFont()} primaryColor={primaryColor()} textColor={textColor()} textMuted={textMuted()} />)}
+                  </div>
+                );
+              }
+              // Legacy fallback
+              return (
+                <div style={{ "text-align": "center", display: "flex", "flex-direction": "column", "align-items": "center", gap: "12px" }}>
+                  <h1 style={{
+                    "font-family": `'${displayFont()}', sans-serif`,
+                    "font-size": "clamp(32px, 5vw, 56px)",
+                    "font-weight": "800", "letter-spacing": "-1.5px",
+                    color: textColor(), "line-height": "1.1", margin: "0",
+                  }}>
+                    {wf?.title || props.form.title}
+                  </h1>
+                  <Show when={!!wf?.description}>
+                    <p style={{ "font-size": "15px", color: textMuted(), "line-height": "1.7", "max-width": "480px", margin: "0" }}>
+                      {wf!.description}
+                    </p>
+                  </Show>
+                </div>
+              );
+            })()}
           </div>
 
           <button

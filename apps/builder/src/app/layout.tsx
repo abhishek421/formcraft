@@ -59,10 +59,10 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: `
           (function(){
             var el = document.documentElement;
-            var t  = localStorage.getItem('fc-theme')   || 'lavender';
+            var t  = localStorage.getItem('fc-theme')   || 'linen';
             var m  = localStorage.getItem('fc-mode')    || 'dark';
-            var r  = localStorage.getItem('fc-radius')  || '';
-            var d  = localStorage.getItem('fc-density') || '';
+            var r  = localStorage.getItem('fc-radius')  || 'subtle';
+            var d  = localStorage.getItem('fc-density') || 'compact';
             var mo = localStorage.getItem('fc-motion');
             el.setAttribute('data-theme',   t + '-' + m);
             if (r && r !== 'sharp')   el.setAttribute('data-radius',  r);

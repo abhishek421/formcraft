@@ -54,10 +54,10 @@ type ThemeCtx = DesignSettings & {
 const defaults: DesignSettings = {
   theme:       "linen",
   mode:        "dark",
-  radius:      "sharp",
-  density:     "default",
-  displayFont: "'Syne', sans-serif",
-  bodyFont:    "'DM Mono', monospace",
+  radius:      "subtle",
+  density:     "compact",
+  displayFont: "'Space Grotesk', sans-serif",
+  bodyFont:    "'Instrument Sans', sans-serif",
   motion:      true,
 };
 

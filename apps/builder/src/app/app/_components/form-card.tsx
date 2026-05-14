@@ -40,7 +40,7 @@ export function FormCard({ form }: { form: Form }) {
         />
       )}
 
-      <Link href={`/app/forms//builder`} style={{ textDecoration: "none" }}>
+      <Link href={`/app/forms/${form.id}/builder`} style={{ textDecoration: "none" }}>
         <div
           style={{
             background: "var(--surface-3)",

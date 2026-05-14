@@ -1,12 +1,14 @@
+"use server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { AppSidebar } from "@/components/app-sidebar";
+import { AddVariantButton } from "./_components/add-variant-button";
 
 type Variant = {
   id: string;
   variant_label: string;
   title: string;
+  type: string;
   traffic_weight: number;
   is_active: boolean;
 };
@@ -54,7 +56,7 @@ async function getExperimentsData(formId: string) {
   const [{ data: allVariants }, { data: allRuns }] = await Promise.all([
     supabase
       .from("question_variants")
-      .select("id, group_id, variant_label, title, traffic_weight, is_active")
+      .select("id, group_id, variant_label, title, type, traffic_weight, is_active")
       .in("group_id", groupIds)
       .order("created_at", { ascending: true }),
     supabase
@@ -158,8 +160,27 @@ export default async function ExperimentsPage({
       background: "var(--bg)", color: "var(--text)",
       fontFamily: "var(--font-body)",
     }}>
-      <AppSidebar email={email} defaultCollapsed={true} />
-
+      <style>{`
+        .cf-tip { position: relative; display: inline-flex; align-items: center; }
+        .cf-tip-box {
+          display: none;
+          position: absolute; bottom: calc(100% + 8px); left: 50%;
+          transform: translateX(-50%);
+          background: var(--surface-4, #1e1e2e);
+          border: 1px solid var(--border-mid);
+          color: var(--text-muted);
+          font-size: 11px; line-height: 1.5;
+          padding: 7px 10px;
+          border-radius: 6px;
+          white-space: nowrap;
+          z-index: 999;
+          pointer-events: none;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+          font-family: var(--font-body);
+          font-weight: 300;
+        }
+        .cf-tip:hover .cf-tip-box { display: block; }
+      `}</style>
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
         {/* Top bar */}
         <div style={{
@@ -221,7 +242,7 @@ export default async function ExperimentsPage({
               </div>
             </div>
 
-            {groups.length === 0 ? (
+{groups.length === 0 ? (
               <div style={{
                 display: "flex", flexDirection: "column", alignItems: "center",
                 justifyContent: "center", gap: "16px",
@@ -282,11 +303,20 @@ export default async function ExperimentsPage({
                             {group.label}
                           </div>
                         </div>
-                        {group.last_optimized_at && (
-                          <div style={{ fontSize: "11px", color: "var(--text-faint)", fontFamily: "var(--font-body)" }}>
-                            Last optimized: {formatDate(group.last_optimized_at)}
-                          </div>
-                        )}
+                        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                          {group.last_optimized_at && (
+                            <div style={{ fontSize: "11px", color: "var(--text-faint)", fontFamily: "var(--font-body)" }}>
+                              Last optimized: {formatDate(group.last_optimized_at)}
+                            </div>
+                          )}
+                          <AddVariantButton
+                            formId={id}
+                            groupId={group.id}
+                            existingLabels={group.variants.map(v => v.variant_label)}
+                            baseType={group.variants[0]?.type ?? "short_text"}
+                            baseTitle={group.variants[0]?.title ?? ""}
+                          />
+                        </div>
                       </div>
 
                       {/* Variants table */}
@@ -297,14 +327,27 @@ export default async function ExperimentsPage({
                         }}>
                           <thead>
                             <tr style={{ background: "var(--surface-2)" }}>
-                              {["Variant", "Impressions", "Answer Rate", "Avg Time", "Traffic Share", "Status"].map((h) => (
-                                <th key={h} style={{
+                              {[
+                                { label: "Variant", tip: null },
+                                { label: "Impressions", tip: "Times this variant was shown to a unique session" },
+                                { label: "Answer Rate", tip: "Sessions that answered vs. total shown" },
+                                { label: "Avg Time", tip: "Average time spent on this question" },
+                                { label: "Traffic Share", tip: "Current % of new sessions routed to this variant" },
+                                { label: "Status", tip: "Optimizer needs 100+ impressions before rebalancing" },
+                              ].map(({ label, tip }) => (
+                                <th key={label} style={{
                                   padding: "10px 16px", textAlign: "left",
                                   fontSize: "10px", letterSpacing: "1.5px",
                                   textTransform: "uppercase", color: "var(--text-dim)",
                                   fontWeight: 400, borderBottom: "1px solid var(--border)",
                                 }}>
-                                  {h}
+                                  {tip ? (
+                                    <span className="cf-tip" style={{ gap: "4px" }}>
+                                      {label}
+                                      <span style={{ opacity: 0.4, fontSize: "9px", cursor: "default" }}>?</span>
+                                      <span className="cf-tip-box">{tip}</span>
+                                    </span>
+                                  ) : label}
                                 </th>
                               ))}
                             </tr>
@@ -377,14 +420,23 @@ export default async function ExperimentsPage({
                                     </div>
                                   </td>
                                   <td style={{ padding: "14px 16px" }}>
-                                    <div style={{
-                                      display: "inline-flex", padding: "3px 8px",
-                                      background: status.bg, border: `1px solid ${status.border}`,
-                                      borderRadius: "var(--radius-full)",
-                                      fontSize: "10px", color: status.color,
-                                      fontFamily: "var(--font-body)", letterSpacing: "0.3px",
-                                    }}>
-                                      {status.label}
+                                    <div className="cf-tip">
+                                      <div style={{
+                                        display: "inline-flex", padding: "3px 8px",
+                                        background: status.bg, border: `1px solid ${status.border}`,
+                                        borderRadius: "var(--radius-full)",
+                                        fontSize: "10px", color: status.color,
+                                        fontFamily: "var(--font-body)", letterSpacing: "0.3px",
+                                        cursor: "default",
+                                      }}>
+                                        {status.label}
+                                      </div>
+                                      {v.impressions < 100 && (
+                                        <div className="cf-tip-box">
+                                          Needs 100 impressions before the optimizer<br />
+                                          can rebalance traffic. Currently at {v.impressions}.
+                                        </div>
+                                      )}
                                     </div>
                                   </td>
                                 </tr>

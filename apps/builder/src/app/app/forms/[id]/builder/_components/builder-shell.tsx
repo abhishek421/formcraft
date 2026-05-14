@@ -3,7 +3,6 @@
 import { useState, useCallback, useTransition, useRef, useEffect } from "react";
 import Link from "next/link";
 import { VariantPanel } from "./variant-editor";
-import { AppSidebar } from "@/components/app-sidebar";
 import {
   DndContext,
   closestCenter,
@@ -30,7 +29,8 @@ import {
   togglePublish,
   updateFormTheme,
 } from "../actions";
-import { listVariants, createVariant, patchVariant } from "../variant-actions";
+import { listVariants, createVariant, patchVariant, removeVariant } from "../variant-actions";
+import { WelcomeScreenEditor } from "./welcome-screen-editor";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -139,7 +139,7 @@ function useDebounce<T extends unknown[]>(fn: (...args: T) => void, delay: numbe
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export function BuilderShell({ form, initialFields, email }: { form: Form; initialFields: Field[]; email: string }) {
+export function BuilderShell({ form, initialFields }: { form: Form; initialFields: Field[] }) {
   const [fields, setFields] = useState<Field[]>(initialFields);
   const [selectedId, setSelectedId] = useState<string | null>(initialFields[0]?.id ?? null);
   const [formTitle, setFormTitle] = useState(form.title);
@@ -245,6 +245,17 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
     saveVariant(activeVariantId, field.question_group_id, updates as Partial<Variant>);
   }, [activeVariantId, fields, selectedId, saveVariant]);
 
+  const handleDeleteVariantTab = async (variantId: string) => {
+    const field = fields.find((f) => f.id === selectedId);
+    if (!field?.question_group_id) return;
+    await removeVariant(form.id, field.question_group_id, variantId);
+    const fresh = await listVariants(form.id, field.question_group_id);
+    setVariants(fresh);
+    if (activeVariantId === variantId) {
+      setActiveVariantId(fresh[0]?.id ?? null);
+    }
+  };
+
   const handleAddVariantTab = async () => {
     const field = fields.find((f) => f.id === selectedId);
     if (!field?.question_group_id) return;
@@ -321,8 +332,6 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
       `}</style>
 
       <div suppressHydrationWarning style={{ display: "flex", height: "100vh", background: "var(--bg)", color: "var(--text)", fontFamily: "var(--font-body)" }}>
-        <AppSidebar email={email} defaultCollapsed={true} />
-
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
 
         {/* ── Top bar ── */}
@@ -514,7 +523,7 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
                     </div>
                   ) : (
                     <>
-                      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                      <DndContext id="builder-dnd" sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                         <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
                           {fields.map((field, idx) => (
                             <SortableFieldRow
@@ -596,28 +605,51 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
                     {variants.map((v) => {
                       const active = v.id === activeVariantId;
                       return (
-                        <button
+                        <div
                           key={v.id}
-                          onClick={() => setActiveVariantId(v.id)}
-                          style={{
-                            padding: "7px 18px",
-                            background: active ? `rgba(${isLight ? "0,0,0" : "240,237,232"},0.07)` : "transparent",
-                            border: `1px solid ${active ? `rgba(${isLight ? "0,0,0" : "240,237,232"},0.15)` : "transparent"}`,
-                            borderBottom: active ? `2px solid ${primary}` : "2px solid transparent",
-                            borderRadius: "4px 4px 0 0",
-                            color: active ? textColor : textMuted,
-                            fontFamily: `'${bFont}', monospace`,
-                            fontSize: "11px", letterSpacing: "1px",
-                            cursor: "pointer",
-                            transition: "all 0.12s",
-                            marginBottom: "-1px",
-                          }}
+                          className="variant-tab"
+                          style={{ position: "relative", display: "inline-flex", alignItems: "center", marginBottom: "-1px" }}
                         >
-                          {v.variant_label}
-                          {!v.is_active && (
-                            <span style={{ marginLeft: "6px", fontSize: "9px", opacity: 0.4 }}>off</span>
+                          <button
+                            onClick={() => setActiveVariantId(v.id)}
+                            style={{
+                              padding: "7px 28px 7px 18px",
+                              background: active ? `rgba(${isLight ? "0,0,0" : "240,237,232"},0.07)` : "transparent",
+                              border: `1px solid ${active ? `rgba(${isLight ? "0,0,0" : "240,237,232"},0.15)` : "transparent"}`,
+                              borderBottom: active ? `2px solid ${primary}` : "2px solid transparent",
+                              borderRadius: "4px 4px 0 0",
+                              color: active ? textColor : textMuted,
+                              fontFamily: `'${bFont}', monospace`,
+                              fontSize: "11px", letterSpacing: "1px",
+                              cursor: "pointer",
+                              transition: "all 0.12s",
+                            }}
+                          >
+                            {v.variant_label}
+                            {!v.is_active && (
+                              <span style={{ marginLeft: "6px", fontSize: "9px", opacity: 0.4 }}>off</span>
+                            )}
+                          </button>
+                          {variants.length > 1 && (
+                            <button
+                              className="variant-close"
+                              onClick={(e) => { e.stopPropagation(); handleDeleteVariantTab(v.id); }}
+                              title="Remove variant"
+                              style={{
+                                position: "absolute", right: "5px",
+                                background: "transparent", border: "none",
+                                color: textMuted, cursor: "pointer",
+                                fontSize: "14px", lineHeight: 1,
+                                padding: "0 2px",
+                                transition: "color 0.12s",
+                              }}
+                              onMouseEnter={(e) => { e.currentTarget.style.color = "#ff5555"; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.color = textMuted; }}
+                            >
+                              ×
+                            </button>
                           )}
-                        </button>
+                        </div>
                       );
                     })}
                     {!loadingVariants && (
@@ -643,7 +675,13 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
                 )}
 
                 <div style={{ flex: 1, overflowY: "auto", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "48px 32px" }}>
-                  {displayField ? (
+                  {displayField?.type === "welcome_screen" ? (
+                    <WelcomeScreenEditor
+                      field={displayField}
+                      onChange={handleChange}
+                      theme={{ bg, primary, dFont, bFont, bRadius, textColor, textMuted }}
+                    />
+                  ) : displayField ? (
                     <FieldEditor
                       field={displayField}
                       onChange={handleChange}
@@ -667,7 +705,7 @@ export function BuilderShell({ form, initialFields, email }: { form: Form; initi
           {/* ── Right: Settings ── */}
           {selectedField && (
             <div style={{
-              width: "240px", flexShrink: 0,
+              width: "300px", flexShrink: 0,
               borderLeft: "1px solid var(--border)",
               background: "var(--surface)", overflowY: "auto",
               padding: "20px 16px",

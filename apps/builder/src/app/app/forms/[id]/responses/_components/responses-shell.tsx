@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect, useTransition } from "react";
 import Link from "next/link";
-import { AppSidebar } from "@/components/app-sidebar";
 import { deleteResponse } from "../actions";
 
 type Field = { id: string; type: string; title: string; variable?: string; position: number };
@@ -195,8 +194,6 @@ export function ResponsesShell({
         background: "var(--bg)", color: "var(--text)",
         fontFamily: "var(--font-body)", overflow: "hidden",
       }}>
-        <AppSidebar email={email} defaultCollapsed={true} />
-
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
 
         {/* Top bar */}

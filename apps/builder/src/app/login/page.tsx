@@ -1,4 +1,3 @@
-import { SettingsPanel } from "@/components/settings-panel";
 import { AuthCard } from "./AuthCard";
 
 export default async function LoginPage({
@@ -256,8 +255,6 @@ export default async function LoginPage({
       <div className="orb orb-2" />
       <div className="orb orb-3" />
       <div className="noise" />
-
-      <SettingsPanel />
 
       <div className="page">
         {/* Left — marketing */}
