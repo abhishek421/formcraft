@@ -22,7 +22,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       form_id: id,
       device_type: body.device_type ?? null,
       referrer: body.referrer ?? null,
-      metadata: body.metadata ?? null,
+      metadata: body.metadata ?? {},
     })
     .select("id")
     .single();

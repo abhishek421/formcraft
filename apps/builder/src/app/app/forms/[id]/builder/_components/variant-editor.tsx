@@ -52,12 +52,14 @@ export function VariantPanel({
   onFieldUpdated,
   variants,
   setVariants,
+  onRequestAddVariant,
 }: {
   field: Field;
   formId: string;
   onFieldUpdated: (groupId: string | null, variants?: Variant[]) => void;
   variants: Variant[];
   setVariants: (v: Variant[]) => void;
+  onRequestAddVariant?: () => void;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -288,7 +290,7 @@ export function VariantPanel({
 
           {variants.length < 6 && (
             <button
-              onClick={addVariant}
+              onClick={onRequestAddVariant ?? addVariant}
               disabled={loading}
               style={{
                 padding: "7px", background: "transparent",

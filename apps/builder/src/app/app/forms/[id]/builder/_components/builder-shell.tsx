@@ -26,7 +26,8 @@ import {
   deleteField,
   reorderFields,
   updateFormTitle,
-  togglePublish,
+  publishForm,
+  unpublishForm,
   updateFormTheme,
 } from "../actions";
 import { listVariants, createVariant, patchVariant, removeVariant } from "../variant-actions";
@@ -52,6 +53,7 @@ type Form = {
   id: string;
   title: string;
   published: boolean;
+  has_unpublished_changes: boolean;
   settings: Record<string, unknown>;
   theme: Record<string, unknown>;
 };
@@ -144,6 +146,7 @@ export function BuilderShell({ form, initialFields }: { form: Form; initialField
   const [selectedId, setSelectedId] = useState<string | null>(initialFields[0]?.id ?? null);
   const [formTitle, setFormTitle] = useState(form.title);
   const [published, setPublished] = useState(form.published);
+  const [hasUnpublishedChanges, setHasUnpublishedChanges] = useState(form.has_unpublished_changes);
   const [showWidgetPicker, setShowWidgetPicker] = useState(false);
   const [copied, setCopied] = useState(false);
   const [leftTab, setLeftTab] = useState<"questions" | "style">("questions");
@@ -154,6 +157,7 @@ export function BuilderShell({ form, initialFields }: { form: Form; initialField
   const [variants, setVariants] = useState<Variant[]>([]);
   const [activeVariantId, setActiveVariantId] = useState<string | null>(null);
   const [loadingVariants, setLoadingVariants] = useState(false);
+  const [showAddVariantModal, setShowAddVariantModal] = useState(false);
 
   const rendererBase = process.env.NEXT_PUBLIC_RENDERER_URL ?? "http://localhost:3001";
   const shareUrl = `${rendererBase}/f/${form.id}`;
@@ -190,7 +194,8 @@ export function BuilderShell({ form, initialFields }: { form: Form; initialField
     const { id: _id, form_id: _fid, created_at: _ca, ...safe } = updates as Record<string, unknown>;
     void _id; void _fid; void _ca;
     saveField(id, safe);
-  }, [saveField]);
+    if (published) setHasUnpublishedChanges(true);
+  }, [saveField, published]);
 
   useEffect(() => {
     const dFont = (formTheme.display_font as string) ?? "Syne";
@@ -216,7 +221,8 @@ export function BuilderShell({ form, initialFields }: { form: Form; initialField
       saveTheme(next);
       return next;
     });
-  }, [saveTheme]);
+    if (published) setHasUnpublishedChanges(true);
+  }, [saveTheme, published]);
 
   // Load variants when selected field changes
   useEffect(() => {
@@ -243,7 +249,8 @@ export function BuilderShell({ form, initialFields }: { form: Form; initialField
     if (!field?.question_group_id) return;
     setVariants((prev) => prev.map((v) => v.id === activeVariantId ? { ...v, ...updates } : v));
     saveVariant(activeVariantId, field.question_group_id, updates as Partial<Variant>);
-  }, [activeVariantId, fields, selectedId, saveVariant]);
+    if (published) setHasUnpublishedChanges(true);
+  }, [activeVariantId, fields, selectedId, saveVariant, published]);
 
   const handleDeleteVariantTab = async (variantId: string) => {
     const field = fields.find((f) => f.id === selectedId);
@@ -256,18 +263,22 @@ export function BuilderShell({ form, initialFields }: { form: Form; initialField
     }
   };
 
-  const handleAddVariantTab = async () => {
+  const handleAddVariantTab = async (mode: "empty" | "duplicate") => {
     const field = fields.find((f) => f.id === selectedId);
     if (!field?.question_group_id) return;
     const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const used = new Set(variants.map((v) => v.variant_label));
     const nextLabel = letters.split("").find((l) => !used.has(l)) ?? "Z";
+    const source = mode === "duplicate"
+      ? (variants.find((v) => v.id === activeVariantId) ?? variants[0])
+      : null;
     const created = await createVariant(form.id, field.question_group_id, {
       variant_label: nextLabel,
-      title: "",
-      type: field.type,
-      config: {},
-      logic: [],
+      title: source?.title ?? "",
+      type: source?.type ?? field.type,
+      description: source?.description,
+      config: source?.config ?? {},
+      logic: (source?.logic ?? []) as unknown[],
     });
     if (created) {
       const fresh = await listVariants(form.id, field.question_group_id);
@@ -283,6 +294,7 @@ export function BuilderShell({ form, initialFields }: { form: Form; initialField
     const newField = await addField(form.id, type, position);
     setFields((prev) => [...prev, newField]);
     setSelectedId(newField.id);
+    if (published) setHasUnpublishedChanges(true);
   };
 
   // Delete field
@@ -291,6 +303,7 @@ export function BuilderShell({ form, initialFields }: { form: Form; initialField
     startTransition(() => { deleteField(id); });
     setFields((prev) => prev.filter((f) => f.id !== id));
     setSelectedId(fields[idx - 1]?.id ?? fields[idx + 1]?.id ?? null);
+    if (published) setHasUnpublishedChanges(true);
   };
 
   // Drag end
@@ -306,13 +319,19 @@ export function BuilderShell({ form, initialFields }: { form: Form; initialField
       });
       return reordered;
     });
+    if (published) setHasUnpublishedChanges(true);
   };
 
-  // Publish toggle
   const handlePublish = () => {
-    const next = !published;
-    setPublished(next);
-    startTransition(() => { togglePublish(form.id, next); });
+    setPublished(true);
+    setHasUnpublishedChanges(false);
+    startTransition(() => { publishForm(form.id); });
+  };
+
+  const handleUnpublish = () => {
+    setPublished(false);
+    setHasUnpublishedChanges(false);
+    startTransition(() => { unpublishForm(form.id); });
   };
 
   return (
@@ -354,6 +373,7 @@ export function BuilderShell({ form, initialFields }: { form: Form; initialField
             onChange={(e) => {
               setFormTitle(e.target.value);
               saveTitle(e.target.value);
+              if (published) setHasUnpublishedChanges(true);
             }}
             style={{
               background: "transparent", border: "none",
@@ -438,22 +458,62 @@ export function BuilderShell({ form, initialFields }: { form: Form; initialField
               Open Form ↗
             </a>
 
-            <button
-              onClick={handlePublish}
-              style={{
-                padding: "7px 16px",
-                background: published ? "var(--accent-dim)" : "var(--accent)",
-                border: `1px solid ${published ? "var(--accent-border)" : "var(--accent)"}`,
-                borderRadius: "var(--radius-sm)",
-                color: published ? "var(--accent)" : "var(--accent-text)",
-                fontFamily: "var(--font-body)",
-                fontSize: "11px", cursor: "pointer",
-                letterSpacing: "1px", textTransform: "uppercase",
-                transition: "all var(--duration) var(--ease)",
-              }}
-            >
-              {published ? "● Live" : "Publish"}
-            </button>
+            {published && !hasUnpublishedChanges ? (
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <span style={{
+                  padding: "7px 14px",
+                  background: "var(--accent-dim)",
+                  border: "1px solid var(--accent-border)",
+                  borderRadius: "var(--radius-sm)",
+                  color: "var(--accent)",
+                  fontFamily: "var(--font-body)",
+                  fontSize: "11px",
+                  letterSpacing: "1px", textTransform: "uppercase",
+                }}>● Live</span>
+                <button
+                  onClick={handleUnpublish}
+                  title="Unpublish form"
+                  style={{
+                    padding: "7px 10px",
+                    background: "transparent",
+                    border: "1px solid var(--border)",
+                    borderRadius: "var(--radius-sm)",
+                    color: "var(--text-dim)",
+                    fontFamily: "var(--font-body)",
+                    fontSize: "11px", cursor: "pointer",
+                    letterSpacing: "1px", textTransform: "uppercase",
+                    transition: "all var(--duration) var(--ease)",
+                  }}
+                >Unpublish</button>
+              </div>
+            ) : (
+              <button
+                onClick={handlePublish}
+                style={{
+                  padding: "7px 16px",
+                  background: published && hasUnpublishedChanges ? "var(--accent)" : "var(--accent)",
+                  border: "1px solid var(--accent)",
+                  borderRadius: "var(--radius-sm)",
+                  color: "var(--accent-text)",
+                  fontFamily: "var(--font-body)",
+                  fontSize: "11px", cursor: "pointer",
+                  letterSpacing: "1px", textTransform: "uppercase",
+                  transition: "all var(--duration) var(--ease)",
+                  display: "flex", alignItems: "center", gap: "6px",
+                }}
+              >
+                {published && hasUnpublishedChanges && (
+                  <span style={{
+                    width: "6px", height: "6px",
+                    borderRadius: "50%",
+                    background: "var(--accent-text)",
+                    display: "inline-block",
+                    opacity: 0.7,
+                  }} />
+                )}
+                {published && hasUnpublishedChanges ? "Publish changes" : "Publish"}
+              </button>
+            )}
           </div>
         </div>
 
@@ -654,7 +714,7 @@ export function BuilderShell({ form, initialFields }: { form: Form; initialField
                     })}
                     {!loadingVariants && (
                       <button
-                        onClick={handleAddVariantTab}
+                        onClick={() => setShowAddVariantModal(true)}
                         title="Add variant"
                         style={{
                           padding: "7px 12px", marginBottom: "-1px",
@@ -725,12 +785,24 @@ export function BuilderShell({ form, initialFields }: { form: Form; initialField
                 }}
                 variants={variants}
                 setVariants={setVariants}
+                onRequestAddVariant={() => setShowAddVariantModal(true)}
               />
             </div>
           )}
         </div>
         </div>{/* end inner flex column */}
       </div>
+
+      {/* ── Add variant modal ── */}
+      {showAddVariantModal && (
+        <AddVariantModal
+          onSelect={async (mode) => {
+            setShowAddVariantModal(false);
+            await handleAddVariantTab(mode);
+          }}
+          onClose={() => setShowAddVariantModal(false)}
+        />
+      )}
 
       {/* ── Widget picker modal ── */}
       {showWidgetPicker && (
@@ -1124,7 +1196,7 @@ function FieldTypePreview({ field, onChange, theme: t }: { field: Field; onChang
 
 // ─── Field settings (right panel) ────────────────────────────────────────────
 
-function FieldSettings({ field, allFields, formId, onChange, onFieldUpdated, variants, setVariants }: { field: Field; allFields: Field[]; formId: string; onChange: (u: Partial<Field>) => void; onFieldUpdated: (groupId: string | null, variants?: Variant[]) => void; variants: Variant[]; setVariants: (v: Variant[]) => void }) {
+function FieldSettings({ field, allFields, formId, onChange, onFieldUpdated, variants, setVariants, onRequestAddVariant }: { field: Field; allFields: Field[]; formId: string; onChange: (u: Partial<Field>) => void; onFieldUpdated: (groupId: string | null, variants?: Variant[]) => void; variants: Variant[]; setVariants: (v: Variant[]) => void; onRequestAddVariant: () => void }) {
   return (
     <>
       <div>
@@ -1232,7 +1304,7 @@ function FieldSettings({ field, allFields, formId, onChange, onFieldUpdated, var
       )}
 
       {/* Experiments */}
-      <VariantPanel field={field} formId={formId} onFieldUpdated={onFieldUpdated} variants={variants} setVariants={setVariants} />
+      <VariantPanel field={field} formId={formId} onFieldUpdated={onFieldUpdated} variants={variants} setVariants={setVariants} onRequestAddVariant={onRequestAddVariant} />
     </>
   );
 }
@@ -1457,6 +1529,87 @@ function LogicEditor({
       >
         + Add rule
       </button>
+    </div>
+  );
+}
+
+// ─── Add variant modal ────────────────────────────────────────────────────────
+
+function AddVariantModal({ onSelect, onClose }: {
+  onSelect: (mode: "empty" | "duplicate") => void;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      style={{
+        position: "fixed", inset: 0, zIndex: 50,
+        background: "rgba(8,8,8,0.85)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        backdropFilter: "blur(4px)",
+      }}
+      onClick={onClose}
+    >
+      <div
+        style={{
+          background: "var(--surface-3)", border: "1px solid var(--border-mid)",
+          borderRadius: "var(--radius-md)",
+          padding: "var(--space-6)", width: "360px",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--space-5)" }}>
+          <div style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 700, letterSpacing: "-0.3px" }}>
+            Add Variant
+          </div>
+          <button onClick={onClose} style={{ background: "transparent", border: "none", color: "var(--text-dim)", cursor: "pointer", fontSize: "20px" }}>×</button>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          <button
+            onClick={() => onSelect("empty")}
+            style={{
+              background: "var(--surface)", border: "1px solid var(--border)",
+              borderRadius: "var(--radius-sm)", padding: "14px 16px",
+              cursor: "pointer", textAlign: "left",
+              display: "flex", flexDirection: "column", gap: "4px",
+              transition: "all var(--duration) var(--ease)",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent-border)";
+              (e.currentTarget as HTMLButtonElement).style.background = "var(--accent-dim)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)";
+              (e.currentTarget as HTMLButtonElement).style.background = "var(--surface)";
+            }}
+          >
+            <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--text)", fontFamily: "var(--font-display)" }}>Empty variant</span>
+            <span style={{ fontSize: "11px", color: "var(--text-dim)", fontFamily: "var(--font-body)", fontWeight: 300 }}>Start from scratch with a blank question</span>
+          </button>
+
+          <button
+            onClick={() => onSelect("duplicate")}
+            style={{
+              background: "var(--surface)", border: "1px solid var(--border)",
+              borderRadius: "var(--radius-sm)", padding: "14px 16px",
+              cursor: "pointer", textAlign: "left",
+              display: "flex", flexDirection: "column", gap: "4px",
+              transition: "all var(--duration) var(--ease)",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent-border)";
+              (e.currentTarget as HTMLButtonElement).style.background = "var(--accent-dim)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)";
+              (e.currentTarget as HTMLButtonElement).style.background = "var(--surface)";
+            }}
+          >
+            <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--text)", fontFamily: "var(--font-display)" }}>Duplicate current</span>
+            <span style={{ fontSize: "11px", color: "var(--text-dim)", fontFamily: "var(--font-body)", fontWeight: 300 }}>Copy the active variant's content and config</span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

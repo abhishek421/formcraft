@@ -187,7 +187,7 @@ export function WelcomeScreenEditor({
       </div>
 
       {/* Start button preview */}
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "10px", marginTop: "32px" }}>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px", marginTop: "32px" }}>
         <div style={{
           background: t.primary, color: t.bg,
           padding: "14px 40px", fontFamily: `'${t.dFont}', sans-serif`,

@@ -15,9 +15,9 @@ function detectDevice(): "mobile" | "tablet" | "desktop" {
 
 async function loadForm(id: string): Promise<{ form: Form; fields: Field[] } | null> {
   const [formRes, fieldsRes] = await Promise.all([
-    supabase.from("forms").select("id, title, settings, theme").eq("id", id).single(),
+    supabase.from("forms").select("id, published_snapshot").eq("id", id).eq("published", true).single(),
     supabase
-      .from("fields")
+      .from("published_fields")
       .select("id, type, title, description, required, position, variable, config, logic, question_group_id")
       .eq("form_id", id)
       .order("position"),
@@ -25,8 +25,21 @@ async function loadForm(id: string): Promise<{ form: Form; fields: Field[] } | n
 
   if (formRes.error || !formRes.data) return null;
 
+  const snapshot = formRes.data.published_snapshot as Record<string, unknown> | null;
+
+  const form: Form = {
+    id: formRes.data.id as string,
+    title: (snapshot?.title as string) ?? "",
+    settings: (snapshot?.settings as Record<string, unknown>) ?? {},
+    theme: (snapshot?.theme as Form["theme"]) ?? {
+      primary_color: "#000000",
+      background_color: "#ffffff",
+      font: "Inter",
+    },
+  };
+
   return {
-    form: formRes.data as Form,
+    form,
     fields: (fieldsRes.data ?? []) as Field[],
   };
 }

@@ -104,6 +104,14 @@ export async function patchVariant(
     .eq("id", variantId)
     .eq("question_group_id", groupId);
 
+  if (!error) {
+    await supabase
+      .from("forms")
+      .update({ has_unpublished_changes: true })
+      .eq("id", formId)
+      .eq("published", true);
+  }
+
   return !error;
 }
 
