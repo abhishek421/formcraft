@@ -233,6 +233,8 @@ export function PublicNav() {
         @media (max-width: 768px) {
           .cf-nav-desktop { display: none !important; }
           .cf-mobile-toggle { display: flex !important; }
+          .cf-nav-cta { display: none !important; }
+          .cf-nav-inner { padding: 0 20px !important; }
         }
         @media (min-width: 769px) {
           .cf-mobile-toggle { display: none !important; }
@@ -254,7 +256,7 @@ export function PublicNav() {
           borderBottom: `1px solid ${BORDER}`,
         }}
       >
-        <div style={{
+        <div className="cf-nav-inner" style={{
           maxWidth: 1280,
           margin: "0 auto",
           padding: "0 52px",
@@ -323,6 +325,7 @@ export function PublicNav() {
           <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
             <Link
               href="/login"
+              className="cf-nav-cta"
               style={{
                 fontFamily: "'DM Mono', monospace",
                 fontSize: 11,
@@ -338,7 +341,7 @@ export function PublicNav() {
             >
               Log in
             </Link>
-            <Link href="/login" style={{
+            <Link href="/login" className="cf-nav-cta" style={{
               fontFamily: "'DM Mono', monospace",
               background: ACCENT,
               color: "#fff",
