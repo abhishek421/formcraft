@@ -903,15 +903,11 @@ function FieldInput(props: {
                 <Show when={t() === "opinion_scale"} fallback={
                   <Show when={t() === "multiple_choice" || t() === "dropdown"} fallback={
                     <Show when={t() === "file_upload"} fallback={null}>
-                      {/* File upload */}
-                      <div style={{
-                        border: `2px dashed rgba(${props.textRgb},0.1)`,
-                        padding: "48px", "text-align": "center",
-                        color: `rgba(${props.textRgb},0.3)`,
-                        "font-size": "14px", cursor: "pointer",
-                      }}>
-                        ↑ Click or drag a file here
-                      </div>
+                      <FileUploadInput
+                        value={props.value as string | undefined}
+                        onChange={props.onChange}
+                        textRgb={props.textRgb}
+                      />
                     </Show>
                   }>
                     {/* Multiple choice / dropdown */}
@@ -1003,6 +999,73 @@ function FieldInput(props: {
         style={baseInput}
       />
     </Show>
+  );
+}
+
+const UPLOAD_API = `${import.meta.env.VITE_BUILDER_URL}/api/v1/upload`;
+
+function FileUploadInput(props: {
+  value: string | undefined;
+  onChange: (v: unknown) => void;
+  textRgb: string;
+}) {
+  const [uploading, setUploading] = createSignal(false);
+  const [error, setError] = createSignal<string | null>(null);
+
+  async function handleFile(file: File) {
+    setUploading(true);
+    setError(null);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch(UPLOAD_API, { method: "POST", body: fd });
+      const json = await res.json();
+      if (!res.ok) { setError(json.error ?? "Upload failed"); return; }
+      props.onChange(json.url);
+    } catch {
+      setError("Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <div>
+      <label
+        style={{ display: "block", cursor: uploading() ? "wait" : "pointer" }}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => {
+          e.preventDefault();
+          const file = e.dataTransfer?.files[0];
+          if (file) handleFile(file);
+        }}
+      >
+        <input
+          type="file"
+          style={{ display: "none" }}
+          disabled={uploading()}
+          onChange={(e) => {
+            const file = e.currentTarget.files?.[0];
+            if (file) handleFile(file);
+          }}
+        />
+        <div style={{
+          border: `2px dashed rgba(${props.textRgb},${props.value ? "0.4" : "0.1"})`,
+          padding: "48px", "text-align": "center",
+          color: `rgba(${props.textRgb},0.4)`,
+          "font-size": "14px", transition: "border-color 0.15s",
+        }}>
+          {uploading()
+            ? "Uploading…"
+            : props.value
+              ? `✓ File uploaded`
+              : "↑ Click or drag a file here (max 5 MB)"}
+        </div>
+      </label>
+      <Show when={!!error()}>
+        <div style={{ color: "#f87171", "font-size": "12px", "margin-top": "8px" }}>{error()}</div>
+      </Show>
+    </div>
   );
 }
 

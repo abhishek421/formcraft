@@ -92,6 +92,7 @@ export async function addField(formId: string, type: string, position: number) {
   const supabase = await createClient();
 
   const defaults: Record<string, object> = {
+    welcome_screen: { blocks: [{ id: crypto.randomUUID(), type: "heading", content: "" }] },
     multiple_choice: { choices: [{ id: crypto.randomUUID(), label: "Option 1" }, { id: crypto.randomUUID(), label: "Option 2" }], allow_multiple: false },
     rating: { steps: 5 },
     opinion_scale: { steps: 10 },

@@ -132,7 +132,7 @@ export function ResponsesShell({
   }, [menuCol]);
 
   const visibleBuiltin = (["submitted", "time"] as const).filter((c) => !hiddenCols.has(c));
-  const visibleFields = questionFields.filter((f) => !hiddenCols.has(f.id));
+  const previewFields = questionFields.slice(0, 3);
   const anyHidden = hiddenCols.size > 0;
 
   function ColHeader({ col, label }: { col: string; label: string }) {
@@ -307,7 +307,7 @@ export function ResponsesShell({
                     <th style={{ ...thStyle, position: "sticky", top: 0, zIndex: 2 }}>#</th>
                     {!hiddenCols.has("submitted") && <ColHeader col="submitted" label="Submitted" />}
                     {!hiddenCols.has("time") && <ColHeader col="time" label="Time" />}
-                    {visibleFields.map((f) => (
+                    {previewFields.map((f) => (
                       <ColHeader key={f.id} col={f.id} label={f.title || "Untitled"} />
                     ))}
                   </tr>
@@ -339,7 +339,7 @@ export function ResponsesShell({
                             {formatTime(completionMs(r))}
                           </td>
                         )}
-                        {visibleFields.map((f) => (
+                        {previewFields.map((f) => (
                           <td key={f.id} style={{ ...tdStyle, maxWidth: "200px" }}>
                             <div style={{
                               overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "180px",
