@@ -101,6 +101,11 @@ export function Hero() {
             <div className="lp-hero-foot" style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.14em", color: DIM }}>
               NO CODE · NO ANALYST · NO GUESSWORK
             </div>
+            <div className="lp-hero-foot" style={{ marginTop: 16 }}>
+              <a href="https://peerpush.com/p/cleverforms" target="_blank" rel="noopener" style={{ width: 230, display: "inline-block" }}>
+                <img src="https://peerpush.com/p/cleverforms/badge.png" alt="CleverForms badge" style={{ width: 230 }} />
+              </a>
+            </div>
           </div>
         </div>
       </div>
